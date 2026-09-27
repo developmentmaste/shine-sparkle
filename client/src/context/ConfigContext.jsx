@@ -71,12 +71,56 @@ export function ConfigProvider({ children }) {
     }
   }, [services]);
 
+  // Sync with remote server / Telegram bot / Cloudflare KV
+  useEffect(() => {
+    let isMounted = true;
+    async function loadRemoteConfig() {
+      try {
+        const res = await fetch('/api/config');
+        if (res.ok) {
+          const data = await res.json();
+          if (!isMounted) return;
+          if (data && data.settings) {
+            setSettings((prev) => ({ ...prev, ...data.settings }));
+          }
+          if (data && Array.isArray(data.services) && data.services.length > 0) {
+            setServices(data.services);
+          }
+        }
+      } catch (err) {
+        // graceful fallback to local storage
+      }
+    }
+    loadRemoteConfig();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const syncToServer = async (newSettings, newServices) => {
+    try {
+      await fetch('/api/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          settings: newSettings || settings,
+          services: newServices || services,
+        }),
+      });
+    } catch (e) {}
+  };
+
   const updateSettings = (newFields) => {
-    setSettings((prev) => ({ ...prev, ...newFields }));
+    setSettings((prev) => {
+      const updated = { ...prev, ...newFields };
+      syncToServer(updated, services);
+      return updated;
+    });
   };
 
   const updateServices = (newServicesList) => {
     setServices(newServicesList);
+    syncToServer(settings, newServicesList);
   };
 
   const addService = (newService) => {
@@ -94,13 +138,17 @@ export function ConfigProvider({ children }) {
             .filter(Boolean)
         : [],
     };
-    setServices((prev) => [...prev, serviceToAdd]);
+    setServices((prev) => {
+      const updated = [...prev, serviceToAdd];
+      syncToServer(settings, updated);
+      return updated;
+    });
     return serviceToAdd;
   };
 
   const editService = (id, updatedFields) => {
-    setServices((prev) =>
-      prev.map((s) => {
+    setServices((prev) => {
+      const updated = prev.map((s) => {
         if (s.id !== id) return s;
         return {
           ...s,
@@ -115,17 +163,24 @@ export function ConfigProvider({ children }) {
                 .filter(Boolean)
             : s.included,
         };
-      })
-    );
+      });
+      syncToServer(settings, updated);
+      return updated;
+    });
   };
 
   const deleteService = (id) => {
-    setServices((prev) => prev.filter((s) => s.id !== id));
+    setServices((prev) => {
+      const updated = prev.filter((s) => s.id !== id);
+      syncToServer(settings, updated);
+      return updated;
+    });
   };
 
   const resetToDefaults = () => {
     setSettings(DEFAULT_SETTINGS);
     setServices(INITIAL_SERVICES);
+    syncToServer(DEFAULT_SETTINGS, INITIAL_SERVICES);
     try {
       localStorage.removeItem(STORAGE_KEY_SETTINGS);
       localStorage.removeItem(STORAGE_KEY_SERVICES);
