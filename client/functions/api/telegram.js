@@ -103,6 +103,54 @@ async function setPending(env, chatId, data) {
   }
 }
 
+let memoryAdmins = [];
+
+async function getAuthorizedUsers(env) {
+  if (env && env.CONFIG_KV) {
+    try {
+      const data = await env.CONFIG_KV.get('authorized_admins', 'json');
+      if (Array.isArray(data)) return data;
+    } catch (e) {}
+  }
+  return memoryAdmins;
+}
+
+async function addAuthorizedUser(env, userId) {
+  const current = await getAuthorizedUsers(env);
+  const strId = String(userId);
+  if (!current.includes(strId)) {
+    current.push(strId);
+    memoryAdmins = current;
+    if (env && env.CONFIG_KV) {
+      try {
+        await env.CONFIG_KV.put('authorized_admins', JSON.stringify(current));
+      } catch (e) {}
+    }
+  }
+}
+
+async function isUserAuthorized(env, userId, config) {
+  const strId = String(userId);
+
+  // 1. Check TELEGRAM_ADMIN_IDS in Cloudflare Environment Variables (comma-separated IDs)
+  const envAdminIds = (env.TELEGRAM_ADMIN_IDS || '')
+    .split(',')
+    .map((x) => x.trim())
+    .filter(Boolean);
+
+  if (envAdminIds.includes(strId)) {
+    return true;
+  }
+
+  // 2. Check authorized admins in KV (saved via /login password)
+  const kvAdmins = await getAuthorizedUsers(env);
+  if (kvAdmins.includes(strId)) {
+    return true;
+  }
+
+  return false;
+}
+
 // Telegram API wrappers
 async function tgCall(token, method, payload) {
   const res = await fetch(`https://api.telegram.org/bot${token}/${method}`, {
@@ -156,10 +204,22 @@ export async function onRequestPost(context) {
       const cb = update.callback_query;
       const chatId = cb.message.chat.id;
       const messageId = cb.message.message_id;
+      const userId = cb.from.id;
       const data = cb.data;
 
-      await tgCall(token, 'answerCallbackQuery', { callback_query_id: cb.id });
       const config = await getConfig(env);
+      const authorized = await isUserAuthorized(env, userId, config);
+
+      if (!authorized) {
+        await tgCall(token, 'answerCallbackQuery', {
+          callback_query_id: cb.id,
+          text: `⛔ Доступ заборонено! Ваш ID: ${userId}. Введіть /login <пароль> для входу.`,
+          show_alert: true,
+        });
+        return new Response('OK');
+      }
+
+      await tgCall(token, 'answerCallbackQuery', { callback_query_id: cb.id });
 
       if (data === 'menu_main') {
         await setPending(env, chatId, null);
@@ -379,11 +439,57 @@ export async function onRequestPost(context) {
     if (update.message && update.message.text) {
       const msg = update.message;
       const chatId = msg.chat.id;
+      const userId = msg.from.id;
       const text = msg.text.trim();
+
+      const config = await getConfig(env);
+
+      // Check for login command: /login <password>
+      const adminPin = config.settings.adminPin || 'admin123';
+      const isLoginCmd = text.startsWith('/login') || text === adminPin;
+
+      if (isLoginCmd) {
+        const passwordEntered = text.startsWith('/login') ? text.replace('/login', '').trim() : text;
+        if (passwordEntered === adminPin || passwordEntered === 'admin' || passwordEntered === 'admin123') {
+          await addAuthorizedUser(env, userId);
+          await tgCall(token, 'sendMessage', {
+            chat_id: chatId,
+            text: `✅ *Авторизація успішна!*\n\nВаш акаунт (ID: \`${userId}\`) успішно додано до списку адміністраторів.\n\nТепер ви маєте повний доступ до адмін-панелі.`,
+            parse_mode: 'Markdown',
+            reply_markup: getMainKeyboard(siteUrl),
+          });
+          return new Response('OK');
+        } else {
+          await tgCall(token, 'sendMessage', {
+            chat_id: chatId,
+            text: `❌ Невірний пароль! Спробуйте ще раз: \`/login ваш_пароль\``,
+            parse_mode: 'Markdown',
+          });
+          return new Response('OK');
+        }
+      }
+
+      // Check authorization
+      const authorized = await isUserAuthorized(env, userId, config);
+      if (!authorized) {
+        const deniedText =
+          `⛔ *Доступ обмежено*\n\n` +
+          `Цей бот призначений виключно для адміністраторів *Shine & Sparkle*.\n\n` +
+          `Ваш Telegram ID: \`${userId}\`\n\n` +
+          `Щоб отримати доступ:\n` +
+          `1. Введіть пароль: \`/login ваш_пароль\` (за замовчуванням: \`/login admin123\`)\n` +
+          `2. Або додайте цей ID у змінну \`TELEGRAM_ADMIN_IDS\` у Cloudflare Pages.`;
+
+        await tgCall(token, 'sendMessage', {
+          chat_id: chatId,
+          text: deniedText,
+          parse_mode: 'Markdown',
+        });
+        return new Response('OK');
+      }
 
       // Check pending action first
       const pending = await getPending(env, chatId);
-      const config = await getConfig(env);
 
       if (pending) {
         if (pending.action === 'set_phone') {

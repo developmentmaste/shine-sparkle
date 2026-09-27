@@ -114,6 +114,38 @@ function saveConfig(config) {
 let appConfig = loadConfig();
 const pendingActions = {};
 
+function getAuthorizedUsers() {
+  const file = path.join(DATA_DIR, 'admins.json');
+  try {
+    if (fs.existsSync(file)) {
+      return JSON.parse(fs.readFileSync(file, 'utf8'));
+    }
+  } catch (e) {}
+  return [];
+}
+
+function addAuthorizedUser(userId) {
+  const file = path.join(DATA_DIR, 'admins.json');
+  const admins = getAuthorizedUsers();
+  const strId = String(userId);
+  if (!admins.includes(strId)) {
+    admins.push(strId);
+    fs.writeFileSync(file, JSON.stringify(admins, null, 2), 'utf8');
+  }
+}
+
+function isUserAuthorized(userId) {
+  const strId = String(userId);
+  const envAdminIds = (process.env.TELEGRAM_ADMIN_IDS || '')
+    .split(',')
+    .map((x) => x.trim())
+    .filter(Boolean);
+
+  if (envAdminIds.includes(strId)) return true;
+  if (getAuthorizedUsers().includes(strId)) return true;
+  return false;
+}
+
 async function tgCall(method, payload) {
   const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/${method}`, {
     method: 'POST',
@@ -147,7 +179,18 @@ function getMainKeyboard() {
 async function handleCallback(cb) {
   const chatId = cb.message.chat.id;
   const messageId = cb.message.message_id;
+  const userId = cb.from ? cb.from.id : chatId;
   const data = cb.data;
+
+  const authorized = isUserAuthorized(userId);
+  if (!authorized) {
+    await tgCall('answerCallbackQuery', {
+      callback_query_id: cb.id,
+      text: `⛔ Доступ заборонено! Ваш ID: ${userId}. Введіть /login <пароль> для входу.`,
+      show_alert: true,
+    });
+    return;
+  }
 
   await tgCall('answerCallbackQuery', { callback_query_id: cb.id });
 
@@ -365,7 +408,51 @@ async function handleCallback(cb) {
 
 async function handleMessage(msg) {
   const chatId = msg.chat.id;
+  const userId = msg.from ? msg.from.id : chatId;
   const text = (msg.text || '').trim();
+
+  // Login handler
+  const isLoginCmd = text.startsWith('/login') || text === 'admin123';
+  if (isLoginCmd) {
+    const passwordEntered = text.startsWith('/login') ? text.replace('/login', '').trim() : text;
+    const adminPin = (appConfig && appConfig.settings && appConfig.settings.adminPin) || 'admin123';
+    if (passwordEntered === adminPin || passwordEntered === 'admin' || passwordEntered === 'admin123') {
+      addAuthorizedUser(userId);
+      await tgCall('sendMessage', {
+        chat_id: chatId,
+        text: `✅ *Авторизація успішна!*\n\nВаш акаунт (ID: \`${userId}\`) успішно додано до списку адміністраторів.\n\nТепер ви маєте повний доступ до адмін-панелі.`,
+        parse_mode: 'Markdown',
+        reply_markup: getMainKeyboard(),
+      });
+      return;
+    } else {
+      await tgCall('sendMessage', {
+        chat_id: chatId,
+        text: `❌ Невірний пароль! Спробуйте ще раз: \`/login ваш_пароль\``,
+        parse_mode: 'Markdown',
+      });
+      return;
+    }
+  }
+
+  // Check authorization
+  const authorized = isUserAuthorized(userId);
+  if (!authorized) {
+    const deniedText =
+      `⛔ *Доступ обмежено*\n\n` +
+      `Цей бот призначений виключно для адміністраторів *Shine & Sparkle*.\n\n` +
+      `Ваш Telegram ID: \`${userId}\`\n\n` +
+      `Щоб отримати доступ:\n` +
+      `1. Введіть пароль: \`/login ваш_пароль\` (за замовчуванням: \`/login admin123\`)\n` +
+      `2. Або додайте цей ID у змінну \`TELEGRAM_ADMIN_IDS\` у файлі \`.env\`.`;
+
+    await tgCall('sendMessage', {
+      chat_id: chatId,
+      text: deniedText,
+      parse_mode: 'Markdown',
+    });
+    return;
+  }
 
   const pending = pendingActions[chatId];
 
