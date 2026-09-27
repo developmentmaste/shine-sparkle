@@ -1,5 +1,3 @@
-const DEFAULT_TOKEN = '8541494076:AAFbIlkwu8avi7UFFcewoYeATgSJbrL9has';
-
 const DEFAULT_SETTINGS = {
   whatsappPhone: '353852850720',
   whatsappDisplay: '+353 85 285 0720',
@@ -141,7 +139,10 @@ function getMainKeyboard(siteUrl) {
 
 export async function onRequestPost(context) {
   const { request, env } = context;
-  const token = env.TELEGRAM_BOT_TOKEN || DEFAULT_TOKEN;
+  const token = env.TELEGRAM_BOT_TOKEN;
+  if (!token) {
+    return new Response('TELEGRAM_BOT_TOKEN environment variable is not configured', { status: 500 });
+  }
 
   // Resolve site host for WebApp
   const urlObj = new URL(request.url);
@@ -545,7 +546,13 @@ export async function onRequestPost(context) {
 
 export async function onRequestGet(context) {
   const { request, env } = context;
-  const token = env.TELEGRAM_BOT_TOKEN || DEFAULT_TOKEN;
+  const token = env.TELEGRAM_BOT_TOKEN;
+  if (!token) {
+    return new Response(JSON.stringify({ error: 'TELEGRAM_BOT_TOKEN environment variable is not configured' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
   const urlObj = new URL(request.url);
 
   // If user visits /api/telegram?setup=1, automatically configure Telegram Webhook!

@@ -25,7 +25,12 @@ try {
 const DATA_DIR = path.resolve(__dirname, '../data');
 const CONFIG_FILE = path.join(DATA_DIR, 'config.json');
 
-const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8541494076:AAFbIlkwu8avi7UFFcewoYeATgSJbrL9has';
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+if (!BOT_TOKEN) {
+  console.error('❌ Помилка: Змінна TELEGRAM_BOT_TOKEN не вказана у файлі server/.env або змінних середовища.');
+  console.error('Створіть файл server/.env та додайте: TELEGRAM_BOT_TOKEN=ваш_токен_від_botfather');
+  process.exit(1);
+}
 const SITE_URL = (process.env.CLIENT_ORIGIN || 'https://shine-sparkle.pages.dev').replace(/\/+$/, '');
 
 const DEFAULT_SETTINGS = {
