@@ -1,0 +1,13 @@
+# Cache Vite hashed assets for 1 year
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Ensure index.html is revalidated so updates take effect immediately
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Default security headers
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin

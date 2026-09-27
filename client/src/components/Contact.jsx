@@ -1,23 +1,29 @@
 import { useState } from 'react';
-import { submitContact } from '../api.js';
-import { buildWhatsAppUrl, DEFAULT_MESSAGE, WHATSAPP_DISPLAY } from '../whatsapp.js';
+import { useConfig } from '../context/ConfigContext.jsx';
+import { buildContactWhatsAppMessage, DEFAULT_MESSAGE } from '../whatsapp.js';
+import SendButton from './SendButton.jsx';
+import whatsappIcon from '../assets/whatsapp-svgrepo-com.svg';
 
-const initialForm = { name: '', email: '', phone: '', message: '' };
+const initialForm = { name: '', message: '' };
 
 export default function Contact() {
+  const { settings, getWhatsAppUrl } = useConfig();
   const [form, setForm] = useState(initialForm);
   const [status, setStatus] = useState({ state: 'idle', message: '' });
 
-  async function handleSubmit(e) {
+  function handleSubmit(e) {
     e.preventDefault();
-    setStatus({ state: 'submitting', message: '' });
-    try {
-      await submitContact(form);
-      setStatus({ state: 'success', message: "Thanks — we'll get back to you shortly." });
-      setForm(initialForm);
-    } catch (err) {
-      setStatus({ state: 'error', message: err.message });
-    }
+    const message = buildContactWhatsAppMessage({
+      ...form,
+      brandName: settings.brandName,
+    });
+    const url = getWhatsAppUrl(message);
+    window.open(url, '_blank');
+    setStatus({
+      state: 'success',
+      message: "Opening WhatsApp with your message! We'll reply shortly.",
+    });
+    setForm(initialForm);
   }
 
   return (
@@ -32,46 +38,36 @@ export default function Contact() {
         <div className="contact-card">
           <a
             className="btn-primary"
-            style={{ width: '100%', justifyContent: 'center', marginBottom: '10px' }}
-            href={buildWhatsAppUrl(DEFAULT_MESSAGE)}
+            style={{
+              width: '100%',
+              justifyContent: 'center',
+              textAlign: 'center',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              marginBottom: '10px',
+            }}
+            href={getWhatsAppUrl(DEFAULT_MESSAGE)}
             target="_blank"
             rel="noopener noreferrer"
           >
-            Chat on WhatsApp — {WHATSAPP_DISPLAY}
+            <span>Chat on WhatsApp</span>
+            <img
+              src={whatsappIcon}
+              alt="WhatsApp"
+              style={{ width: '18px', height: '18px', objectFit: 'contain' }}
+            />
           </a>
           <div className="divider" />
 
           <form onSubmit={handleSubmit}>
-            <div className="form-row">
-              <div>
-                <label className="field-label">Name</label>
-                <input
-                  className="field-input"
-                  required
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="Your name"
-                />
-              </div>
-              <div>
-                <label className="field-label">Email</label>
-                <input
-                  type="email"
-                  className="field-input"
-                  required
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  placeholder="you@example.com"
-                />
-              </div>
-            </div>
-
-            <label className="field-label">Phone (optional)</label>
+            <label className="field-label">Name</label>
             <input
               className="field-input"
-              value={form.phone}
-              onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              placeholder="+1 555 123 4567"
+              required
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              placeholder="Your name"
             />
 
             <label className="field-label">Message</label>
@@ -83,14 +79,7 @@ export default function Contact() {
               placeholder="What would you like to know?"
             />
 
-            <button
-              type="submit"
-              className="btn-primary"
-              style={{ width: '100%', justifyContent: 'center' }}
-              disabled={status.state === 'submitting'}
-            >
-              {status.state === 'submitting' ? 'Sending…' : 'Send message'}
-            </button>
+            <SendButton text="Send message to WhatsApp" />
           </form>
 
           {status.state === 'success' && (

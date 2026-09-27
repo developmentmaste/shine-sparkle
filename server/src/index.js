@@ -12,7 +12,21 @@ const allowedOrigins = (process.env.CLIENT_ORIGIN || 'http://localhost:5173')
   .split(',')
   .map((origin) => origin.trim());
 
-app.use(cors({ origin: allowedOrigins }));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      const isAllowed =
+        allowedOrigins.includes('*') ||
+        allowedOrigins.includes(origin) ||
+        allowedOrigins.some(
+          (pattern) => pattern.startsWith('*.') && origin.endsWith(pattern.slice(1))
+        );
+      callback(null, isAllowed);
+    },
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 app.get('/api/health', async (req, res) => {
