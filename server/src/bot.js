@@ -202,14 +202,14 @@ function renderServiceMessage(service) {
   const includedList = (service.included || []).map((x) => `  ✓ ${x}`).join('\n');
   const text =
     `🧹 *Послуга:* ${service.name}\n` +
-    `💵 *Тариф:* from *$${service.rate}/m²*\n` +
+    `💵 *Тариф:* from *€${service.rate}/m²*\n` +
     `⏳ *Періодичність:* \`${service.cadence || 'за домовленістю'}\`\n` +
     `📝 *Опис:* ${service.description || '—'}\n\n` +
     `📋 *Що входить:*\n${includedList || '  (список порожній)'}`;
 
   const keyboard = [
     [
-      { text: '💵 Тариф ($/m²)', callback_data: `rate_${service.id}` },
+      { text: '💶 Тариф (€/m²)', callback_data: `rate_${service.id}` },
       { text: '✏️ Назва', callback_data: `rename_${service.id}` },
     ],
     [
@@ -518,8 +518,8 @@ async function handleCallback(cb) {
     const keyboard = [];
 
     services.forEach((s, idx) => {
-      text += `${idx + 1}. *${s.name}* — from *$${s.rate}/m²*\n`;
-      keyboard.push([{ text: `⚙️ ${s.name} ($${s.rate}/m²)`, callback_data: `svc_${s.id}` }]);
+      text += `${idx + 1}. *${s.name}* — from *€${s.rate}/m²*\n`;
+      keyboard.push([{ text: `⚙️ ${s.name} (€${s.rate}/m²)`, callback_data: `svc_${s.id}` }]);
     });
 
     text += `\nНатисніть на послугу нижче для налаштування або зміни ціни:`;
@@ -564,7 +564,7 @@ async function handleCallback(cb) {
     pendingActions[chatId] = { action: 'set_rate', id };
     await tgCall('sendMessage', {
       chat_id: chatId,
-      text: `💵 Введіть новий тариф за м² для *"${service.name}"* (поточний: $${service.rate}/m²):\nНаприклад: \`1.5\``,
+      text: `💶 Введіть новий тариф за м² для *"${service.name}"* (поточний: €${service.rate}/m²):\nНаприклад: \`1.5\``,
       parse_mode: 'Markdown',
       reply_markup: {
         inline_keyboard: [[{ text: '❌ Скасувати', callback_data: `svc_${id}` }]],
@@ -719,8 +719,8 @@ async function handleCallback(cb) {
     let text = `🧹 *Список послуг на сайті:*\n\n`;
     const keyboard = [];
     appConfig.services.forEach((s, idx) => {
-      text += `${idx + 1}. *${s.name}* — from *$${s.rate}/m²*\n`;
-      keyboard.push([{ text: `⚙️ ${s.name} ($${s.rate}/m²)`, callback_data: `svc_${s.id}` }]);
+      text += `${idx + 1}. *${s.name}* — from *€${s.rate}/m²*\n`;
+      keyboard.push([{ text: `⚙️ ${s.name} (€${s.rate}/m²)`, callback_data: `svc_${s.id}` }]);
     });
     keyboard.push([{ text: '➕ Додати нову послугу', callback_data: 'act_add_svc' }]);
     keyboard.push([{ text: '🔙 Назад до меню', callback_data: 'menu_main' }]);
@@ -982,7 +982,7 @@ async function handleMessage(msg) {
 
       await tgCall('sendMessage', {
         chat_id: chatId,
-        text: `✅ Тариф для *"${svc ? svc.name : 'послуги'}"* успішно змінено на *$${newRate}/m²*!`,
+        text: `✅ Тариф для *"${svc ? svc.name : 'послуги'}"* успішно змінено на *€${newRate}/m²*!`,
         parse_mode: 'Markdown',
         reply_markup: getMainKeyboard(),
       });
@@ -1080,7 +1080,7 @@ async function handleMessage(msg) {
       pendingActions[chatId] = { action: 'add_svc_cadence', name: pending.name, rate };
       await tgCall('sendMessage', {
         chat_id: chatId,
-        text: `⏳ Оберіть періодичність для *"${pending.name}"* ($${rate}/m²):\n(Або натисніть кнопку нижче)`,
+        text: `⏳ Оберіть періодичність для *"${pending.name}"* (€${rate}/m²):\n(Або натисніть кнопку нижче)`,
         parse_mode: 'Markdown',
         reply_markup: {
           inline_keyboard: [

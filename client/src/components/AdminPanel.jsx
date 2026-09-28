@@ -329,7 +329,7 @@ export default function AdminPanel({ isOpen, onClose }) {
 
                   <div className="form-row">
                     <div>
-                      <label className="field-label">Мінімальна вартість замовлення ($)</label>
+                      <label className="field-label">Мінімальна вартість замовлення (€)</label>
                       <input
                         type="number"
                         min="0"
@@ -408,7 +408,7 @@ export default function AdminPanel({ isOpen, onClose }) {
                                 {service.name}
                               </div>
                               <div style={{ fontSize: '0.84rem', color: 'var(--ink-soft)' }}>
-                                від <b>${service.rate}/м²</b> · {service.cadence}
+                                від <b>€{service.rate}/м²</b> · {service.cadence}
                               </div>
                               <div style={{ fontSize: '0.78rem', color: 'var(--ink-soft)', marginTop: '4px' }}>
                                 Пунктів у списку: {(service.included || []).length}
@@ -485,7 +485,7 @@ export default function AdminPanel({ isOpen, onClose }) {
                           />
                         </div>
                         <div>
-                          <label className="field-label">Тариф ($/м²)</label>
+                          <label className="field-label">Тариф (€/м²)</label>
                           <input
                             type="number"
                             step="0.1"
