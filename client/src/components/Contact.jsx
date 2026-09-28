@@ -10,9 +10,29 @@ export default function Contact() {
   const { settings, getWhatsAppUrl } = useConfig();
   const [form, setForm] = useState(initialForm);
   const [status, setStatus] = useState({ state: 'idle', message: '' });
+  const [nameError, setNameError] = useState(false);
+  const [messageError, setMessageError] = useState(false);
 
   function handleSubmit(e) {
     e.preventDefault();
+    let hasError = false;
+
+    if (!form.name.trim()) {
+      setNameError(true);
+      hasError = true;
+    } else {
+      setNameError(false);
+    }
+
+    if (!form.message.trim()) {
+      setMessageError(true);
+      hasError = true;
+    } else {
+      setMessageError(false);
+    }
+
+    if (hasError) return;
+
     const message = buildContactWhatsAppMessage({
       ...form,
       brandName: settings.brandName,
@@ -24,6 +44,8 @@ export default function Contact() {
       message: "Opening WhatsApp with your message! We'll reply shortly.",
     });
     setForm(initialForm);
+    setNameError(false);
+    setMessageError(false);
   }
 
   return (
@@ -60,22 +82,26 @@ export default function Contact() {
           </a>
           <div className="divider" />
 
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} noValidate>
             <label className="field-label">Name</label>
             <input
-              className="field-input"
-              required
+              className={`field-input${nameError ? ' has-error' : ''}`}
               value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              onChange={(e) => {
+                setForm({ ...form, name: e.target.value });
+                if (nameError) setNameError(false);
+              }}
               placeholder="Your name"
             />
 
             <label className="field-label">Message</label>
             <textarea
-              className="field-textarea"
-              required
+              className={`field-textarea${messageError ? ' has-error' : ''}`}
               value={form.message}
-              onChange={(e) => setForm({ ...form, message: e.target.value })}
+              onChange={(e) => {
+                setForm({ ...form, message: e.target.value });
+                if (messageError) setMessageError(false);
+              }}
               placeholder="What would you like to know?"
             />
 

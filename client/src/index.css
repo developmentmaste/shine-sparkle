@@ -275,9 +275,21 @@ header.site-header .nav {
   border:1px solid var(--border); border-radius:var(--radius-md);
   font-family:'Inter', sans-serif; font-size:0.95rem; color:var(--ink);
   background:var(--bg-soft);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-.field-textarea{resize:vertical; min-height:110px;}
+.field-textarea{resize:none; min-height:110px;}
 .field-input:focus, .field-textarea:focus, select.field-input:focus{outline:2px solid var(--accent); outline-offset:1px;}
+@keyframes fieldShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
+}
+.field-input.has-error, .field-textarea.has-error{
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2) !important;
+  outline: none !important;
+  animation: fieldShake 0.35s ease-in-out;
+}
 .form-msg{margin-top:6px; font-size:0.9rem; padding:12px 14px; border-radius:var(--radius-md);}
 .form-msg.success{background:#E9FBEF; color:#1E7B41;}
 .form-msg.error{background:#FDECEC; color:var(--danger);}
