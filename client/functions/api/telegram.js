@@ -191,6 +191,55 @@ async function tgCall(token, method, payload) {
   return await res.json().catch(() => ({}));
 }
 
+function parseIncludedItems(text) {
+  if (!text) return ['Основне прибирання поверхонь', 'Дезінфекція санвузлів', 'Миття підлоги'];
+  const lines = text
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean);
+
+  let items = [];
+  if (lines.length > 1) {
+    items = lines.map((l) => l.replace(/^[•\-\*\d\.\)\s✓]+/, '').trim()).filter(Boolean);
+  } else if (lines.length === 1) {
+    items = lines[0]
+      .split(/[,;]/)
+      .map((l) => l.replace(/^[•\-\*\d\.\)\s✓]+/, '').trim())
+      .filter(Boolean);
+  }
+  return items.length > 0 ? items : ['Основне прибирання поверхонь', 'Дезінфекція санвузлів', 'Миття підлоги'];
+}
+
+function renderServiceMessage(service) {
+  const includedList = (service.included || []).map((x) => `  ✓ ${x}`).join('\n');
+  const text =
+    `🧹 *Послуга:* ${service.name}\n` +
+    `💵 *Тариф:* from *$${service.rate}/m²*\n` +
+    `⏳ *Періодичність:* \`${service.cadence || 'за домовленістю'}\`\n` +
+    `📝 *Опис:* ${service.description || '—'}\n\n` +
+    `📋 *Що входить:*\n${includedList || '  (список порожній)'}`;
+
+  const keyboard = [
+    [
+      { text: '💵 Тариф ($/m²)', callback_data: `rate_${service.id}` },
+      { text: '✏️ Назва', callback_data: `rename_${service.id}` },
+    ],
+    [
+      { text: '⏳ Періодичність', callback_data: `cadence_${service.id}` },
+      { text: '📝 Опис', callback_data: `desc_${service.id}` },
+    ],
+    [
+      { text: '📋 Що входить', callback_data: `incl_${service.id}` },
+      { text: '🗑 Видалити', callback_data: `del_${service.id}` },
+    ],
+    [
+      { text: '🔙 До списку послуг', callback_data: 'menu_services' },
+    ],
+  ];
+
+  return { text, reply_markup: { inline_keyboard: keyboard } };
+}
+
 function getMainKeyboard(siteUrl) {
   const adminUrl = siteUrl ? `${siteUrl.replace(/\/+$/, '')}/#admin` : 'https://shine-sparkle.pages.dev/#admin';
   const liveUrl = siteUrl ? siteUrl.replace(/\/+$/, '') : 'https://shine-sparkle.pages.dev';
@@ -530,26 +579,13 @@ export async function onRequestPost(context) {
           return new Response('OK');
         }
 
-        const includedList = (service.included || []).map((x) => `  ✓ ${x}`).join('\n');
-        const text = `🧹 *Послуга:* ${service.name}\n` +
-          `💵 *Тариф:* from *$${service.rate}/m²*\n` +
-          `⏳ *Періодичність:* ${service.cadence || 'за домовленістю'}\n` +
-          `📝 *Опис:* ${service.description || '—'}\n\n` +
-          `*Що входить:*\n${includedList || '  (список порожній)'}`;
-
+        const { text, reply_markup } = renderServiceMessage(service);
         await tgCall(token, 'editMessageText', {
           chat_id: chatId,
           message_id: messageId,
           text,
           parse_mode: 'Markdown',
-          reply_markup: {
-            inline_keyboard: [
-              [{ text: '💵 Змінити тариф ($/m²)', callback_data: `rate_${service.id}` }],
-              [{ text: '✏️ Змінити назву', callback_data: `rename_${service.id}` }],
-              [{ text: '🗑 Видалити послугу', callback_data: `del_${service.id}` }],
-              [{ text: '🔙 До списку послуг', callback_data: 'menu_services' }],
-            ],
-          },
+          reply_markup,
         });
         return new Response('OK');
       }
@@ -580,6 +616,121 @@ export async function onRequestPost(context) {
         await tgCall(token, 'sendMessage', {
           chat_id: chatId,
           text: `✏️ Введіть нову назву для *"${service.name}"*:`,
+          parse_mode: 'Markdown',
+          reply_markup: {
+            inline_keyboard: [[{ text: '❌ Скасувати', callback_data: `svc_${id}` }]],
+          },
+        });
+        return new Response('OK');
+      }
+
+      if (data.startsWith('cadence_')) {
+        const id = data.replace('cadence_', '');
+        const service = (config.services || []).find((s) => s.id === id);
+        if (!service) return new Response('OK');
+
+        await setPending(env, chatId, null);
+        const text =
+          `⏳ *Зміна періодичності для "${service.name}"*\n\n` +
+          `Поточне значення: \`${service.cadence || 'за домовленістю'}\`\n\n` +
+          `Оберіть варіант або введіть власний текст:`;
+
+        await tgCall(token, 'editMessageText', {
+          chat_id: chatId,
+          message_id: messageId,
+          text,
+          parse_mode: 'Markdown',
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: 'one-time or seasonal', callback_data: `setcad_${id}_one-time or seasonal` }],
+              [{ text: 'weekly or biweekly', callback_data: `setcad_${id}_weekly or biweekly` }],
+              [{ text: 'one-time', callback_data: `setcad_${id}_one-time` }],
+              [{ text: 'monthly', callback_data: `setcad_${id}_monthly` }],
+              [{ text: '✏️ Ввести свій текст', callback_data: `customcad_${id}` }],
+              [{ text: '🔙 Скасувати', callback_data: `svc_${id}` }],
+            ],
+          },
+        });
+        return new Response('OK');
+      }
+
+      if (data.startsWith('setcad_')) {
+        const raw = data.replace('setcad_', '');
+        const firstUnderscore = raw.indexOf('_');
+        const id = firstUnderscore !== -1 ? raw.substring(0, firstUnderscore) : raw;
+        const val = firstUnderscore !== -1 ? raw.substring(firstUnderscore + 1) : 'one-time or seasonal';
+        const service = (config.services || []).find((s) => s.id === id);
+        if (service) {
+          service.cadence = val;
+          await saveConfig(env, config);
+        }
+        await setPending(env, chatId, null);
+
+        const { text, reply_markup } = renderServiceMessage(service || { name: 'послуги', rate: 1, cadence: val, included: [] });
+        await tgCall(token, 'editMessageText', {
+          chat_id: chatId,
+          message_id: messageId,
+          text: `✅ Періодичність оновлено на *${val}*!\n\n` + text,
+          parse_mode: 'Markdown',
+          reply_markup,
+        });
+        return new Response('OK');
+      }
+
+      if (data.startsWith('customcad_')) {
+        const id = data.replace('customcad_', '');
+        const service = (config.services || []).find((s) => s.id === id);
+        if (!service) return new Response('OK');
+
+        await setPending(env, chatId, { action: 'set_custom_cadence', id });
+        await tgCall(token, 'sendMessage', {
+          chat_id: chatId,
+          text: `⏳ Введіть періодичність для *"${service.name}"*:\n(Наприклад: \`one-time or seasonal\` або \`2-3 рази на тиждень\`)`,
+          parse_mode: 'Markdown',
+          reply_markup: {
+            inline_keyboard: [[{ text: '❌ Скасувати', callback_data: `svc_${id}` }]],
+          },
+        });
+        return new Response('OK');
+      }
+
+      if (data.startsWith('desc_')) {
+        const id = data.replace('desc_', '');
+        const service = (config.services || []).find((s) => s.id === id);
+        if (!service) return new Response('OK');
+
+        await setPending(env, chatId, { action: 'set_desc', id });
+        await tgCall(token, 'sendMessage', {
+          chat_id: chatId,
+          text:
+            `📝 Введіть новий детальний опис для послуги *"${service.name}"*:\n\n` +
+            `_Поточний опис:_\n${service.description || '—'}`,
+          parse_mode: 'Markdown',
+          reply_markup: {
+            inline_keyboard: [[{ text: '❌ Скасувати', callback_data: `svc_${id}` }]],
+          },
+        });
+        return new Response('OK');
+      }
+
+      if (data.startsWith('incl_')) {
+        const id = data.replace('incl_', '');
+        const service = (config.services || []).find((s) => s.id === id);
+        if (!service) return new Response('OK');
+
+        const currentItems = (service.included || []).map((x) => `• ${x}`).join('\n');
+        await setPending(env, chatId, { action: 'set_included', id });
+        await tgCall(token, 'sendMessage', {
+          chat_id: chatId,
+          text:
+            `📋 *Що входить у послугу "${service.name}":*\n\n` +
+            `Введіть новий перелік пунктів. Кожен пункт пишіть з нового рядка або розділяйте комами.\n\n` +
+            `_Поточні пункти:_\n${currentItems || '(порожньо)'}\n\n` +
+            `_Приклад:_\n` +
+            `Kitchen surfaces and sink\n` +
+            `Bathroom and fixtures\n` +
+            `Floors, vacuumed and mopped\n` +
+            `Dusting and bed making`,
           parse_mode: 'Markdown',
           reply_markup: {
             inline_keyboard: [[{ text: '❌ Скасувати', callback_data: `svc_${id}` }]],
@@ -626,6 +777,92 @@ export async function onRequestPost(context) {
           reply_markup: {
             inline_keyboard: [[{ text: '❌ Скасувати', callback_data: 'menu_services' }]],
           },
+        });
+        return new Response('OK');
+      }
+
+      if (data.startsWith('newcad_')) {
+        const pending = await getPending(env, chatId);
+        if (!pending) return new Response('OK');
+
+        if (data === 'newcad_custom') {
+          pending.action = 'add_svc_cadence_input';
+          await setPending(env, chatId, pending);
+          await tgCall(token, 'sendMessage', {
+            chat_id: chatId,
+            text: `⏳ Введіть власну періодичність для *"${pending.name}"*:\n(Наприклад: \`one-time or seasonal\` або \`щотижня\`)`,
+            parse_mode: 'Markdown',
+            reply_markup: {
+              inline_keyboard: [[{ text: '❌ Скасувати', callback_data: 'menu_services' }]],
+            },
+          });
+          return new Response('OK');
+        }
+
+        const cadence = data === 'newcad_skip' ? 'за домовленістю' : data.replace('newcad_', '');
+        pending.cadence = cadence;
+        pending.action = 'add_svc_desc';
+        await setPending(env, chatId, pending);
+
+        await tgCall(token, 'sendMessage', {
+          chat_id: chatId,
+          text: `📝 Введіть детальний опис послуги *"${pending.name}"*:\n(Що це за прибирання, для кого підходить тощо)\n\nАбо натисніть кнопку нижче, щоб пропустити:`,
+          parse_mode: 'Markdown',
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '➡️ Пропустити опис', callback_data: 'newdesc_skip' }],
+              [{ text: '❌ Скасувати', callback_data: 'menu_services' }],
+            ],
+          },
+        });
+        return new Response('OK');
+      }
+
+      if (data === 'newdesc_skip') {
+        const pending = await getPending(env, chatId);
+        if (!pending) return new Response('OK');
+
+        pending.description = 'Якісний сервіс від перевірених фахівців Shine & Sparkle.';
+        pending.action = 'add_svc_included';
+        await setPending(env, chatId, pending);
+
+        await tgCall(token, 'sendMessage', {
+          chat_id: chatId,
+          text: `📋 Введіть пункти «Що входить» у послугу *"${pending.name}"*:\n(Кожен пункт пишіть з нового рядка або через кому)\n\nАбо натисніть кнопку нижче, щоб додати стандартний набір:`,
+          parse_mode: 'Markdown',
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '➡️ Пропустити (стандартний набір)', callback_data: 'newincl_skip' }],
+              [{ text: '❌ Скасувати', callback_data: 'menu_services' }],
+            ],
+          },
+        });
+        return new Response('OK');
+      }
+
+      if (data === 'newincl_skip') {
+        const pending = await getPending(env, chatId);
+        if (!pending) return new Response('OK');
+
+        const newService = {
+          id: 'svc_' + Date.now(),
+          name: pending.name,
+          rate: pending.rate || 1.0,
+          cadence: pending.cadence || 'one-time or seasonal',
+          description: pending.description || 'Якісний сервіс від перевірених фахівців Shine & Sparkle.',
+          included: ['Основне прибирання поверхонь', 'Дезінфекція санвузлів', 'Миття підлоги'],
+          iconBg: '#E3EFFB',
+        };
+        config.services.push(newService);
+        await saveConfig(env, config);
+        await setPending(env, chatId, null);
+
+        const { text, reply_markup } = renderServiceMessage(newService);
+        await tgCall(token, 'sendMessage', {
+          chat_id: chatId,
+          text: `✅ *Нову послугу успішно створено та опубліковано на сайті!*\n\n` + text,
+          parse_mode: 'Markdown',
+          reply_markup,
         });
         return new Response('OK');
       }
@@ -802,11 +1039,67 @@ export async function onRequestPost(context) {
           }
           await setPending(env, chatId, null);
 
+          const { text: svcText, reply_markup } = renderServiceMessage(svc || { name: text, rate: 1, cadence: 'one-time or seasonal', included: [] });
           await tgCall(token, 'sendMessage', {
             chat_id: chatId,
-            text: `✅ Назву послуги змінено на *"${text}"*!`,
+            text: `✅ Назву послуги змінено на *"${text}"*!\n\n` + svcText,
             parse_mode: 'Markdown',
-            reply_markup: getMainKeyboard(siteUrl),
+            reply_markup,
+          });
+          return new Response('OK');
+        }
+
+        if (pending.action === 'set_custom_cadence') {
+          const svc = (config.services || []).find((s) => s.id === pending.id);
+          if (svc) {
+            svc.cadence = text;
+            await saveConfig(env, config);
+          }
+          await setPending(env, chatId, null);
+
+          const { text: svcText, reply_markup } = renderServiceMessage(svc || { name: 'послуги', rate: 1, cadence: text, included: [] });
+          await tgCall(token, 'sendMessage', {
+            chat_id: chatId,
+            text: `✅ Періодичність для *"${svc ? svc.name : 'послуги'}"* змінено на *"${text}"*!\n\n` + svcText,
+            parse_mode: 'Markdown',
+            reply_markup,
+          });
+          return new Response('OK');
+        }
+
+        if (pending.action === 'set_desc') {
+          const svc = (config.services || []).find((s) => s.id === pending.id);
+          if (svc) {
+            svc.description = text;
+            await saveConfig(env, config);
+          }
+          await setPending(env, chatId, null);
+
+          const { text: svcText, reply_markup } = renderServiceMessage(svc || { name: 'послуги', rate: 1, description: text, included: [] });
+          await tgCall(token, 'sendMessage', {
+            chat_id: chatId,
+            text: `✅ Опис для *"${svc ? svc.name : 'послуги'}"* успішно оновлено!\n\n` + svcText,
+            parse_mode: 'Markdown',
+            reply_markup,
+          });
+          return new Response('OK');
+        }
+
+        if (pending.action === 'set_included') {
+          const svc = (config.services || []).find((s) => s.id === pending.id);
+          const items = parseIncludedItems(text);
+          if (svc) {
+            svc.included = items;
+            await saveConfig(env, config);
+          }
+          await setPending(env, chatId, null);
+
+          const { text: svcText, reply_markup } = renderServiceMessage(svc || { name: 'послуги', rate: 1, included: items });
+          await tgCall(token, 'sendMessage', {
+            chat_id: chatId,
+            text: `✅ Перелік «Що входить» для *"${svc ? svc.name : 'послуги'}"* оновлено (${items.length} пунктів)!\n\n` + svcText,
+            parse_mode: 'Markdown',
+            reply_markup,
           });
           return new Response('OK');
         }
@@ -815,32 +1108,100 @@ export async function onRequestPost(context) {
           await setPending(env, chatId, { action: 'add_svc_rate', name: text });
           await tgCall(token, 'sendMessage', {
             chat_id: chatId,
-            text: `💵 Тепер введіть тариф за м² для *"${text}"* (наприклад: \`1.7\`):`,
+            text: `💵 Тепер введіть тариф за м² для *"${text}"* (наприклад: \`1.8\`):`,
             parse_mode: 'Markdown',
+            reply_markup: {
+              inline_keyboard: [[{ text: '❌ Скасувати', callback_data: 'menu_services' }]],
+            },
           });
           return new Response('OK');
         }
 
         if (pending.action === 'add_svc_rate') {
           const rate = parseFloat(text.replace(',', '.')) || 1.0;
+          await setPending(env, chatId, { action: 'add_svc_cadence', name: pending.name, rate });
+          await tgCall(token, 'sendMessage', {
+            chat_id: chatId,
+            text: `⏳ Оберіть періодичність для *"${pending.name}"* ($${rate}/m²):\n(Або натисніть кнопку нижче)`,
+            parse_mode: 'Markdown',
+            reply_markup: {
+              inline_keyboard: [
+                [{ text: 'one-time or seasonal', callback_data: 'newcad_one-time or seasonal' }],
+                [{ text: 'weekly or biweekly', callback_data: 'newcad_weekly or biweekly' }],
+                [{ text: 'one-time', callback_data: 'newcad_one-time' }],
+                [{ text: '✏️ Ввести свій варіант', callback_data: 'newcad_custom' }],
+                [{ text: '➡️ Пропустити (за домовленістю)', callback_data: 'newcad_skip' }],
+                [{ text: '❌ Скасувати', callback_data: 'menu_services' }],
+              ],
+            },
+          });
+          return new Response('OK');
+        }
+
+        if (pending.action === 'add_svc_cadence_input') {
+          await setPending(env, chatId, {
+            action: 'add_svc_desc',
+            name: pending.name,
+            rate: pending.rate,
+            cadence: text,
+          });
+          await tgCall(token, 'sendMessage', {
+            chat_id: chatId,
+            text: `📝 Введіть детальний опис послуги *"${pending.name}"*:\n(Що це за прибирання, для кого підходить тощо)\n\nАбо натисніть кнопку нижче, щоб пропустити:`,
+            parse_mode: 'Markdown',
+            reply_markup: {
+              inline_keyboard: [
+                [{ text: '➡️ Пропустити опис', callback_data: 'newdesc_skip' }],
+                [{ text: '❌ Скасувати', callback_data: 'menu_services' }],
+              ],
+            },
+          });
+          return new Response('OK');
+        }
+
+        if (pending.action === 'add_svc_desc') {
+          await setPending(env, chatId, {
+            action: 'add_svc_included',
+            name: pending.name,
+            rate: pending.rate,
+            cadence: pending.cadence,
+            description: text,
+          });
+          await tgCall(token, 'sendMessage', {
+            chat_id: chatId,
+            text: `📋 Введіть пункти «Що входить» у послугу *"${pending.name}"*:\n(Кожен пункт пишіть з нового рядка або через кому)\n\nАбо натисніть кнопку нижче, щоб додати стандартні пункти:`,
+            parse_mode: 'Markdown',
+            reply_markup: {
+              inline_keyboard: [
+                [{ text: '➡️ Пропустити (стандартний набір)', callback_data: 'newincl_skip' }],
+                [{ text: '❌ Скасувати', callback_data: 'menu_services' }],
+              ],
+            },
+          });
+          return new Response('OK');
+        }
+
+        if (pending.action === 'add_svc_included') {
+          const items = parseIncludedItems(text);
           const newService = {
             id: 'svc_' + Date.now(),
             name: pending.name,
-            rate: rate,
-            cadence: 'за домовленістю',
+            rate: pending.rate || 1.0,
+            cadence: pending.cadence || 'one-time or seasonal',
+            description: pending.description || 'Якісний сервіс від перевірених фахівців Shine & Sparkle.',
+            included: items,
             iconBg: '#E3EFFB',
-            description: 'Якісний сервіс від перевірених фахівців Shine & Sparkle.',
-            included: ['Основне прибирання поверхонь', 'Дезінфекція санвузлів', 'Миття підлоги'],
           };
           config.services.push(newService);
           await saveConfig(env, config);
           await setPending(env, chatId, null);
 
+          const { text: svcMsg, reply_markup } = renderServiceMessage(newService);
           await tgCall(token, 'sendMessage', {
             chat_id: chatId,
-            text: `✅ Послугу *"${pending.name}"* успішно створено з тарифом *$${rate}/m²*!`,
+            text: `✅ *Нову послугу успішно створено та опубліковано на сайті!*\n\n` + svcMsg,
             parse_mode: 'Markdown',
-            reply_markup: getMainKeyboard(siteUrl),
+            reply_markup,
           });
           return new Response('OK');
         }
