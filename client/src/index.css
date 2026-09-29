@@ -1140,14 +1140,14 @@ header.site-header .nav {
 }
 
 .draw-loop-svg path {
-  stroke: #000000;
+  stroke: var(--ink, #14395F);
   stroke-dasharray: 1 1;
   stroke-dashoffset: 1;
   animation: drawLoopPath 3.67s linear forwards;
 }
 
 .draw-loop-svg ellipse {
-  fill: #000000;
+  fill: var(--ink, #14395F);
   opacity: 0;
   animation: drawLoopDot 3.67s linear forwards;
 }
