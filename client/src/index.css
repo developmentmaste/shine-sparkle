@@ -43,7 +43,7 @@ html {
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: var(--ink);
   background: var(--white);
   font-size: 16px;
@@ -431,7 +431,7 @@ header.site-header .nav {
 .field-input, .field-textarea{
   width:100%; padding:13px 16px; margin-bottom:18px;
   border:1px solid var(--border); border-radius:var(--radius-md);
-  font-family:'Inter', sans-serif; font-size:0.95rem; color:var(--ink);
+  font-family: inherit; font-size:0.95rem; color:var(--ink);
   background:var(--bg-soft);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
