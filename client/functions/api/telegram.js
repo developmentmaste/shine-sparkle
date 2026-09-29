@@ -181,6 +181,56 @@ async function isUserAuthorized(env, userId, config) {
   return false;
 }
 
+// Cryptographic verification of Telegram WebApp initData
+async function verifyTelegramWebAppData(initData, botToken) {
+  if (!initData || !botToken) return null;
+  try {
+    const params = new URLSearchParams(initData);
+    const hash = params.get('hash');
+    if (!hash) return null;
+
+    params.delete('hash');
+    const items = [];
+    for (const [key, value] of params.entries()) {
+      items.push(`${key}=${value}`);
+    }
+    items.sort();
+    const dataCheckString = items.join('\n');
+
+    const encoder = new TextEncoder();
+    const keyMaterial = await crypto.subtle.importKey(
+      'raw',
+      encoder.encode('WebAppData'),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign']
+    );
+    const secretKey = await crypto.subtle.sign('HMAC', keyMaterial, encoder.encode(botToken));
+
+    const hmacKey = await crypto.subtle.importKey(
+      'raw',
+      secretKey,
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign']
+    );
+    const signature = await crypto.subtle.sign('HMAC', hmacKey, encoder.encode(dataCheckString));
+    const hexHash = Array.from(new Uint8Array(signature))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+
+    if (hexHash.toLowerCase() === hash.toLowerCase()) {
+      const userStr = params.get('user');
+      if (userStr) {
+        return JSON.parse(userStr);
+      }
+    }
+  } catch (err) {
+    console.error('Error verifying Telegram WebApp data:', err);
+  }
+  return null;
+}
+
 // Telegram API wrappers
 async function tgCall(token, method, payload) {
   const res = await fetch(`https://api.telegram.org/bot${token}/${method}`, {
@@ -241,7 +291,7 @@ function renderServiceMessage(service) {
 }
 
 function getMainKeyboard(siteUrl) {
-  const adminUrl = siteUrl ? `${siteUrl.replace(/\/+$/, '')}/#admin` : 'https://shine-sparkle.pages.dev/#admin';
+  const adminUrl = siteUrl ? `${siteUrl.replace(/\/+$/, '')}/?tg_admin=1` : 'https://shine-sparkle.pages.dev/?tg_admin=1';
   const liveUrl = siteUrl ? siteUrl.replace(/\/+$/, '') : 'https://shine-sparkle.pages.dev';
 
   return {
@@ -271,6 +321,53 @@ function getMainKeyboard(siteUrl) {
 export async function onRequestPost(context) {
   const { request, env } = context;
   const token = env.TELEGRAM_BOT_TOKEN;
+
+  // 0. Handle Admin Verification API call from WebApp
+  try {
+    const contentType = request.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      const clonedReq = request.clone();
+      const body = await clonedReq.json().catch(() => null);
+      if (body && (body.action === 'verify_admin' || body.action === 'check_admin')) {
+        let verifiedUser = null;
+        if (body.initData && token) {
+          verifiedUser = await verifyTelegramWebAppData(body.initData, token);
+        }
+
+        const targetUserId = (verifiedUser && verifiedUser.id) ? verifiedUser.id : body.userId;
+        if (!targetUserId) {
+          return new Response(JSON.stringify({ authorized: false, error: 'No user ID provided' }), {
+            status: 400,
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+            },
+          });
+        }
+
+        const config = await getConfig(env);
+        const authorized = await isUserAuthorized(env, targetUserId, config);
+
+        return new Response(JSON.stringify({
+          authorized,
+          user: {
+            id: targetUserId,
+            firstName: verifiedUser?.first_name || body.firstName || '',
+            username: verifiedUser?.username || body.username || '',
+          },
+        }), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
+        });
+      }
+    }
+  } catch (authErr) {
+    console.error('Error handling admin verification in onRequestPost:', authErr);
+  }
+
   if (!token) {
     return new Response('TELEGRAM_BOT_TOKEN environment variable is not configured', { status: 500 });
   }
@@ -1247,21 +1344,63 @@ export async function onRequestPost(context) {
 export async function onRequestGet(context) {
   const { request, env } = context;
   const token = env.TELEGRAM_BOT_TOKEN;
+  const urlObj = new URL(request.url);
+
+  // 1. Handle Admin Verification via GET (e.g. /api/telegram?action=verify_admin&userId=...)
+  const action = urlObj.searchParams.get('action');
+  if (action === 'verify_admin' || action === 'check_admin') {
+    const userId = urlObj.searchParams.get('userId');
+    const initData = urlObj.searchParams.get('initData');
+
+    let verifiedUser = null;
+    if (initData && token) {
+      verifiedUser = await verifyTelegramWebAppData(initData, token);
+    }
+
+    const targetUserId = (verifiedUser && verifiedUser.id) ? verifiedUser.id : userId;
+    if (!targetUserId) {
+      return new Response(JSON.stringify({ authorized: false, error: 'No user ID provided' }), {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+      });
+    }
+
+    const config = await getConfig(env);
+    const authorized = await isUserAuthorized(env, targetUserId, config);
+
+    return new Response(JSON.stringify({
+      authorized,
+      user: {
+        id: targetUserId,
+        firstName: verifiedUser?.first_name || urlObj.searchParams.get('firstName') || '',
+        username: verifiedUser?.username || urlObj.searchParams.get('username') || '',
+      },
+    }), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
+  }
+
   if (!token) {
     return new Response(JSON.stringify({ error: 'TELEGRAM_BOT_TOKEN environment variable is not configured' }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
     });
   }
-  const urlObj = new URL(request.url);
 
   // If user visits /api/telegram?setup=1, automatically configure Telegram Webhook!
   if (urlObj.searchParams.get('setup')) {
     const webhookUrl = `${urlObj.protocol}//${urlObj.host}/api/telegram`;
     const res = await tgCall(token, 'setWebhook', { url: webhookUrl });
 
-    // Also configure native menu button
-    const adminUrl = `${urlObj.protocol}//${urlObj.host}/#admin`;
+    // Also configure native menu button to open WebApp with tg_admin=1
+    const adminUrl = `${urlObj.protocol}//${urlObj.host}/?tg_admin=1`;
     await tgCall(token, 'setChatMenuButton', {
       menu_button: {
         type: 'web_app',
@@ -1271,11 +1410,21 @@ export async function onRequestGet(context) {
     });
 
     return new Response(JSON.stringify({ webhookUrl, telegramResponse: res }), {
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
     });
   }
 
   return new Response(JSON.stringify({ status: 'Telegram bot webhook endpoint active.' }), {
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+  });
+}
+
+export async function onRequestOptions() {
+  return new Response(null, {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
   });
 }

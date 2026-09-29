@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useConfig } from '../context/ConfigContext.jsx';
 
-export default function AdminPanel({ isOpen, onClose }) {
+export default function AdminPanel({ isOpen, onClose, telegramUser }) {
   const {
     settings,
     services,
@@ -15,9 +15,6 @@ export default function AdminPanel({ isOpen, onClose }) {
   } = useConfig();
 
   const [activeTab, setActiveTab] = useState('settings'); // 'settings' | 'services' | 'backup'
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [pinInput, setPinInput] = useState('');
-  const [pinError, setPinError] = useState('');
 
   // Local copy of general settings for the form
   const [formData, setFormData] = useState({ ...settings });
@@ -40,16 +37,6 @@ export default function AdminPanel({ isOpen, onClose }) {
   const [backupMsg, setBackupMsg] = useState('');
 
   if (!isOpen) return null;
-
-  function handleLogin(e) {
-    e.preventDefault();
-    if (pinInput.trim() === settings.adminPin || pinInput.trim() === 'admin' || pinInput.trim() === 'admin123') {
-      setIsAuthenticated(true);
-      setPinError('');
-    } else {
-      setPinError('Невірний пароль/PIN (за замовчуванням: admin123)');
-    }
-  }
 
   function handleSaveSettings(e) {
     e.preventDefault();
@@ -163,62 +150,61 @@ export default function AdminPanel({ isOpen, onClose }) {
           ✕
         </button>
 
-        {!isAuthenticated ? (
-          <div style={{ padding: '20px 0', textAlign: 'center' }}>
-            <div style={{ fontSize: '2.4rem', marginBottom: '12px' }}>⚙️</div>
-            <h3 style={{ marginBottom: '8px' }}>Вхід до Адмін-панелі</h3>
-            <p className="modal-sub" style={{ marginBottom: '24px' }}>
-              Введіть пароль для редагування контактів та списку послуг.
-            </p>
-
-            <form onSubmit={handleLogin} style={{ maxWidth: '320px', margin: '0 auto' }}>
-              <input
-                type="password"
-                className="field-input"
-                placeholder="Введіть PIN / пароль"
-                value={pinInput}
-                onChange={(e) => setPinInput(e.target.value)}
-                autoFocus
-                required
-              />
-              {pinError && (
-                <div style={{ color: 'var(--danger)', fontSize: '0.85rem', marginBottom: '12px' }}>
-                  {pinError}
-                </div>
-              )}
-              <button
-                type="submit"
-                className="btn-primary"
-                style={{ width: '100%', justifyContent: 'center' }}
-              >
-                Увійти
-              </button>
-            </form>
-          </div>
-        ) : (
-          <>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <div>
-                <h3 style={{ margin: 0 }}>⚙️ Панель керування</h3>
-                <span style={{ fontSize: '0.82rem', color: 'var(--ink-soft)' }}>
-                  Зміни зберігаються миттєво в браузері
-                </span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+          <div>
+            <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>⚙️</span> Адмін-панель Shine & Sparkle
+            </h3>
+            {telegramUser ? (
+              <div style={{ fontSize: '0.82rem', color: 'var(--ink-soft)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#22c55e' }}></span>
+                <span>Telegram: <strong>{telegramUser.firstName || telegramUser.username || 'Адміністратор'}</strong></span>
+                {telegramUser.username && <span style={{ color: '#0088cc' }}>@{telegramUser.username}</span>}
+                <span style={{ opacity: 0.65 }}>· ID: {telegramUser.id}</span>
               </div>
-              {saveSuccess && (
-                <span
-                  style={{
-                    background: '#E9FBEF',
-                    color: '#1E7B41',
-                    padding: '6px 12px',
-                    borderRadius: '100px',
-                    fontSize: '0.85rem',
-                    fontWeight: 600,
-                  }}
-                >
-                  ✓ Збережено!
-                </span>
-              )}
-            </div>
+            ) : (
+              <span style={{ fontSize: '0.82rem', color: 'var(--ink-soft)' }}>
+                Авторизовано через Telegram Bot
+              </span>
+            )}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            {saveSuccess && (
+              <span
+                style={{
+                  background: '#E9FBEF',
+                  color: '#1E7B41',
+                  padding: '6px 12px',
+                  borderRadius: '100px',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                }}
+              >
+                ✓ Збережено!
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                background: '#F0F6FC',
+                border: '1px solid #D0E1F5',
+                color: 'var(--ink)',
+                borderRadius: '8px',
+                padding: '6px 12px',
+                fontSize: '0.82rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontWeight: 500,
+              }}
+              title="Закрити WebApp та повернутися до бота"
+            >
+              <span>↩</span> Повернутися в бот
+            </button>
+          </div>
+        </div>
 
             {/* Navigation tabs */}
             <div
@@ -343,15 +329,23 @@ export default function AdminPanel({ isOpen, onClose }) {
                     </div>
 
                     <div>
-                      <label className="field-label">PIN для входу в адмінку</label>
-                      <input
-                        type="text"
-                        className="field-input"
-                        value={formData.adminPin}
-                        onChange={(e) => setFormData({ ...formData, adminPin: e.target.value })}
-                        placeholder="admin123"
-                        required
-                      />
+                      <label className="field-label">Безпека та доступ</label>
+                      <div
+                        style={{
+                          background: '#F0F7FF',
+                          border: '1px solid #C8E1FF',
+                          borderRadius: '10px',
+                          padding: '12px 14px',
+                          fontSize: '0.84rem',
+                          color: 'var(--ink)',
+                          lineHeight: '1.4',
+                        }}
+                      >
+                        🔒 <strong>Авторизація через Telegram</strong>
+                        <div style={{ color: 'var(--ink-soft)', marginTop: '4px', fontSize: '0.78rem' }}>
+                          Доступ надається лише зареєстрованим ID у боті. Публічний доступ за PIN-кодом вимкнено.
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -651,8 +645,6 @@ export default function AdminPanel({ isOpen, onClose }) {
                 </div>
               )}
             </div>
-          </>
-        )}
       </div>
     </div>
   );

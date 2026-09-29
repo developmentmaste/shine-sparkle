@@ -40,7 +40,12 @@ export default function SplashScreen({ onFinish }) {
     };
   }, [handleDismiss, onFinish]);
 
-  if (isDismissed || (typeof window !== 'undefined' && window.location.hash === '#admin')) {
+  const isTgSession =
+    typeof window !== 'undefined' &&
+    (new URLSearchParams(window.location.search).get('tg_admin') === '1' ||
+      Boolean(window.Telegram?.WebApp?.initDataUnsafe?.user));
+
+  if (isDismissed || isTgSession) {
     return null;
   }
 

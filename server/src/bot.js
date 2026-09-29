@@ -234,7 +234,7 @@ function getMainKeyboard() {
       [
         {
           text: '📱 Відкрити Адмін-панель (WebApp)',
-          web_app: { url: `${SITE_URL}/#admin` },
+          web_app: { url: `${SITE_URL}/?tg_admin=1` },
         },
       ],
       [
@@ -1202,7 +1202,7 @@ async function startPolling() {
     menu_button: {
       type: 'web_app',
       text: 'Адмінка',
-      web_app: { url: `${SITE_URL}/#admin` },
+      web_app: { url: `${SITE_URL}/?tg_admin=1` },
     },
   });
 
