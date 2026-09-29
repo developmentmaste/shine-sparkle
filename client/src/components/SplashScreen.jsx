@@ -14,16 +14,16 @@ export default function SplashScreen({ onFinish }) {
   }, [onFinish]);
 
   useEffect(() => {
-    // Total animation cycle in Draw loop is ~5.5-6s.
+    // Total animation cycle in Draw loop accelerated by 1.5x (~3.67s).
     // Start auto fade-out after drawing completes and settles:
     const fadeTimer = setTimeout(() => {
       setIsFading(true);
-    }, 5200);
+    }, 3500);
 
     const removeTimer = setTimeout(() => {
       setIsDismissed(true);
       if (onFinish) onFinish();
-    }, 5800);
+    }, 3900);
 
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') {

@@ -1140,24 +1140,24 @@ header.site-header .nav {
 }
 
 .draw-loop-svg path {
-  stroke: var(--ink, #14395F);
+  stroke: #000000;
   stroke-dasharray: 1 1;
   stroke-dashoffset: 1;
-  animation: drawLoopPath 5.5s linear forwards;
+  animation: drawLoopPath 3.67s linear forwards;
 }
 
 .draw-loop-svg ellipse {
-  fill: var(--ink, #14395F);
+  fill: #000000;
   opacity: 0;
-  animation: drawLoopDot 5.5s linear forwards;
+  animation: drawLoopDot 3.67s linear forwards;
 }
 
 .draw-loop-svg.is-looping path {
-  animation: drawLoopPath 7s linear infinite;
+  animation: drawLoopPath 4.67s linear infinite;
 }
 
 .draw-loop-svg.is-looping ellipse {
-  animation: drawLoopDot 7s linear infinite;
+  animation: drawLoopDot 4.67s linear infinite;
 }
 
 @keyframes drawLoopPath {
