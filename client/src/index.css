@@ -123,7 +123,7 @@ header.site-header .nav {
 }
 
 /* HERO */
-.hero{position:relative; padding:60px 24px 48px; text-align:center; overflow:hidden;}
+.hero{position:relative; padding:120px 24px 60px; text-align:center; overflow:hidden;}
 .blob{position:absolute; border-radius:50%; filter:blur(75px); opacity:0.58; z-index:0; pointer-events:none;}
 .hero .blob-1{
   width:340px; height:340px;
@@ -599,6 +599,9 @@ header.site-header .nav {
 @media (max-width: 768px) {
   :root {
     --section-fade-height: 70px;
+  }
+  .hero {
+    padding: 104px 20px 48px;
   }
   .site-footer {
     padding: 44px 0 28px;
