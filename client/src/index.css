@@ -13,6 +13,7 @@
   --radius-xl: 32px;
   --radius-lg: 24px;
   --radius-md: 16px;
+  --section-fade-height: 160px;
 }
 *,
 *::before,
@@ -215,7 +216,9 @@ header.site-header .nav {
 }
 
 /* PROCESS */
-.process{background:var(--bg-soft);}
+.process{
+  background: linear-gradient(180deg, var(--white) 0%, var(--bg-soft) var(--section-fade-height), var(--bg-soft) 100%);
+}
 .steps{display:grid; grid-template-columns:repeat(4,1fr); gap:18px;}
 .step{background:var(--white); border:1px solid var(--border); border-radius:var(--radius-md); padding:26px 22px;}
 .step-num{width:30px; height:30px; border-radius:50%; background:var(--ink); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.9rem; margin-bottom:18px;}
@@ -256,11 +259,34 @@ header.site-header .nav {
 }
 
 /* TESTIMONIALS */
+.reviews, #reviews {
+  background: linear-gradient(180deg, var(--bg-soft) 0%, var(--bg-soft) calc(100% - var(--section-fade-height)), var(--white) 100%);
+}
 .test-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
-.test-card{background:var(--bg-soft); border-radius:var(--radius-md); padding:26px; border:1px solid var(--border);}
+.test-card{
+  background:var(--white); 
+  border-radius:var(--radius-md); 
+  padding:26px; 
+  border:1px solid var(--border);
+  box-shadow: 0 4px 16px rgba(20, 57, 95, 0.04);
+}
 .test-card p{font-size:0.95rem; margin-bottom:18px;}
 .test-name{font-weight:700; font-size:0.9rem;}
 .test-role{color:var(--ink-soft); font-size:0.84rem;}
+
+/* SECTION TRANSITION UTILITIES */
+.fade-from-white {
+  background: linear-gradient(180deg, var(--white) 0%, var(--bg-soft) var(--section-fade-height), var(--bg-soft) 100%) !important;
+}
+.fade-to-white {
+  background: linear-gradient(180deg, var(--bg-soft) 0%, var(--bg-soft) calc(100% - var(--section-fade-height)), var(--white) 100%) !important;
+}
+.fade-from-gray {
+  background: linear-gradient(180deg, var(--bg-soft) 0%, var(--white) var(--section-fade-height), var(--white) 100%) !important;
+}
+.fade-to-gray {
+  background: linear-gradient(180deg, var(--white) 0%, var(--white) calc(100% - var(--section-fade-height)), var(--bg-soft) 100%) !important;
+}
 
 /* CONTACT */
 .contact-card{
@@ -439,6 +465,9 @@ header.site-header .nav {
 }
 
 @media (max-width: 768px) {
+  :root {
+    --section-fade-height: 100px;
+  }
   .site-footer {
     padding: 44px 0 28px;
     margin-top: 48px;

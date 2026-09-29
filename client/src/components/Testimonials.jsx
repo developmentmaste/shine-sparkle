@@ -18,7 +18,7 @@ const REVIEWS = [
 
 export default function Testimonials() {
   return (
-    <section className="section" id="reviews" style={{ background: 'var(--bg-soft)' }}>
+    <section className="section reviews" id="reviews">
       <div className="wrap">
         <div className="section-head">
           <span className="eyebrow">Reviews</span>
