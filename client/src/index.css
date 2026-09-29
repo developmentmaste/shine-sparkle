@@ -134,7 +134,7 @@ header.site-header .nav {
 }
 .hero .blob-2{
   width:310px; height:310px;
-  background: radial-gradient(circle at 40% 40%, #FDE047 0%, #F59E0B 70%, #D97706 100%);
+  background: radial-gradient(circle at 40% 40%, #818CF8 0%, #4F46E5 70%, #312E81 100%);
   top:20px; right:4%;
   animation: dvdBounce2 22s linear infinite;
   will-change: transform, opacity;

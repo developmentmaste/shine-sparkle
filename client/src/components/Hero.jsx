@@ -10,7 +10,6 @@ export default function Hero({ onOpenQuote }) {
       <div className="blob blob-2" />
       <div className="blob blob-3" />
       <div className="hero-inner">
-        <span className="eyebrow">Now booking in {settings.cities || '6 cities'}</span>
         <h1>Home cleaning, without the back and forth</h1>
         <p className="lead">
           {settings.brandName} matches you with a vetted local cleaner and gets
