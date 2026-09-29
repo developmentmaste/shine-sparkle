@@ -207,7 +207,7 @@ export default function ServiceAccordion({ onOpenQuote }) {
                           )}
                         </div>
                         <div>
-                          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0, color: 'var(--ink)' }}>
+                          <h3 style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0, color: 'var(--ink)' }}>
                             {service.name}
                           </h3>
                           <div

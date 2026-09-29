@@ -98,7 +98,7 @@ export default function Nav({ onOpenQuote }) {
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <img src="/logo.png" alt={settings.brandName} style={{ height: '38px', width: 'auto' }} />
               <div>
-                <div style={{ fontWeight: 800, fontSize: '1.15rem', color: 'var(--ink)' }}>
+                <div style={{ fontWeight: 700, fontSize: '1.15rem', color: 'var(--ink)' }}>
                   {settings.brandName}
                 </div>
                 <div style={{ fontSize: '0.8rem', color: 'var(--ink-soft)' }}>
