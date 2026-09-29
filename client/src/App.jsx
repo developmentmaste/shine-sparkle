@@ -10,6 +10,7 @@ import CTA from './components/CTA.jsx';
 import Footer from './components/Footer.jsx';
 import QuoteModal from './components/QuoteModal.jsx';
 import AdminPanel from './components/AdminPanel.jsx';
+import SplashScreen from './components/SplashScreen.jsx';
 
 function MainApp() {
   const [isQuoteOpen, setIsQuoteOpen] = useState(false);
@@ -47,6 +48,7 @@ function MainApp() {
 
   return (
     <>
+      <SplashScreen />
       <Nav onOpenQuote={() => handleOpenQuote()} />
       <Hero onOpenQuote={() => handleOpenQuote()} />
       <ServiceAccordion onOpenQuote={handleOpenQuote} />
