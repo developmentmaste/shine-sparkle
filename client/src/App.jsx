@@ -83,17 +83,17 @@ function MainApp() {
             setIsAdminOpen(false);
             if (hasTgAdminParam || isTg) {
               setAdminAuthError(
-                `Ваш Telegram ID (${userId || 'невідомий'}) не зареєстровано в списку адміністраторів Shine & Sparkle.`
+                `Your Telegram ID (${userId || 'unknown'}) is not registered in the Shine & Sparkle administrators list.`
               );
             }
           }
         })
         .catch((err) => {
-          console.error('Помилка перевірки Telegram адміністратора:', err);
+          console.error('Error verifying Telegram admin:', err);
           setIsVerifyingAdmin(false);
           setIsAdminOpen(false);
           if (hasTgAdminParam || isTg) {
-            setAdminAuthError('Не вдалося зв’язатися з сервером для підтвердження прав адміністратора.');
+            setAdminAuthError('Could not reach the server to verify administrator credentials.');
           }
         });
     }
@@ -145,7 +145,7 @@ function MainApp() {
         <div className="modal-overlay open" style={{ zIndex: 10001 }}>
           <div className="modal-card" style={{ maxWidth: '420px', textAlign: 'center', padding: '32px 24px' }}>
             <div style={{ fontSize: '3rem', marginBottom: '16px' }}>⛔</div>
-            <h3 style={{ marginBottom: '10px' }}>Доступ заборонено</h3>
+            <h3 style={{ marginBottom: '10px' }}>Access Restricted</h3>
             <p style={{ color: 'var(--ink-soft)', fontSize: '0.92rem', lineHeight: '1.5', marginBottom: '20px' }}>
               {adminAuthError}
             </p>
@@ -162,9 +162,9 @@ function MainApp() {
                 lineHeight: '1.4',
               }}
             >
-              🔑 <strong>Як отримати доступ:</strong>
+              🔑 <strong>How to get access:</strong>
               <div style={{ marginTop: '4px', color: 'var(--ink-soft)' }}>
-                Зверніться до власника або надішліть код запрошення у чат бота: <code>/login ваш_код</code>.
+                Contact the business owner or send your invite code in the Telegram bot: <code>/login your_code</code>.
               </div>
             </div>
             <button
@@ -180,7 +180,7 @@ function MainApp() {
                 }
               }}
             >
-              Закрити
+              Close
             </button>
           </div>
         </div>

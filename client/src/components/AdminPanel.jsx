@@ -145,16 +145,16 @@ export default function AdminPanel({ isOpen, onClose, telegramUser }) {
     importConfigJson,
   } = useConfig();
 
-  // Language state (Exclusive to Admin Panel)
+  // Language state (Exclusive to Admin Panel, defaults to English)
   const [lang, setLang] = useState(() => {
     try {
-      return localStorage.getItem('shine_sparkle_admin_lang') || 'ua';
+      return localStorage.getItem('shine_sparkle_admin_lang') || 'en';
     } catch {
-      return 'ua';
+      return 'en';
     }
   });
 
-  const t = TRANSLATIONS[lang] || TRANSLATIONS.ua;
+  const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
 
   const handleSwitchLang = (newLang) => {
     setLang(newLang);

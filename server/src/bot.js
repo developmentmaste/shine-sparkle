@@ -27,8 +27,8 @@ const CONFIG_FILE = path.join(DATA_DIR, 'config.json');
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 if (!BOT_TOKEN) {
-  console.error('❌ Помилка: Змінна TELEGRAM_BOT_TOKEN не вказана у файлі server/.env або змінних середовища.');
-  console.error('Створіть файл server/.env та додайте: TELEGRAM_BOT_TOKEN=ваш_токен_від_botfather');
+  console.error('❌ Error: TELEGRAM_BOT_TOKEN environment variable is not defined.');
+  console.error('Please configure TELEGRAM_BOT_TOKEN in server/.env or environment variables.');
   process.exit(1);
 }
 const SITE_URL = (process.env.CLIENT_ORIGIN || 'https://shine-sparkle.pages.dev').replace(/\/+$/, '');
@@ -180,7 +180,7 @@ async function tgCall(method, payload) {
 }
 
 function parseIncludedItems(text) {
-  if (!text) return ['Основне прибирання поверхонь', 'Дезінфекція санвузлів', 'Миття підлоги'];
+  if (!text) return ['Kitchen surfaces and sink', 'Bathroom disinfection', 'Floor vacuuming and mopping'];
   const lines = text
     .split('\n')
     .map((l) => l.trim())
@@ -195,33 +195,33 @@ function parseIncludedItems(text) {
       .map((l) => l.replace(/^[•\-\*\d\.\)\s✓]+/, '').trim())
       .filter(Boolean);
   }
-  return items.length > 0 ? items : ['Основне прибирання поверхонь', 'Дезінфекція санвузлів', 'Миття підлоги'];
+  return items.length > 0 ? items : ['Kitchen surfaces and sink', 'Bathroom disinfection', 'Floor vacuuming and mopping'];
 }
 
 function renderServiceMessage(service) {
   const includedList = (service.included || []).map((x) => `  ✓ ${x}`).join('\n');
   const text =
-    `🧹 *Послуга:* ${service.name}\n` +
-    `💵 *Тариф:* from *€${service.rate}/m²*\n` +
-    `⏳ *Періодичність:* \`${service.cadence || 'за домовленістю'}\`\n` +
-    `📝 *Опис:* ${service.description || '—'}\n\n` +
-    `📋 *Що входить:*\n${includedList || '  (список порожній)'}`;
+    `🧹 *Service:* ${service.name}\n` +
+    `💵 *Rate:* from *€${service.rate}/m²*\n` +
+    `⏳ *Frequency:* \`${service.cadence || 'custom'}\`\n` +
+    `📝 *Description:* ${service.description || '—'}\n\n` +
+    `📋 *Included:*\n${includedList || '  (empty list)'}`;
 
   const keyboard = [
     [
-      { text: '💶 Тариф (€/m²)', callback_data: `rate_${service.id}` },
-      { text: '✏️ Назва', callback_data: `rename_${service.id}` },
+      { text: '💶 Rate (€/m²)', callback_data: `rate_${service.id}` },
+      { text: '✏️ Name', callback_data: `rename_${service.id}` },
     ],
     [
-      { text: '⏳ Періодичність', callback_data: `cadence_${service.id}` },
-      { text: '📝 Опис', callback_data: `desc_${service.id}` },
+      { text: '⏳ Frequency', callback_data: `cadence_${service.id}` },
+      { text: '📝 Description', callback_data: `desc_${service.id}` },
     ],
     [
-      { text: '📋 Що входить', callback_data: `incl_${service.id}` },
-      { text: '🗑 Видалити', callback_data: `del_${service.id}` },
+      { text: '📋 Checklist', callback_data: `incl_${service.id}` },
+      { text: '🗑 Delete', callback_data: `del_${service.id}` },
     ],
     [
-      { text: '🔙 До списку послуг', callback_data: 'menu_services' },
+      { text: '🔙 Back to Services', callback_data: 'menu_services' },
     ],
   ];
 
@@ -233,21 +233,21 @@ function getMainKeyboard() {
     inline_keyboard: [
       [
         {
-          text: '📱 Відкрити Адмін-панель (WebApp)',
+          text: '📱 Open Admin Panel (WebApp)',
           web_app: { url: `${SITE_URL}/?tg_admin=1` },
         },
       ],
       [
-        { text: '🧹 Послуги та тарифи', callback_data: 'menu_services' },
-        { text: '📞 Контакти сайту', callback_data: 'menu_contacts' },
+        { text: '🧹 Services & Rates', callback_data: 'menu_services' },
+        { text: '📞 Website Contacts', callback_data: 'menu_contacts' },
       ],
       [
-        { text: '🔑 Коди доступу', callback_data: 'menu_codes' },
-        { text: '👥 Адміністратори', callback_data: 'act_list_admins' },
+        { text: '🔑 Access Codes', callback_data: 'menu_codes' },
+        { text: '👥 Administrators', callback_data: 'act_list_admins' },
       ],
       [
-        { text: '🌐 Відкрити сайт', url: SITE_URL },
-        { text: '🔄 Оновити', callback_data: 'menu_main' },
+        { text: '🌐 View Live Site', url: SITE_URL },
+        { text: '🔄 Refresh', callback_data: 'menu_main' },
       ],
     ],
   };
@@ -263,7 +263,7 @@ async function handleCallback(cb) {
   if (!authorized) {
     await tgCall('answerCallbackQuery', {
       callback_query_id: cb.id,
-      text: `⛔ Доступ заборонено! Ваш ID: ${userId}. Введіть /login <пароль> для входу.`,
+      text: `⛔ Access Denied! Your ID: ${userId}. Enter /login <code> to authenticate.`,
       show_alert: true,
     });
     return;
@@ -276,7 +276,7 @@ async function handleCallback(cb) {
     await tgCall('editMessageText', {
       chat_id: chatId,
       message_id: messageId,
-      text: `🧹 *Головне меню адмін-панелі*\n\nТут ви можете керувати послугами, тарифами за м² та контактами сайту.\n\nТакож ви можете натиснути кнопку *WebApp* нижче, щоб відкрити повноцінний інтерфейс прямо в Telegram!`,
+      text: `🧹 *Admin Control Panel*\n\nManage services, pricing per m², contacts, and team access.\n\nTap *Open Admin Panel (WebApp)* below to launch the full-screen mobile app directly in Telegram!`,
       parse_mode: 'Markdown',
       reply_markup: getMainKeyboard(),
     });
@@ -287,11 +287,11 @@ async function handleCallback(cb) {
     delete pendingActions[chatId];
     const { settings } = appConfig;
     const text =
-      `📞 *Поточні контакти сайту:*\n\n` +
-      `• *Телефон / WhatsApp:* \`${settings.whatsappDisplay}\`\n` +
+      `📞 *Current Website Contacts:*\n\n` +
+      `• *Phone / WhatsApp:* \`${settings.whatsappDisplay}\`\n` +
       `• *Email:* \`${settings.email}\`\n` +
-      `• *Локація:* \`${settings.cities || 'Dublin & surrounding areas'}\`\n\n` +
-      `Оберіть параметр, який бажаєте змінити:`;
+      `• *Service Areas:* \`${settings.cities || 'Dublin & surrounding areas'}\`\n\n` +
+      `Select a contact field to edit:`;
 
     await tgCall('editMessageText', {
       chat_id: chatId,
@@ -300,10 +300,10 @@ async function handleCallback(cb) {
       parse_mode: 'Markdown',
       reply_markup: {
         inline_keyboard: [
-          [{ text: '✏️ Змінити телефон / WhatsApp', callback_data: 'act_phone' }],
-          [{ text: '✏️ Змінити Email', callback_data: 'act_email' }],
-          [{ text: '✏️ Змінити локацію / міста', callback_data: 'act_cities' }],
-          [{ text: '🔙 Назад до меню', callback_data: 'menu_main' }],
+          [{ text: '✏️ Edit WhatsApp / Phone', callback_data: 'act_phone' }],
+          [{ text: '✏️ Edit Email', callback_data: 'act_email' }],
+          [{ text: '✏️ Edit Service Areas', callback_data: 'act_cities' }],
+          [{ text: '🔙 Back to Menu', callback_data: 'menu_main' }],
         ],
       },
     });
@@ -316,21 +316,21 @@ async function handleCallback(cb) {
     const activeCodes = codes.filter((c) => c.status === 'active');
     const usedCodes = codes.filter((c) => c.status === 'used');
 
-    let text = `🔑 *Керування кодами доступу*\n\n` +
-      `Тут ви можете створювати одноразові коди та роздавати їх колегам чи помічникам.\n\n`;
+    let text = `🔑 *Access Codes Management*\n\n` +
+      `Generate single-use invite codes to grant admin permissions to teammates.\n\n`;
 
     if (activeCodes.length > 0) {
-      text += `🟢 *Активні коди доступу (${activeCodes.length}):*\n`;
+      text += `🟢 *Active Access Codes (${activeCodes.length}):*\n`;
       activeCodes.slice(-8).reverse().forEach((c) => {
         text += `• \`${c.code}\`\n`;
       });
       text += `\n`;
     } else {
-      text += `🟢 *Активні коди:* _Немає активних кодів_\n\n`;
+      text += `🟢 *Active Codes:* _No active codes currently_\n\n`;
     }
 
     if (usedCodes.length > 0) {
-      text += `⚪ *Використані коди (${usedCodes.length}):*\n`;
+      text += `⚪ *Used Codes (${usedCodes.length}):*\n`;
       usedCodes.slice(-4).reverse().forEach((c) => {
         const who = c.used_by_username || `ID: ${c.used_by}`;
         text += `• ~${c.code}~ (${who})\n`;
@@ -339,13 +339,13 @@ async function handleCallback(cb) {
     }
 
     const buttons = [
-      [{ text: '➕ Згенерувати новий код', callback_data: 'act_gen_code' }],
-      [{ text: '👥 Список адміністраторів', callback_data: 'act_list_admins' }],
+      [{ text: '➕ Generate New Invite Code', callback_data: 'act_gen_code' }],
+      [{ text: '👥 Administrators List', callback_data: 'act_list_admins' }],
     ];
     if (usedCodes.length > 0) {
-      buttons.push([{ text: '🗑 Очистити використані', callback_data: 'act_clean_codes' }]);
+      buttons.push([{ text: '🗑 Clear Used Codes', callback_data: 'act_clean_codes' }]);
     }
-    buttons.push([{ text: '🔙 Назад до меню', callback_data: 'menu_main' }]);
+    buttons.push([{ text: '🔙 Back to Menu', callback_data: 'menu_main' }]);
 
     await tgCall('editMessageText', {
       chat_id: chatId,
@@ -369,13 +369,13 @@ async function handleCallback(cb) {
     saveAccessCodes(codes);
 
     const text =
-      `🎉 *Згенеровано новий код доступу!*\n\n` +
-      `Ключ: \`${newCode}\`\n\n` +
-      `📋 *Інструкція для передачі:*\n` +
-      `1. Надішліть цей код людині, якій надаєте доступ.\n` +
-      `2. Людина відкриває бота @sandsparklebot та відправляє:\n` +
-      `\`/login ${newCode}\` (або просто код \`${newCode}\` у повідомленні).\n\n` +
-      `_Код є одноразовим. Після активації доступ закріплюється за Telegram ID назавжди._`;
+      `🎉 *New Invite Code Generated!*\n\n` +
+      `Key: \`${newCode}\`\n\n` +
+      `📋 *How to share:*\n` +
+      `1. Send this code to the person you want to give access to.\n` +
+      `2. They open this bot and send:\n` +
+      `\`/login ${newCode}\` (or simply send \`${newCode}\` in chat).\n\n` +
+      `_The code is single-use. Once redeemed, admin access is linked to their Telegram ID permanently._`;
 
     await tgCall('editMessageText', {
       chat_id: chatId,
@@ -384,9 +384,9 @@ async function handleCallback(cb) {
       parse_mode: 'Markdown',
       reply_markup: {
         inline_keyboard: [
-          [{ text: '➕ Згенерувати ще один код', callback_data: 'act_gen_code' }],
-          [{ text: '🔑 Усі коди доступу', callback_data: 'menu_codes' }],
-          [{ text: '🔙 Головне меню', callback_data: 'menu_main' }],
+          [{ text: '➕ Generate Another Code', callback_data: 'act_gen_code' }],
+          [{ text: '🔑 View All Codes', callback_data: 'menu_codes' }],
+          [{ text: '🔙 Main Menu', callback_data: 'menu_main' }],
         ],
       },
     });
@@ -399,20 +399,20 @@ async function handleCallback(cb) {
     saveAccessCodes(remaining);
     await tgCall('answerCallbackQuery', {
       callback_query_id: cb.id,
-      text: '🧹 Використані коди очищено!',
+      text: '🧹 Used codes history cleared!',
     });
 
-    let text = `🔑 *Керування кодами доступу*\n\n` +
-      `Історію використаних кодів очищено.\n\n`;
+    let text = `🔑 *Access Codes Management*\n\n` +
+      `Used codes history has been cleared.\n\n`;
 
     if (remaining.length > 0) {
-      text += `🟢 *Активні коди доступу (${remaining.length}):*\n`;
+      text += `🟢 *Active Access Codes (${remaining.length}):*\n`;
       remaining.slice(-8).reverse().forEach((c) => {
         text += `• \`${c.code}\`\n`;
       });
       text += `\n`;
     } else {
-      text += `🟢 *Активні коди:* _Немає активних кодів_\n\n`;
+      text += `🟢 *Active Codes:* _No active codes currently_\n\n`;
     }
 
     await tgCall('editMessageText', {
@@ -422,9 +422,9 @@ async function handleCallback(cb) {
       parse_mode: 'Markdown',
       reply_markup: {
         inline_keyboard: [
-          [{ text: '➕ Згенерувати новий код', callback_data: 'act_gen_code' }],
-          [{ text: '👥 Список адміністраторів', callback_data: 'act_list_admins' }],
-          [{ text: '🔙 Назад до меню', callback_data: 'menu_main' }],
+          [{ text: '➕ Generate New Invite Code', callback_data: 'act_gen_code' }],
+          [{ text: '👥 Administrators List', callback_data: 'act_list_admins' }],
+          [{ text: '🔙 Back to Menu', callback_data: 'menu_main' }],
         ],
       },
     });
@@ -438,9 +438,9 @@ async function handleCallback(cb) {
       .map((x) => x.trim())
       .filter(Boolean);
 
-    let text = `👥 *Авторизовані адміністратори*\n\n`;
+    let text = `👥 *Authorized Administrators*\n\n`;
     if (envAdmins.length > 0) {
-      text += `⚙️ *Через змінну оточення (${envAdmins.length}):*\n`;
+      text += `⚙️ *Via Environment Variables (${envAdmins.length}):*\n`;
       envAdmins.forEach((id) => {
         text += `• ID: \`${id}\`\n`;
       });
@@ -448,12 +448,12 @@ async function handleCallback(cb) {
     }
 
     if (admins.length > 0) {
-      text += `🔑 *Через коди доступу / пароль (${admins.length}):*\n`;
+      text += `🔑 *Via Invite Codes / Login (${admins.length}):*\n`;
       admins.forEach((id) => {
-        text += `• ID: \`${id}\`${String(id) === String(userId) ? ' (Це ви)' : ''}\n`;
+        text += `• ID: \`${id}\`${String(id) === String(userId) ? ' (You)' : ''}\n`;
       });
     } else if (envAdmins.length === 0) {
-      text += `_Ще немає доданих адміністраторів._\n`;
+      text += `_No administrators registered yet._\n`;
     }
 
     await tgCall('editMessageText', {
@@ -463,9 +463,9 @@ async function handleCallback(cb) {
       parse_mode: 'Markdown',
       reply_markup: {
         inline_keyboard: [
-          [{ text: '➕ Створити код доступу', callback_data: 'act_gen_code' }],
-          [{ text: '🔑 До кодів доступу', callback_data: 'menu_codes' }],
-          [{ text: '🔙 Головне меню', callback_data: 'menu_main' }],
+          [{ text: '➕ Generate Invite Code', callback_data: 'act_gen_code' }],
+          [{ text: '🔑 Access Codes', callback_data: 'menu_codes' }],
+          [{ text: '🔙 Main Menu', callback_data: 'menu_main' }],
         ],
       },
     });
@@ -476,10 +476,10 @@ async function handleCallback(cb) {
     pendingActions[chatId] = { action: 'set_phone' };
     await tgCall('sendMessage', {
       chat_id: chatId,
-      text: `✏️ *Введіть новий номер телефону / WhatsApp* у відповідь на це повідомлення:\n(Наприклад: \`+353 85 285 0720\`)`,
+      text: `✏️ *Send the new phone / WhatsApp number* in reply to this message:\n(e.g.: \`+353 85 285 0720\`)`,
       parse_mode: 'Markdown',
       reply_markup: {
-        inline_keyboard: [[{ text: '❌ Скасувати', callback_data: 'menu_contacts' }]],
+        inline_keyboard: [[{ text: '❌ Cancel', callback_data: 'menu_contacts' }]],
       },
     });
     return;
@@ -489,10 +489,10 @@ async function handleCallback(cb) {
     pendingActions[chatId] = { action: 'set_email' };
     await tgCall('sendMessage', {
       chat_id: chatId,
-      text: `✏️ *Введіть новий Email* у відповідь на це повідомлення:\n(Наприклад: \`shineandsparkle.mm@gmail.com\`)`,
+      text: `✏️ *Send the new contact Email* in reply to this message:\n(e.g.: \`shineandsparkle.mm@gmail.com\`)`,
       parse_mode: 'Markdown',
       reply_markup: {
-        inline_keyboard: [[{ text: '❌ Скасувати', callback_data: 'menu_contacts' }]],
+        inline_keyboard: [[{ text: '❌ Cancel', callback_data: 'menu_contacts' }]],
       },
     });
     return;
@@ -502,10 +502,10 @@ async function handleCallback(cb) {
     pendingActions[chatId] = { action: 'set_cities' };
     await tgCall('sendMessage', {
       chat_id: chatId,
-      text: `✏️ *Введіть нову зону обслуговування*:\n(Наприклад: \`Dublin & surrounding areas\`)`,
+      text: `✏️ *Send the new service areas / cities* in reply to this message:\n(e.g.: \`Dublin & surrounding areas\`)`,
       parse_mode: 'Markdown',
       reply_markup: {
-        inline_keyboard: [[{ text: '❌ Скасувати', callback_data: 'menu_contacts' }]],
+        inline_keyboard: [[{ text: '❌ Cancel', callback_data: 'menu_contacts' }]],
       },
     });
     return;
@@ -514,7 +514,7 @@ async function handleCallback(cb) {
   if (data === 'menu_services') {
     delete pendingActions[chatId];
     const { services } = appConfig;
-    let text = `🧹 *Список послуг на сайті:*\n\n`;
+    let text = `🧹 *Services on Website:*\n\n`;
     const keyboard = [];
 
     services.forEach((s, idx) => {
@@ -522,9 +522,9 @@ async function handleCallback(cb) {
       keyboard.push([{ text: `⚙️ ${s.name} (€${s.rate}/m²)`, callback_data: `svc_${s.id}` }]);
     });
 
-    text += `\nНатисніть на послугу нижче для налаштування або зміни ціни:`;
-    keyboard.push([{ text: '➕ Додати нову послугу', callback_data: 'act_add_svc' }]);
-    keyboard.push([{ text: '🔙 Назад до меню', callback_data: 'menu_main' }]);
+    text += `\nTap any service below to configure its rate, description, or tasks:`;
+    keyboard.push([{ text: '➕ Add New Service', callback_data: 'act_add_svc' }]);
+    keyboard.push([{ text: '🔙 Back to Menu', callback_data: 'menu_main' }]);
 
     await tgCall('editMessageText', {
       chat_id: chatId,
@@ -541,7 +541,7 @@ async function handleCallback(cb) {
     const service = (appConfig.services || []).find((s) => s.id === id);
 
     if (!service) {
-      await tgCall('sendMessage', { chat_id: chatId, text: '❌ Послугу не знайдено.' });
+      await tgCall('sendMessage', { chat_id: chatId, text: '❌ Service not found.' });
       return;
     }
 
@@ -564,10 +564,10 @@ async function handleCallback(cb) {
     pendingActions[chatId] = { action: 'set_rate', id };
     await tgCall('sendMessage', {
       chat_id: chatId,
-      text: `💶 Введіть новий тариф за м² для *"${service.name}"* (поточний: €${service.rate}/m²):\nНаприклад: \`1.5\``,
+      text: `💶 Enter the new rate per m² for *"${service.name}"* (current: €${service.rate}/m²):\nExample: \`1.5\``,
       parse_mode: 'Markdown',
       reply_markup: {
-        inline_keyboard: [[{ text: '❌ Скасувати', callback_data: `svc_${id}` }]],
+        inline_keyboard: [[{ text: '❌ Cancel', callback_data: `svc_${id}` }]],
       },
     });
     return;
@@ -581,10 +581,10 @@ async function handleCallback(cb) {
     pendingActions[chatId] = { action: 'set_name', id };
     await tgCall('sendMessage', {
       chat_id: chatId,
-      text: `✏️ Введіть нову назву для *"${service.name}"*:`,
+      text: `✏️ Enter the new name for *"${service.name}"*:`,
       parse_mode: 'Markdown',
       reply_markup: {
-        inline_keyboard: [[{ text: '❌ Скасувати', callback_data: `svc_${id}` }]],
+        inline_keyboard: [[{ text: '❌ Cancel', callback_data: `svc_${id}` }]],
       },
     });
     return;
@@ -597,9 +597,9 @@ async function handleCallback(cb) {
 
     delete pendingActions[chatId];
     const text =
-      `⏳ *Зміна періодичності для "${service.name}"*\n\n` +
-      `Поточне значення: \`${service.cadence || 'за домовленістю'}\`\n\n` +
-      `Оберіть варіант або введіть власний текст:`;
+      `⏳ *Change Frequency for "${service.name}"*\n\n` +
+      `Current value: \`${service.cadence || 'custom'}\`\n\n` +
+      `Choose an option or enter custom text:`;
 
     await tgCall('editMessageText', {
       chat_id: chatId,
@@ -612,8 +612,8 @@ async function handleCallback(cb) {
           [{ text: 'weekly or biweekly', callback_data: `setcad_${id}_weekly or biweekly` }],
           [{ text: 'one-time', callback_data: `setcad_${id}_one-time` }],
           [{ text: 'monthly', callback_data: `setcad_${id}_monthly` }],
-          [{ text: '✏️ Ввести свій текст', callback_data: `customcad_${id}` }],
-          [{ text: '🔙 Скасувати', callback_data: `svc_${id}` }],
+          [{ text: '✏️ Enter custom text', callback_data: `customcad_${id}` }],
+          [{ text: '🔙 Cancel', callback_data: `svc_${id}` }],
         ],
       },
     });
@@ -632,11 +632,11 @@ async function handleCallback(cb) {
     }
     delete pendingActions[chatId];
 
-    const { text, reply_markup } = renderServiceMessage(service || { name: 'послуги', rate: 1, cadence: val, included: [] });
+    const { text, reply_markup } = renderServiceMessage(service || { name: 'Service', rate: 1, cadence: val, included: [] });
     await tgCall('editMessageText', {
       chat_id: chatId,
       message_id: messageId,
-      text: `✅ Періодичність оновлено на *${val}*!\n\n` + text,
+      text: `✅ Frequency updated to *${val}*!\n\n` + text,
       parse_mode: 'Markdown',
       reply_markup,
     });
@@ -651,10 +651,10 @@ async function handleCallback(cb) {
     pendingActions[chatId] = { action: 'set_custom_cadence', id };
     await tgCall('sendMessage', {
       chat_id: chatId,
-      text: `⏳ Введіть періодичність для *"${service.name}"*:\n(Наприклад: \`one-time or seasonal\` або \`2-3 рази на тиждень\`)`,
+      text: `⏳ Enter frequency for *"${service.name}"*:\n(e.g.: \`one-time or seasonal\` or \`2-3 times a week\`)`,
       parse_mode: 'Markdown',
       reply_markup: {
-        inline_keyboard: [[{ text: '❌ Скасувати', callback_data: `svc_${id}` }]],
+        inline_keyboard: [[{ text: '❌ Cancel', callback_data: `svc_${id}` }]],
       },
     });
     return;
@@ -669,11 +669,11 @@ async function handleCallback(cb) {
     await tgCall('sendMessage', {
       chat_id: chatId,
       text:
-        `📝 Введіть новий детальний опис для послуги *"${service.name}"*:\n\n` +
-        `_Поточний опис:_\n${service.description || '—'}`,
+        `📝 Enter new detailed description for *"${service.name}"*:\n\n` +
+        `_Current description:_\n${service.description || '—'}`,
       parse_mode: 'Markdown',
       reply_markup: {
-        inline_keyboard: [[{ text: '❌ Скасувати', callback_data: `svc_${id}` }]],
+        inline_keyboard: [[{ text: '❌ Cancel', callback_data: `svc_${id}` }]],
       },
     });
     return;
@@ -689,17 +689,17 @@ async function handleCallback(cb) {
     await tgCall('sendMessage', {
       chat_id: chatId,
       text:
-        `📋 *Що входить у послугу "${service.name}":*\n\n` +
-        `Введіть новий перелік пунктів. Кожен пункт пишіть з нового рядка або розділяйте комами.\n\n` +
-        `_Поточні пункти:_\n${currentItems || '(порожньо)'}\n\n` +
-        `_Приклад:_\n` +
+        `📋 *Included checklist for "${service.name}":*\n\n` +
+        `Enter new checklist items (one item per line or separated by commas).\n\n` +
+        `_Current checklist:_\n${currentItems || '(empty)'}\n\n` +
+        `_Example:_\n` +
         `Kitchen surfaces and sink\n` +
-        `Bathroom and fixtures\n` +
+        `Bathroom fixtures\n` +
         `Floors, vacuumed and mopped\n` +
         `Dusting and bed making`,
       parse_mode: 'Markdown',
       reply_markup: {
-        inline_keyboard: [[{ text: '❌ Скасувати', callback_data: `svc_${id}` }]],
+        inline_keyboard: [[{ text: '❌ Cancel', callback_data: `svc_${id}` }]],
       },
     });
     return;
@@ -712,18 +712,18 @@ async function handleCallback(cb) {
 
     await tgCall('sendMessage', {
       chat_id: chatId,
-      text: `🗑 Послугу успішно видалено!`,
+      text: `🗑 Service successfully deleted!`,
     });
 
     // Show updated services menu
-    let text = `🧹 *Список послуг на сайті:*\n\n`;
+    let text = `🧹 *Services on Website:*\n\n`;
     const keyboard = [];
     appConfig.services.forEach((s, idx) => {
       text += `${idx + 1}. *${s.name}* — from *€${s.rate}/m²*\n`;
       keyboard.push([{ text: `⚙️ ${s.name} (€${s.rate}/m²)`, callback_data: `svc_${s.id}` }]);
     });
-    keyboard.push([{ text: '➕ Додати нову послугу', callback_data: 'act_add_svc' }]);
-    keyboard.push([{ text: '🔙 Назад до меню', callback_data: 'menu_main' }]);
+    keyboard.push([{ text: '➕ Add New Service', callback_data: 'act_add_svc' }]);
+    keyboard.push([{ text: '🔙 Back to Menu', callback_data: 'menu_main' }]);
 
     await tgCall('sendMessage', {
       chat_id: chatId,
@@ -738,10 +738,10 @@ async function handleCallback(cb) {
     pendingActions[chatId] = { action: 'add_svc_name' };
     await tgCall('sendMessage', {
       chat_id: chatId,
-      text: `➕ Введіть назву для нової послуги (наприклад: \`Eco Cleaning\`):`,
+      text: `➕ Enter the name for the new service (e.g.: \`Office Cleaning\`):`,
       parse_mode: 'Markdown',
       reply_markup: {
-        inline_keyboard: [[{ text: '❌ Скасувати', callback_data: 'menu_services' }]],
+        inline_keyboard: [[{ text: '❌ Cancel', callback_data: 'menu_services' }]],
       },
     });
     return;
@@ -755,27 +755,27 @@ async function handleCallback(cb) {
       pending.action = 'add_svc_cadence_input';
       await tgCall('sendMessage', {
         chat_id: chatId,
-        text: `⏳ Введіть власну періодичність для *"${pending.name}"*:\n(Наприклад: \`one-time or seasonal\` або \`щотижня\`)`,
+        text: `⏳ Enter custom frequency for *"${pending.name}"*:\n(e.g.: \`one-time or seasonal\` or \`weekly\`)`,
         parse_mode: 'Markdown',
         reply_markup: {
-          inline_keyboard: [[{ text: '❌ Скасувати', callback_data: 'menu_services' }]],
+          inline_keyboard: [[{ text: '❌ Cancel', callback_data: 'menu_services' }]],
         },
       });
       return;
     }
 
-    const cadence = data === 'newcad_skip' ? 'за домовленістю' : data.replace('newcad_', '');
+    const cadence = data === 'newcad_skip' ? 'one-time or seasonal' : data.replace('newcad_', '');
     pending.cadence = cadence;
     pending.action = 'add_svc_desc';
 
     await tgCall('sendMessage', {
       chat_id: chatId,
-      text: `📝 Введіть детальний опис послуги *"${pending.name}"*:\n(Що це за прибирання, для кого підходить тощо)\n\nАбо натисніть кнопку нижче, щоб пропустити:`,
+      text: `📝 Enter detailed description for *"${pending.name}"*:\n(What kind of cleaning, who it is for, etc.)\n\nOr tap below to skip:`,
       parse_mode: 'Markdown',
       reply_markup: {
         inline_keyboard: [
-          [{ text: '➡️ Пропустити опис', callback_data: 'newdesc_skip' }],
-          [{ text: '❌ Скасувати', callback_data: 'menu_services' }],
+          [{ text: '➡️ Skip description', callback_data: 'newdesc_skip' }],
+          [{ text: '❌ Cancel', callback_data: 'menu_services' }],
         ],
       },
     });
@@ -786,17 +786,17 @@ async function handleCallback(cb) {
     const pending = pendingActions[chatId];
     if (!pending) return;
 
-    pending.description = 'Якісний сервіс від перевірених фахівців Shine & Sparkle.';
+    pending.description = 'Professional cleaning service from trusted Shine & Sparkle specialists.';
     pending.action = 'add_svc_included';
 
     await tgCall('sendMessage', {
       chat_id: chatId,
-      text: `📋 Введіть пункти «Що входить» у послугу *"${pending.name}"*:\n(Кожен пункт пишіть з нового рядка або через кому)\n\nАбо натисніть кнопку нижче, щоб додати стандартний набір:`,
+      text: `📋 Enter checklist items for *"${pending.name}"*:\n(Write each item on a new line or separated by commas)\n\nOr tap below to use the standard checklist:`,
       parse_mode: 'Markdown',
       reply_markup: {
         inline_keyboard: [
-          [{ text: '➡️ Пропустити (стандартний набір)', callback_data: 'newincl_skip' }],
-          [{ text: '❌ Скасувати', callback_data: 'menu_services' }],
+          [{ text: '➡️ Skip (standard checklist)', callback_data: 'newincl_skip' }],
+          [{ text: '❌ Cancel', callback_data: 'menu_services' }],
         ],
       },
     });
@@ -812,8 +812,8 @@ async function handleCallback(cb) {
       name: pending.name,
       rate: pending.rate || 1.0,
       cadence: pending.cadence || 'one-time or seasonal',
-      description: pending.description || 'Якісний сервіс від перевірених фахівців Shine & Sparkle.',
-      included: ['Основне прибирання поверхонь', 'Дезінфекція санвузлів', 'Миття підлоги'],
+      description: pending.description || 'Professional cleaning service from trusted Shine & Sparkle specialists.',
+      included: ['Kitchen surfaces and sink', 'Bathroom disinfection', 'Floor vacuuming and mopping'],
       iconBg: '#E3EFFB',
     };
     appConfig.services.push(newService);
@@ -823,7 +823,7 @@ async function handleCallback(cb) {
     const { text, reply_markup } = renderServiceMessage(newService);
     await tgCall('sendMessage', {
       chat_id: chatId,
-      text: `✅ *Нову послугу успішно створено та опубліковано на сайті!*\n\n` + text,
+      text: `✅ *New service successfully created and published on the website!*\n\n` + text,
       parse_mode: 'Markdown',
       reply_markup,
     });
@@ -854,9 +854,9 @@ async function handleMessage(msg) {
     addAuthorizedUser(userId);
     await tgCall('sendMessage', {
       chat_id: chatId,
-      text: `👑 *Авторизація успішна (Головний адміністратор)!*\n\n` +
-        `Ваш Telegram ID (\`${userId}\`) додано до списку адміністраторів.\n\n` +
-        `Вам надано повні права: зміна послуг, тарифів, контактів, а також *створення кодів доступу* для вашої команди через меню «🔑 Коди доступу».`,
+      text: `👑 *Authentication Successful (Primary Administrator)!*\n\n` +
+        `Your Telegram ID (\`${userId}\`) has been added to the administrators list.\n\n` +
+        `You have full admin access: update services, rates, contacts, and *create invite codes* for your team via «🔑 Access Codes».`,
       parse_mode: 'Markdown',
       reply_markup: getMainKeyboard(),
     });
@@ -879,9 +879,9 @@ async function handleMessage(msg) {
 
     await tgCall('sendMessage', {
       chat_id: chatId,
-      text: `🎉 *Код доступу активовано успішно!*\n\n` +
-        `Ваш Telegram ID (\`${userId}\`) успішно додано до адміністраторів *Shine & Sparkle*.\n\n` +
-        `Одноразовий код \`${matchedCode.code}\` погашено. Вам відкрито доступ:`,
+      text: `🎉 *Access Code Activated Successfully!*\n\n` +
+        `Your Telegram ID (\`${userId}\`) has been added to the administrators of *Shine & Sparkle*.\n\n` +
+        `One-time code \`${matchedCode.code}\` has been redeemed. Access is now unlocked:`,
       parse_mode: 'Markdown',
       reply_markup: getMainKeyboard(),
     });
@@ -891,7 +891,7 @@ async function handleMessage(msg) {
   if (rawText.startsWith('/login')) {
     await tgCall('sendMessage', {
       chat_id: chatId,
-      text: `❌ *Недійсний або вже використаний код доступу!*\n\nПеревірте правильність введеного коду або зверніться до власника для отримання нового запрошення.`,
+      text: `❌ *Invalid or already used access code!*\n\nPlease verify the code or contact the business owner for a new invite.`,
       parse_mode: 'Markdown',
     });
     return;
@@ -901,12 +901,12 @@ async function handleMessage(msg) {
   const authorized = isUserAuthorized(userId);
   if (!authorized) {
     const deniedText =
-      `⛔ *Доступ обмежено*\n\n` +
-      `Цей бот призначений виключно для адміністраторів *Shine & Sparkle*.\n\n` +
-      `Ваш Telegram ID: \`${userId}\`\n\n` +
-      `🔑 *Щоб отримати доступ:*\n` +
-      `Введіть код доступу, який вам надав власник:\n` +
-      `\`/login ваш_код\` (або просто надішліть код повідомленням).`;
+      `⛔ *Access Restricted*\n\n` +
+      `This bot is strictly reserved for *Shine & Sparkle* administrators.\n\n` +
+      `Your Telegram ID: \`${userId}\`\n\n` +
+      `🔑 *To gain access:*\n` +
+      `Enter the access code provided by the owner:\n` +
+      `\`/login your_code\` (or simply reply with your code).`;
 
     await tgCall('sendMessage', {
       chat_id: chatId,
@@ -927,7 +927,7 @@ async function handleMessage(msg) {
 
       await tgCall('sendMessage', {
         chat_id: chatId,
-        text: `✅ Номер WhatsApp успішно змінено на *${text}*!\nДані миттєво збережено.`,
+        text: `✅ WhatsApp phone number updated to *${text}*!\nUpdated live on the website.`,
         parse_mode: 'Markdown',
         reply_markup: getMainKeyboard(),
       });
@@ -941,7 +941,7 @@ async function handleMessage(msg) {
 
       await tgCall('sendMessage', {
         chat_id: chatId,
-        text: `✅ Email успішно змінено на *${text}*!`,
+        text: `✅ Contact email updated to *${text}*!\nUpdated live on the website.`,
         parse_mode: 'Markdown',
         reply_markup: getMainKeyboard(),
       });
@@ -955,7 +955,7 @@ async function handleMessage(msg) {
 
       await tgCall('sendMessage', {
         chat_id: chatId,
-        text: `✅ Зону обслуговування оновлено на *${text}*!`,
+        text: `✅ Service areas updated to *${text}*!`,
         parse_mode: 'Markdown',
         reply_markup: getMainKeyboard(),
       });
@@ -967,7 +967,7 @@ async function handleMessage(msg) {
       if (isNaN(newRate) || newRate <= 0) {
         await tgCall('sendMessage', {
           chat_id: chatId,
-          text: `⚠️ Будь ласка, введіть коректне додатнє число (наприклад: \`1.5\`):`,
+          text: `⚠️ Please enter a valid rate number (e.g.: \`1.5\`):`,
           parse_mode: 'Markdown',
         });
         return;
@@ -982,7 +982,7 @@ async function handleMessage(msg) {
 
       await tgCall('sendMessage', {
         chat_id: chatId,
-        text: `✅ Тариф для *"${svc ? svc.name : 'послуги'}"* успішно змінено на *€${newRate}/m²*!`,
+        text: `✅ Rate for *"${svc ? svc.name : 'Service'}"* updated to *€${newRate}/m²*!\nUpdated live on the website.`,
         parse_mode: 'Markdown',
         reply_markup: getMainKeyboard(),
       });
@@ -1000,7 +1000,7 @@ async function handleMessage(msg) {
       const { text: svcText, reply_markup } = renderServiceMessage(svc || { name: text, rate: 1, cadence: 'one-time or seasonal', included: [] });
       await tgCall('sendMessage', {
         chat_id: chatId,
-        text: `✅ Назву послуги змінено на *"${text}"*!\n\n` + svcText,
+        text: `✅ Service name updated to *"${text}"*!\n\n` + svcText,
         parse_mode: 'Markdown',
         reply_markup,
       });
@@ -1015,10 +1015,10 @@ async function handleMessage(msg) {
       }
       delete pendingActions[chatId];
 
-      const { text: svcText, reply_markup } = renderServiceMessage(svc || { name: 'послуги', rate: 1, cadence: text, included: [] });
+      const { text: svcText, reply_markup } = renderServiceMessage(svc || { name: 'Service', rate: 1, cadence: text, included: [] });
       await tgCall('sendMessage', {
         chat_id: chatId,
-        text: `✅ Періодичність для *"${svc ? svc.name : 'послуги'}"* змінено на *"${text}"*!\n\n` + svcText,
+        text: `✅ Frequency for *"${svc ? svc.name : 'Service'}"* updated to *"${text}"*!\n\n` + svcText,
         parse_mode: 'Markdown',
         reply_markup,
       });
@@ -1033,10 +1033,10 @@ async function handleMessage(msg) {
       }
       delete pendingActions[chatId];
 
-      const { text: svcText, reply_markup } = renderServiceMessage(svc || { name: 'послуги', rate: 1, description: text, included: [] });
+      const { text: svcText, reply_markup } = renderServiceMessage(svc || { name: 'Service', rate: 1, description: text, included: [] });
       await tgCall('sendMessage', {
         chat_id: chatId,
-        text: `✅ Опис для *"${svc ? svc.name : 'послуги'}"* успішно оновлено!\n\n` + svcText,
+        text: `✅ Description for *"${svc ? svc.name : 'Service'}"* updated successfully!\n\n` + svcText,
         parse_mode: 'Markdown',
         reply_markup,
       });
@@ -1052,10 +1052,10 @@ async function handleMessage(msg) {
       }
       delete pendingActions[chatId];
 
-      const { text: svcText, reply_markup } = renderServiceMessage(svc || { name: 'послуги', rate: 1, included: items });
+      const { text: svcText, reply_markup } = renderServiceMessage(svc || { name: 'Service', rate: 1, included: items });
       await tgCall('sendMessage', {
         chat_id: chatId,
-        text: `✅ Перелік «Що входить» для *"${svc ? svc.name : 'послуги'}"* оновлено (${items.length} пунктів)!\n\n` + svcText,
+        text: `✅ Checklist for *"${svc ? svc.name : 'Service'}"* updated (${items.length} items)!\n\n` + svcText,
         parse_mode: 'Markdown',
         reply_markup,
       });
@@ -1066,10 +1066,10 @@ async function handleMessage(msg) {
       pendingActions[chatId] = { action: 'add_svc_rate', name: text };
       await tgCall('sendMessage', {
         chat_id: chatId,
-        text: `💵 Тепер введіть тариф за м² для *"${text}"* (наприклад: \`1.8\`):`,
+        text: `💵 Now enter the rate per m² for *"${text}"* (e.g.: \`1.8\`):`,
         parse_mode: 'Markdown',
         reply_markup: {
-          inline_keyboard: [[{ text: '❌ Скасувати', callback_data: 'menu_services' }]],
+          inline_keyboard: [[{ text: '❌ Cancel', callback_data: 'menu_services' }]],
         },
       });
       return;
@@ -1080,16 +1080,16 @@ async function handleMessage(msg) {
       pendingActions[chatId] = { action: 'add_svc_cadence', name: pending.name, rate };
       await tgCall('sendMessage', {
         chat_id: chatId,
-        text: `⏳ Оберіть періодичність для *"${pending.name}"* (€${rate}/m²):\n(Або натисніть кнопку нижче)`,
+        text: `⏳ Select frequency for *"${pending.name}"* (€${rate}/m²):\n(Or choose an option below)`,
         parse_mode: 'Markdown',
         reply_markup: {
           inline_keyboard: [
             [{ text: 'one-time or seasonal', callback_data: 'newcad_one-time or seasonal' }],
             [{ text: 'weekly or biweekly', callback_data: 'newcad_weekly or biweekly' }],
             [{ text: 'one-time', callback_data: 'newcad_one-time' }],
-            [{ text: '✏️ Ввести свій варіант', callback_data: 'newcad_custom' }],
-            [{ text: '➡️ Пропустити (за домовленістю)', callback_data: 'newcad_skip' }],
-            [{ text: '❌ Скасувати', callback_data: 'menu_services' }],
+            [{ text: '✏️ Custom frequency', callback_data: 'newcad_custom' }],
+            [{ text: '➡️ Skip (one-time or seasonal)', callback_data: 'newcad_skip' }],
+            [{ text: '❌ Cancel', callback_data: 'menu_services' }],
           ],
         },
       });
@@ -1105,12 +1105,12 @@ async function handleMessage(msg) {
       };
       await tgCall('sendMessage', {
         chat_id: chatId,
-        text: `📝 Введіть детальний опис послуги *"${pending.name}"*:\n(Що це за прибирання, для кого підходить тощо)\n\nАбо натисніть кнопку нижче, щоб пропустити:`,
+        text: `📝 Enter detailed description for *"${pending.name}"*:\n(What this clean includes, who it is for, etc.)\n\nOr tap below to skip:`,
         parse_mode: 'Markdown',
         reply_markup: {
           inline_keyboard: [
-            [{ text: '➡️ Пропустити опис', callback_data: 'newdesc_skip' }],
-            [{ text: '❌ Скасувати', callback_data: 'menu_services' }],
+            [{ text: '➡️ Skip description', callback_data: 'newdesc_skip' }],
+            [{ text: '❌ Cancel', callback_data: 'menu_services' }],
           ],
         },
       });
@@ -1127,12 +1127,12 @@ async function handleMessage(msg) {
       };
       await tgCall('sendMessage', {
         chat_id: chatId,
-        text: `📋 Введіть пункти «Що входить» у послугу *"${pending.name}"*:\n(Кожен пункт пишіть з нового рядка або через кому)\n\nАбо натисніть кнопку нижче, щоб додати стандартні пункти:`,
+        text: `📋 Enter checklist items for *"${pending.name}"*:\n(Write each item on a new line or separated by commas)\n\nOr tap below to add standard checklist:`,
         parse_mode: 'Markdown',
         reply_markup: {
           inline_keyboard: [
-            [{ text: '➡️ Пропустити (стандартний набір)', callback_data: 'newincl_skip' }],
-            [{ text: '❌ Скасувати', callback_data: 'menu_services' }],
+            [{ text: '➡️ Skip (standard checklist)', callback_data: 'newincl_skip' }],
+            [{ text: '❌ Cancel', callback_data: 'menu_services' }],
           ],
         },
       });
@@ -1146,7 +1146,7 @@ async function handleMessage(msg) {
         name: pending.name,
         rate: pending.rate || 1.0,
         cadence: pending.cadence || 'one-time or seasonal',
-        description: pending.description || 'Якісний сервіс від перевірених фахівців Shine & Sparkle.',
+        description: pending.description || 'Professional cleaning service from trusted Shine & Sparkle specialists.',
         included: items,
         iconBg: '#E3EFFB',
       };
@@ -1157,7 +1157,7 @@ async function handleMessage(msg) {
       const { text: svcMsg, reply_markup } = renderServiceMessage(newService);
       await tgCall('sendMessage', {
         chat_id: chatId,
-        text: `✅ *Нову послугу успішно створено та опубліковано на сайті!*\n\n` + svcMsg,
+        text: `✅ *New service successfully created and published on the website!*\n\n` + svcMsg,
         parse_mode: 'Markdown',
         reply_markup,
       });
@@ -1168,13 +1168,13 @@ async function handleMessage(msg) {
   if (text.startsWith('/start') || text.startsWith('/menu') || text.startsWith('/admin')) {
     delete pendingActions[chatId];
     const welcomeText =
-      `👋 *Вітаємо в адмін-панелі Shine & Sparkle!*\n\n` +
-      `Тут ви можете миттєво керувати сайтом:\n` +
-      `• 🧹 *Послуги та ціни* за м²\n` +
-      `• 📞 *Контакти* (номер WhatsApp, Email, міста)\n` +
-      `• 🔑 *Коди доступу* (створення запрошень для команди)\n` +
-      `• 📱 Відкривати повноцінну *веб-адмінку* прямо в Telegram\n\n` +
-      `Оберіть дію нижче:`;
+      `👋 *Welcome to Shine & Sparkle Admin Bot!*\n\n` +
+      `Here you can manage:\n` +
+      `• 🧹 *Services & rates* per m²\n` +
+      `• 📞 *Contacts* (WhatsApp number, Email, service areas)\n` +
+      `• 🔑 *Access codes* (generate single-use invite codes for teammates)\n` +
+      `• 📱 Open the full *Web Admin App* directly in Telegram\n\n` +
+      `Choose an action below:`;
 
     await tgCall('sendMessage', {
       chat_id: chatId,
@@ -1187,7 +1187,7 @@ async function handleMessage(msg) {
 
   await tgCall('sendMessage', {
     chat_id: chatId,
-    text: `Натисніть /start для відкриття меню керування сайтом.`,
+    text: `Press /start to open the website management menu.`,
     reply_markup: getMainKeyboard(),
   });
 }
@@ -1201,7 +1201,7 @@ async function startPolling() {
   await tgCall('setChatMenuButton', {
     menu_button: {
       type: 'web_app',
-      text: 'Адмінка',
+      text: 'Admin',
       web_app: { url: `${SITE_URL}/?tg_admin=1` },
     },
   });
