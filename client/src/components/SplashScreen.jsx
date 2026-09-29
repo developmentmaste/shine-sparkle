@@ -50,11 +50,24 @@ export default function SplashScreen({ onFinish }) {
       onClick={handleDismiss}
       role="banner"
       aria-label="Welcome animation"
-      title="Click anywhere to skip"
     >
+      <button
+        type="button"
+        className="splash-skip-btn"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleDismiss();
+        }}
+        aria-label="Skip intro animation"
+      >
+        Пропустити ✕
+      </button>
+
       <div className="splash-stage">
         <DrawLoopSvg className="splash-svg" />
       </div>
+
+      <span className="splash-hint">Натисніть у будь-якому місці, щоб пропустити</span>
     </div>
   );
 }
