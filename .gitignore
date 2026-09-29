@@ -5,4 +5,11 @@ client/dist/
 .env.local
 .env.*.local
 .DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 .wrangler/
+.vscode/
+.idea/

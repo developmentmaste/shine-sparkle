@@ -1006,50 +1006,5 @@ header.site-header .nav {
   63%, 100% { opacity: 1; }
 }
 
-.splash-skip-btn {
-  position: absolute;
-  top: 24px;
-  right: 24px;
-  background: rgba(20, 57, 95, 0.05);
-  border: 1px solid rgba(20, 57, 95, 0.12);
-  color: var(--ink, #14395F);
-  font-family: inherit;
-  font-size: 0.85rem;
-  font-weight: 600;
-  padding: 8px 18px;
-  border-radius: 9999px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  z-index: 10;
-}
-
-.splash-skip-btn:hover {
-  background: rgba(20, 57, 95, 0.1);
-  transform: translateY(-1px);
-}
-
-.splash-hint {
-  position: absolute;
-  bottom: 24px;
-  font-size: 0.78rem;
-  letter-spacing: 0.03em;
-  color: var(--ink-soft, #5A6B7D);
-  opacity: 0.7;
-  font-weight: 500;
-}
-
-@media (max-width: 600px) {
-  .splash-skip-btn {
-    top: 16px;
-    right: 16px;
-    padding: 6px 14px;
-    font-size: 0.8rem;
-  }
-  .splash-hint {
-    bottom: 16px;
-    font-size: 0.72rem;
-  }
-}
-
 
 
