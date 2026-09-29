@@ -1,25 +1,34 @@
 import { useState, useEffect } from 'react';
 import { useConfig } from '../context/ConfigContext.jsx';
-import { buildQuoteWhatsAppMessage } from '../whatsapp.js';
+import { buildContactWhatsAppMessage, DEFAULT_MESSAGE } from '../whatsapp.js';
 import SendButton from './SendButton.jsx';
+import whatsappIcon from '../assets/whatsapp-svgrepo-com.svg';
 
 export default function QuoteModal({ isOpen, onClose, initialServiceId }) {
   const { services, settings, getWhatsAppUrl } = useConfig();
 
-  const defaultServiceId = services.length > 0 ? services[0].id : '';
-  const [serviceId, setServiceId] = useState(initialServiceId || defaultServiceId);
-  const [area, setArea] = useState('');
   const [name, setName] = useState('');
-  const [notes, setNotes] = useState('');
+  const [message, setMessage] = useState('');
+  const [serviceId, setServiceId] = useState(initialServiceId || '');
+  const [nameError, setNameError] = useState(false);
+  const [messageError, setMessageError] = useState(false);
 
-  // Update selected service if initialServiceId changes
+  // When opened with a specific serviceId or when initialServiceId changes
   useEffect(() => {
     if (initialServiceId) {
       setServiceId(initialServiceId);
-    } else if (services.length > 0 && !serviceId) {
-      setServiceId(services[0].id);
+      const svc = services.find((s) => s.id === initialServiceId);
+      if (svc) {
+        setMessage(`Hi! I'd like to ask about ${svc.name}. `);
+      }
+    } else {
+      setServiceId('');
+      setMessage('');
     }
-  }, [initialServiceId, services]);
+    setName('');
+    setNameError(false);
+    setMessageError(false);
+  }, [initialServiceId, services, isOpen]);
 
   // Handle ESC key and body scroll lock
   useEffect(() => {
@@ -40,22 +49,42 @@ export default function QuoteModal({ isOpen, onClose, initialServiceId }) {
 
   if (!isOpen) return null;
 
-  const currentService = services.find((s) => s.id === serviceId) || services[0] || {};
+  const currentService = services.find((s) => s.id === serviceId);
 
   function handleSubmit(e) {
     e.preventDefault();
+    let hasError = false;
 
-    const quoteText = buildQuoteWhatsAppMessage({
-      serviceName: currentService.name,
-      cadence: currentService.cadence,
-      areaSqm: area.trim() ? area.trim() : undefined,
-      name: name,
-      notes: notes,
+    if (!name.trim()) {
+      setNameError(true);
+      hasError = true;
+    } else {
+      setNameError(false);
+    }
+
+    if (!message.trim()) {
+      setMessageError(true);
+      hasError = true;
+    } else {
+      setMessageError(false);
+    }
+
+    if (hasError) return;
+
+    const formattedMessage = buildContactWhatsAppMessage({
+      name: name.trim(),
+      message: currentService
+        ? `[Inquiry: ${currentService.name}]\n${message.trim()}`
+        : message.trim(),
       brandName: settings.brandName,
     });
 
-    const url = getWhatsAppUrl(quoteText);
+    const url = getWhatsAppUrl(formattedMessage);
     window.open(url, '_blank');
+    setName('');
+    setMessage('');
+    setNameError(false);
+    setMessageError(false);
     onClose();
   }
 
@@ -66,60 +95,95 @@ export default function QuoteModal({ isOpen, onClose, initialServiceId }) {
           type="button"
           className="modal-close"
           onClick={onClose}
-          aria-label="Close quote modal"
+          aria-label="Close modal"
         >
           ✕
         </button>
 
-        <h3>Request a Quote</h3>
+        <h3>Questions or Booking?</h3>
         <p className="modal-sub">
-          Fill in your details and we’ll format an instant message for WhatsApp.
+          Fastest way to reach us is WhatsApp. Send your message below.
         </p>
 
-        <form onSubmit={handleSubmit}>
-          <label className="field-label">Select Service</label>
-          <select
-            className="field-input"
-            value={serviceId}
-            onChange={(e) => setServiceId(e.target.value)}
-          >
-            {services.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
-
-          <label className="field-label">Apartment / Space details (optional)</label>
-          <input
-            type="text"
-            className="field-input"
-            placeholder="e.g. 65 m² or 2 bedrooms"
-            value={area}
-            onChange={(e) => setArea(e.target.value)}
+        <a
+          className="btn-primary"
+          style={{
+            width: '100%',
+            justifyContent: 'center',
+            textAlign: 'center',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            marginBottom: '14px',
+            padding: '13px 20px',
+            fontSize: '0.94rem',
+          }}
+          href={getWhatsAppUrl(DEFAULT_MESSAGE)}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span>Chat on WhatsApp</span>
+          <img
+            src={whatsappIcon}
+            alt="WhatsApp"
+            style={{ width: '18px', height: '18px', objectFit: 'contain' }}
           />
+        </a>
 
-          <label className="field-label">Your Name (optional)</label>
+        <div className="divider" style={{ margin: '14px 0 18px' }} />
+
+        <form onSubmit={handleSubmit} noValidate>
+          {services.length > 0 && (
+            <>
+              <label className="field-label">Service (optional)</label>
+              <select
+                className="field-input"
+                value={serviceId}
+                onChange={(e) => {
+                  const newId = e.target.value;
+                  setServiceId(newId);
+                  const svc = services.find((s) => s.id === newId);
+                  if (svc && (!message || message.startsWith("Hi! I'd like to ask about"))) {
+                    setMessage(`Hi! I'd like to ask about ${svc.name}. `);
+                  }
+                }}
+              >
+                <option value="">General inquiry / Other</option>
+                {services.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            </>
+          )}
+
+          <label className="field-label">Name</label>
           <input
-            type="text"
-            className="field-input"
-            placeholder="e.g. Alex"
+            className={`field-input${nameError ? ' has-error' : ''}`}
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value);
+              if (nameError) setNameError(false);
+            }}
+            placeholder="Your name"
           />
 
-          <label className="field-label">Notes or specific requests</label>
+          <label className="field-label">Message</label>
           <textarea
-            className="field-textarea"
-            placeholder="e.g. 2 bedrooms, have 1 cat, windows need washing, prefer Saturday morning..."
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            rows={3}
+            className={`field-textarea${messageError ? ' has-error' : ''}`}
+            value={message}
+            onChange={(e) => {
+              setMessage(e.target.value);
+              if (messageError) setMessageError(false);
+            }}
+            placeholder="What would you like to know or book?"
+            rows={4}
           />
 
-          <div className="divider" style={{ margin: '16px 0 20px' }} />
-
-          <SendButton text="Send Quote to WhatsApp" />
+          <div style={{ marginTop: '8px' }}>
+            <SendButton text="Send message to WhatsApp" />
+          </div>
         </form>
       </div>
     </div>
