@@ -1,5 +1,136 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useConfig } from '../context/ConfigContext.jsx';
+
+const TRANSLATIONS = {
+  ua: {
+    appTitle: 'Адмін-панель',
+    brand: 'Shine & Sparkle',
+    backToBot: 'У бот',
+    adminRole: 'Адміністратор',
+    authTelegram: 'Авторизовано через Telegram',
+    saved: '✓ Збережено!',
+    // Tabs
+    tabContacts: 'Контакти',
+    tabServices: 'Послуги',
+    tabBackup: 'Резерв',
+    // Tab 1: Contacts & Settings
+    contactsHeader: 'Контактні дані сайту',
+    contactsSub: 'Ці контакти автоматично оновлюються на головному сайті для клієнтів.',
+    whatsappPhoneLabel: 'WhatsApp номер (тільки цифри)',
+    whatsappPhoneHint: 'Формат без знаку плюс, наприклад: 353852850720',
+    whatsappDisplayLabel: 'Відображення телефону на сайті',
+    whatsappDisplayHint: 'Наприклад: +353 85 285 0720',
+    emailLabel: 'Контактний Email',
+    brandNameLabel: 'Назва компанії / Бренд',
+    minChargeLabel: 'Мінімальна вартість замовлення (€)',
+    citiesLabel: 'Міста та регіони обслуговування',
+    citiesHint: 'Наприклад: Dublin & surrounding areas',
+    securityLabel: 'Безпека та доступ',
+    securityTitle: 'Авторизація через Telegram',
+    securityDesc: 'Доступ надається лише зареєстрованим ID у боті. Публічний доступ за PIN-кодом вимкнено для захисту.',
+    saveSettingsBtn: 'Зберегти зміни контактів',
+    // Tab 2: Services
+    servicesHeader: 'Список активних послуг',
+    servicesSub: 'Керуйте списком послуг, тарифами за м² та переліком робіт.',
+    addServiceBtn: '+ Додати нову послугу',
+    editBtn: '✏️ Редагувати',
+    deleteBtn: '🗑️ Видалити',
+    ratePerM2: '€ / м²',
+    includedTitle: 'Що входить у послугу:',
+    confirmDelete: (name) => `Ви впевнені, що хочете видалити послугу "${name}"?`,
+    // Service Form
+    formAddTitle: '✨ Створення нової послуги',
+    formEditTitle: '✏️ Редагування послуги',
+    serviceNameLabel: 'Назва послуги',
+    serviceRateLabel: 'Тариф (€ за м²)',
+    serviceCadenceLabel: 'Періодичність / Тип прибирання',
+    cadenceWeekly: 'weekly or biweekly (щотижня / 2 тижні)',
+    cadenceSeasonal: 'one-time or seasonal (разове / сезонне)',
+    cadenceOneTime: 'one-time (разове прибирання)',
+    serviceDescLabel: 'Детальний опис послуги',
+    serviceIncludedLabel: 'Пункти «Що входить» (кожен пункт з нового рядка)',
+    saveServiceBtn: 'Зберегти послугу',
+    cancelBtn: 'Скасувати',
+    // Tab 3: Backup
+    backupHeader: 'Резервна копія налаштувань',
+    backupSub: 'Ви можете скопіювати повну конфігурацію сайту в JSON для резерву або перенесення.',
+    copyJsonBtn: '📋 Скопіювати JSON конфігурації',
+    copiedMsg: 'Конфігурацію скопійовано в буфер обміну!',
+    importHeader: 'Імпорт конфігурації',
+    importPlaceholder: 'Вставте сюди скопійований JSON...',
+    importBtn: '📥 Застосувати імпортований JSON',
+    importSuccessMsg: 'Конфігурацію успішно імпортовано!',
+    importErrorMsg: 'Помилка імпорту: ',
+    resetHeader: 'Скидання до заводських значень',
+    resetSub: 'Повертає всі контакти, послуги та тарифи до початкового стану.',
+    resetBtn: '⚠️ Скинути все до початкового стану',
+    confirmReset: 'Скинути всі налаштування та послуги до початкових заводських значень?',
+  },
+  en: {
+    appTitle: 'Admin Panel',
+    brand: 'Shine & Sparkle',
+    backToBot: 'To Bot',
+    adminRole: 'Administrator',
+    authTelegram: 'Authenticated via Telegram',
+    saved: '✓ Saved!',
+    // Tabs
+    tabContacts: 'Contacts',
+    tabServices: 'Services',
+    tabBackup: 'Backup',
+    // Tab 1: Contacts & Settings
+    contactsHeader: 'Website Contact Info',
+    contactsSub: 'These details update immediately on the live website for your clients.',
+    whatsappPhoneLabel: 'WhatsApp Number (digits only)',
+    whatsappPhoneHint: 'Format without plus sign, e.g.: 353852850720',
+    whatsappDisplayLabel: 'Phone Display Format on Website',
+    whatsappDisplayHint: 'E.g.: +353 85 285 0720',
+    emailLabel: 'Contact Email',
+    brandNameLabel: 'Brand / Company Name',
+    minChargeLabel: 'Minimum Order Charge (€)',
+    citiesLabel: 'Service Cities & Areas',
+    citiesHint: 'E.g.: Dublin & surrounding areas',
+    securityLabel: 'Security & Access',
+    securityTitle: 'Authorized via Telegram',
+    securityDesc: 'Access is granted strictly to registered Telegram IDs. Public PIN access is disabled for maximum security.',
+    saveSettingsBtn: 'Save Contact Details',
+    // Tab 2: Services
+    servicesHeader: 'Active Services List',
+    servicesSub: 'Manage your services, rates per m², and included tasks.',
+    addServiceBtn: '+ Add New Service',
+    editBtn: '✏️ Edit',
+    deleteBtn: '🗑️ Delete',
+    ratePerM2: '€ / m²',
+    includedTitle: "What's included in this service:",
+    confirmDelete: (name) => `Are you sure you want to delete service "${name}"?`,
+    // Service Form
+    formAddTitle: '✨ Create New Service',
+    formEditTitle: '✏️ Edit Service',
+    serviceNameLabel: 'Service Name',
+    serviceRateLabel: 'Rate (€ per m²)',
+    serviceCadenceLabel: 'Frequency / Clean Type',
+    cadenceWeekly: 'weekly or biweekly',
+    cadenceSeasonal: 'one-time or seasonal',
+    cadenceOneTime: 'one-time clean',
+    serviceDescLabel: 'Detailed Description',
+    serviceIncludedLabel: "Included Checklist (one item per line)",
+    saveServiceBtn: 'Save Service',
+    cancelBtn: 'Cancel',
+    // Tab 3: Backup
+    backupHeader: 'Configuration Backup',
+    backupSub: 'You can copy the entire website configuration in JSON format to backup or migrate.',
+    copyJsonBtn: '📋 Copy JSON Configuration',
+    copiedMsg: 'Configuration copied to clipboard!',
+    importHeader: 'Import Configuration',
+    importPlaceholder: 'Paste copied JSON here...',
+    importBtn: '📥 Apply Imported JSON',
+    importSuccessMsg: 'Configuration successfully imported!',
+    importErrorMsg: 'Import error: ',
+    resetHeader: 'Reset to Factory Defaults',
+    resetSub: 'Restores all contacts, rates, and services to factory default values.',
+    resetBtn: '⚠️ Reset All to Initial Defaults',
+    confirmReset: 'Reset all settings and services to initial factory defaults?',
+  },
+};
 
 export default function AdminPanel({ isOpen, onClose, telegramUser }) {
   const {
@@ -14,11 +145,32 @@ export default function AdminPanel({ isOpen, onClose, telegramUser }) {
     importConfigJson,
   } = useConfig();
 
-  const [activeTab, setActiveTab] = useState('settings'); // 'settings' | 'services' | 'backup'
+  // Language state (Exclusive to Admin Panel)
+  const [lang, setLang] = useState(() => {
+    try {
+      return localStorage.getItem('shine_sparkle_admin_lang') || 'ua';
+    } catch {
+      return 'ua';
+    }
+  });
 
-  // Local copy of general settings for the form
+  const t = TRANSLATIONS[lang] || TRANSLATIONS.ua;
+
+  const handleSwitchLang = (newLang) => {
+    setLang(newLang);
+    try {
+      localStorage.setItem('shine_sparkle_admin_lang', newLang);
+    } catch {}
+  };
+
+  const [activeTab, setActiveTab] = useState('settings'); // 'settings' | 'services' | 'backup'
   const [formData, setFormData] = useState({ ...settings });
   const [saveSuccess, setSaveSuccess] = useState(false);
+
+  // Sync settings whenever external settings update
+  useEffect(() => {
+    setFormData({ ...settings });
+  }, [settings]);
 
   // Service form state (for editing or adding)
   const [editingServiceId, setEditingServiceId] = useState(null);
@@ -97,14 +249,14 @@ export default function AdminPanel({ isOpen, onClose, telegramUser }) {
   }
 
   function handleDeleteService(id, name) {
-    if (window.confirm(`Ви впевнені, що хочете видалити послугу "${name}"?`)) {
+    if (window.confirm(t.confirmDelete(name))) {
       deleteService(id);
     }
   }
 
   function handleCopyJson() {
     navigator.clipboard.writeText(exportConfigJson());
-    setBackupMsg('Конфігурацію скопійовано в буфер обміну!');
+    setBackupMsg(t.copiedMsg);
     setTimeout(() => setBackupMsg(''), 3000);
   }
 
@@ -112,540 +264,554 @@ export default function AdminPanel({ isOpen, onClose, telegramUser }) {
     if (!importJsonText.trim()) return;
     const res = importConfigJson(importJsonText);
     if (res.success) {
-      setBackupMsg('Конфігурацію успішно імпортовано!');
+      setBackupMsg(t.importSuccessMsg);
       setImportJsonText('');
       setFormData({ ...settings });
       setTimeout(() => setBackupMsg(''), 3000);
     } else {
-      setBackupMsg('Помилка імпорту: ' + res.error);
+      setBackupMsg(t.importErrorMsg + res.error);
     }
   }
 
   function handleResetAll() {
-    if (window.confirm('Скинути всі налаштування та послуги до початкових заводських значень?')) {
+    if (window.confirm(t.confirmReset)) {
       resetToDefaults();
       onClose();
     }
   }
 
   return (
-    <div className="modal-overlay open" style={{ zIndex: 9999 }}>
-      <div
-        className="modal-card"
-        style={{
-          maxWidth: '740px',
-          width: '95%',
-          maxHeight: '90vh',
-          display: 'flex',
-          flexDirection: 'column',
-          padding: '28px',
-        }}
-      >
-        <button
-          type="button"
-          className="modal-close"
-          onClick={onClose}
-          aria-label="Закрити адмін-панель"
-        >
-          ✕
-        </button>
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
-          <div>
-            <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span>⚙️</span> Адмін-панель Shine & Sparkle
-            </h3>
-            {telegramUser ? (
-              <div style={{ fontSize: '0.82rem', color: 'var(--ink-soft)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#22c55e' }}></span>
-                <span>Telegram: <strong>{telegramUser.firstName || telegramUser.username || 'Адміністратор'}</strong></span>
-                {telegramUser.username && <span style={{ color: '#0088cc' }}>@{telegramUser.username}</span>}
-                <span style={{ opacity: 0.65 }}>· ID: {telegramUser.id}</span>
-              </div>
-            ) : (
-              <span style={{ fontSize: '0.82rem', color: 'var(--ink-soft)' }}>
-                Авторизовано через Telegram Bot
-              </span>
-            )}
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            {saveSuccess && (
-              <span
-                style={{
-                  background: '#E9FBEF',
-                  color: '#1E7B41',
-                  padding: '6px 12px',
-                  borderRadius: '100px',
-                  fontSize: '0.85rem',
-                  fontWeight: 600,
-                }}
-              >
-                ✓ Збережено!
-              </span>
-            )}
+    <div className="admin-app-root">
+      {/* Top Header */}
+      <header className="admin-app-header">
+        <div className="admin-header-row">
+          <div className="admin-header-left">
             <button
               type="button"
+              className="admin-back-btn"
               onClick={onClose}
-              style={{
-                background: '#F0F6FC',
-                border: '1px solid #D0E1F5',
-                color: 'var(--ink)',
-                borderRadius: '8px',
-                padding: '6px 12px',
-                fontSize: '0.82rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                fontWeight: 500,
-              }}
-              title="Закрити WebApp та повернутися до бота"
+              title={t.backToBot}
             >
-              <span>↩</span> Повернутися в бот
+              <span>←</span> {t.backToBot}
+            </button>
+            <div className="admin-title-wrap">
+              <h2>{t.appTitle}</h2>
+            </div>
+          </div>
+
+          <div className="admin-header-right">
+            {/* Exclusive Language Switcher */}
+            <div className="admin-lang-switcher" role="group" aria-label="Language selection">
+              <button
+                type="button"
+                className={`admin-lang-btn ${lang === 'ua' ? 'active' : ''}`}
+                onClick={() => handleSwitchLang('ua')}
+                aria-pressed={lang === 'ua'}
+              >
+                🇺🇦 UA
+              </button>
+              <button
+                type="button"
+                className={`admin-lang-btn ${lang === 'en' ? 'active' : ''}`}
+                onClick={() => handleSwitchLang('en')}
+                aria-pressed={lang === 'en'}
+              >
+                🇬🇧 EN
+              </button>
+            </div>
+
+            <button
+              type="button"
+              className="admin-close-btn"
+              onClick={onClose}
+              aria-label="Close"
+            >
+              ✕
             </button>
           </div>
         </div>
 
-            {/* Navigation tabs */}
-            <div
-              style={{
-                display: 'flex',
-                gap: '8px',
-                borderBottom: '1px solid var(--border)',
-                paddingBottom: '12px',
-                marginBottom: '20px',
-              }}
-            >
-              <button
-                type="button"
-                className={activeTab === 'settings' ? 'btn-primary' : 'btn-secondary'}
-                style={{ padding: '8px 16px', fontSize: '0.88rem' }}
-                onClick={() => {
-                  setActiveTab('settings');
-                  setIsAddingService(false);
-                  setEditingServiceId(null);
-                }}
-              >
-                📞 Контакти
-              </button>
-              <button
-                type="button"
-                className={activeTab === 'services' ? 'btn-primary' : 'btn-secondary'}
-                style={{ padding: '8px 16px', fontSize: '0.88rem' }}
-                onClick={() => setActiveTab('services')}
-              >
-                🧹 Послуги ({services.length})
-              </button>
-              <button
-                type="button"
-                className={activeTab === 'backup' ? 'btn-primary' : 'btn-secondary'}
-                style={{ padding: '8px 16px', fontSize: '0.88rem' }}
-                onClick={() => {
-                  setActiveTab('backup');
-                  setIsAddingService(false);
-                  setEditingServiceId(null);
-                }}
-              >
-                💾 Резервна копія
-              </button>
+        {/* Telegram Profile Banner */}
+        <div className="admin-profile-banner">
+          <div className="admin-profile-info">
+            <span className="admin-online-dot"></span>
+            <span>
+              {t.adminRole}:{' '}
+              <strong>
+                {telegramUser?.firstName || telegramUser?.username || 'Telegram User'}
+              </strong>
+              {telegramUser?.username && ` (@${telegramUser.username})`}
+              {telegramUser?.id && ` · ID: ${telegramUser.id}`}
+            </span>
+          </div>
+
+          {saveSuccess && (
+            <span className="admin-toast-badge">{t.saved}</span>
+          )}
+        </div>
+      </header>
+
+      {/* Main Scrollable Content */}
+      <main className="admin-scroll-area">
+        {/* ================= TAB 1: CONTACTS & SETTINGS ================= */}
+        {activeTab === 'settings' && (
+          <div className="admin-card">
+            <div className="admin-card-header">
+              <h3>📞 {t.contactsHeader}</h3>
+              <p>{t.contactsSub}</p>
             </div>
 
-            <div style={{ flex: 1, overflowY: 'auto', paddingRight: '4px' }}>
-              {/* TAB 1: General & Contact Settings */}
-              {activeTab === 'settings' && (
-                <form onSubmit={handleSaveSettings}>
-                  <div className="form-row">
-                    <div>
-                      <label className="field-label">WhatsApp номер (тільки цифри)</label>
-                      <input
-                        type="text"
-                        className="field-input"
-                        value={formData.whatsappPhone}
-                        onChange={(e) =>
-                          setFormData({ ...formData, whatsappPhone: e.target.value })
-                        }
-                        placeholder="15551234567"
-                        required
-                      />
-                      <small style={{ color: 'var(--ink-soft)', fontSize: '0.75rem', display: 'block', marginTop: '-12px', marginBottom: '14px' }}>
-                        Формат без знаку плюс, наприклад: 380971234567 або 15551234567
-                      </small>
-                    </div>
+            <form onSubmit={handleSaveSettings}>
+              <div className="admin-field-group">
+                <label className="field-label">{t.whatsappPhoneLabel}</label>
+                <input
+                  type="tel"
+                  className="admin-input-touch"
+                  value={formData.whatsappPhone || ''}
+                  onChange={(e) =>
+                    setFormData({ ...formData, whatsappPhone: e.target.value })
+                  }
+                  placeholder="353852850720"
+                  required
+                />
+                <small style={{ color: 'var(--ink-soft)', fontSize: '0.78rem', display: 'block', marginTop: '4px' }}>
+                  {t.whatsappPhoneHint}
+                </small>
+              </div>
 
-                    <div>
-                      <label className="field-label">Відображення телефону на сайті</label>
-                      <input
-                        type="text"
-                        className="field-input"
-                        value={formData.whatsappDisplay}
-                        onChange={(e) =>
-                          setFormData({ ...formData, whatsappDisplay: e.target.value })
-                        }
-                        placeholder="+1 555 123 4567"
-                        required
-                      />
-                    </div>
+              <div className="admin-field-group">
+                <label className="field-label">{t.whatsappDisplayLabel}</label>
+                <input
+                  type="text"
+                  className="admin-input-touch"
+                  value={formData.whatsappDisplay || ''}
+                  onChange={(e) =>
+                    setFormData({ ...formData, whatsappDisplay: e.target.value })
+                  }
+                  placeholder="+353 85 285 0720"
+                  required
+                />
+                <small style={{ color: 'var(--ink-soft)', fontSize: '0.78rem', display: 'block', marginTop: '4px' }}>
+                  {t.whatsappDisplayHint}
+                </small>
+              </div>
+
+              <div className="admin-field-group">
+                <label className="field-label">{t.emailLabel}</label>
+                <input
+                  type="email"
+                  className="admin-input-touch"
+                  value={formData.email || ''}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                  placeholder="shineandsparkle.mm@gmail.com"
+                  required
+                />
+              </div>
+
+              <div className="admin-field-group">
+                <label className="field-label">{t.brandNameLabel}</label>
+                <input
+                  type="text"
+                  className="admin-input-touch"
+                  value={formData.brandName || ''}
+                  onChange={(e) =>
+                    setFormData({ ...formData, brandName: e.target.value })
+                  }
+                  placeholder="Shine & Sparkle Cleaning"
+                  required
+                />
+              </div>
+
+              <div className="admin-field-group">
+                <label className="field-label">{t.minChargeLabel}</label>
+                <input
+                  type="number"
+                  min="0"
+                  className="admin-input-touch"
+                  value={formData.minCharge || 0}
+                  onChange={(e) =>
+                    setFormData({ ...formData, minCharge: Number(e.target.value) || 0 })
+                  }
+                  required
+                />
+              </div>
+
+              <div className="admin-field-group">
+                <label className="field-label">{t.citiesLabel}</label>
+                <input
+                  type="text"
+                  className="admin-input-touch"
+                  value={formData.cities || ''}
+                  onChange={(e) =>
+                    setFormData({ ...formData, cities: e.target.value })
+                  }
+                  placeholder="Dublin & surrounding areas"
+                  required
+                />
+                <small style={{ color: 'var(--ink-soft)', fontSize: '0.78rem', display: 'block', marginTop: '4px' }}>
+                  {t.citiesHint}
+                </small>
+              </div>
+
+              {/* Security info card */}
+              <div className="admin-field-group" style={{ marginTop: '20px' }}>
+                <label className="field-label">{t.securityLabel}</label>
+                <div
+                  style={{
+                    background: '#F0F7FF',
+                    border: '1px solid #C8E1FF',
+                    borderRadius: '12px',
+                    padding: '14px',
+                    fontSize: '0.84rem',
+                    color: 'var(--ink)',
+                    lineHeight: '1.45',
+                  }}
+                >
+                  🔒 <strong>{t.securityTitle}</strong>
+                  <div style={{ color: 'var(--ink-soft)', marginTop: '4px', fontSize: '0.79rem' }}>
+                    {t.securityDesc}
                   </div>
-
-                  <div className="form-row">
-                    <div>
-                      <label className="field-label">Контактний Email</label>
-                      <input
-                        type="email"
-                        className="field-input"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        placeholder="hello@example.com"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label className="field-label">Назва компанії / Бренд</label>
-                      <input
-                        type="text"
-                        className="field-input"
-                        value={formData.brandName}
-                        onChange={(e) => setFormData({ ...formData, brandName: e.target.value })}
-                        placeholder="Shine & Sparkle Cleaning"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="form-row">
-                    <div>
-                      <label className="field-label">Мінімальна вартість замовлення (€)</label>
-                      <input
-                        type="number"
-                        min="0"
-                        className="field-input"
-                        value={formData.minCharge}
-                        onChange={(e) =>
-                          setFormData({ ...formData, minCharge: Number(e.target.value) || 0 })
-                        }
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label className="field-label">Безпека та доступ</label>
-                      <div
-                        style={{
-                          background: '#F0F7FF',
-                          border: '1px solid #C8E1FF',
-                          borderRadius: '10px',
-                          padding: '12px 14px',
-                          fontSize: '0.84rem',
-                          color: 'var(--ink)',
-                          lineHeight: '1.4',
-                        }}
-                      >
-                        🔒 <strong>Авторизація через Telegram</strong>
-                        <div style={{ color: 'var(--ink-soft)', marginTop: '4px', fontSize: '0.78rem' }}>
-                          Доступ надається лише зареєстрованим ID у боті. Публічний доступ за PIN-кодом вимкнено.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="btn-primary"
-                    style={{ marginTop: '10px', width: '100%', justifyContent: 'center' }}
-                  >
-                    Зберегти контакти
-                  </button>
-                </form>
-              )}
-
-              {/* TAB 2: Services Management */}
-              {activeTab === 'services' && (
-                <div>
-                  {!isAddingService && !editingServiceId ? (
-                    <div>
-                      <div
-                        style={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          marginBottom: '16px',
-                        }}
-                      >
-                        <h4 style={{ margin: 0 }}>Список активних послуг</h4>
-                        <button
-                          type="button"
-                          className="btn-primary"
-                          style={{ padding: '7px 14px', fontSize: '0.85rem' }}
-                          onClick={handleOpenAddService}
-                        >
-                          + Додати послугу
-                        </button>
-                      </div>
-
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                        {services.map((service, index) => (
-                          <div
-                            key={service.id || index}
-                            style={{
-                              border: '1px solid var(--border)',
-                              borderRadius: '12px',
-                              padding: '14px 18px',
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                              background: 'var(--bg-soft)',
-                            }}
-                          >
-                            <div>
-                              <div style={{ fontWeight: 700, fontSize: '0.98rem' }}>
-                                {service.name}
-                              </div>
-                              <div style={{ fontSize: '0.84rem', color: 'var(--ink-soft)' }}>
-                                від <b>€{service.rate}/м²</b> · {service.cadence}
-                              </div>
-                              <div style={{ fontSize: '0.78rem', color: 'var(--ink-soft)', marginTop: '4px' }}>
-                                Пунктів у списку: {(service.included || []).length}
-                              </div>
-                            </div>
-                            <div style={{ display: 'flex', gap: '8px' }}>
-                              <button
-                                type="button"
-                                className="btn-secondary"
-                                style={{ padding: '6px 12px', fontSize: '0.82rem' }}
-                                onClick={() => handleOpenEditService(service)}
-                              >
-                                ✏️ Редагувати
-                              </button>
-                              <button
-                                type="button"
-                                style={{
-                                  padding: '6px 12px',
-                                  fontSize: '0.82rem',
-                                  background: '#FFF0F0',
-                                  color: 'var(--danger)',
-                                  border: '1px solid #FFD4D4',
-                                  borderRadius: '100px',
-                                  cursor: 'pointer',
-                                }}
-                                onClick={() => handleDeleteService(service.id, service.name)}
-                              >
-                                🗑️
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    /* Edit/Add Service Form */
-                    <form onSubmit={handleSaveService}>
-                      <div
-                        style={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          marginBottom: '16px',
-                        }}
-                      >
-                        <h4 style={{ margin: 0 }}>
-                          {isAddingService ? '➕ Додавання нової послуги' : '✏️ Редагування послуги'}
-                        </h4>
-                        <button
-                          type="button"
-                          className="btn-secondary"
-                          style={{ padding: '5px 12px', fontSize: '0.8rem' }}
-                          onClick={() => {
-                            setIsAddingService(false);
-                            setEditingServiceId(null);
-                          }}
-                        >
-                          Назад до списку
-                        </button>
-                      </div>
-
-                      <div className="form-row">
-                        <div>
-                          <label className="field-label">Назва послуги</label>
-                          <input
-                            type="text"
-                            className="field-input"
-                            value={serviceForm.name}
-                            onChange={(e) =>
-                              setServiceForm({ ...serviceForm, name: e.target.value })
-                            }
-                            placeholder="наприклад: Генеральне прибирання"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="field-label">Тариф (€/м²)</label>
-                          <input
-                            type="number"
-                            step="0.1"
-                            min="0.1"
-                            className="field-input"
-                            value={serviceForm.rate}
-                            onChange={(e) =>
-                              setServiceForm({ ...serviceForm, rate: e.target.value })
-                            }
-                            placeholder="1.5"
-                            required
-                          />
-                        </div>
-                      </div>
-
-                      <div className="form-row">
-                        <div>
-                          <label className="field-label">Періодичність / Тип</label>
-                          <input
-                            type="text"
-                            className="field-input"
-                            value={serviceForm.cadence}
-                            onChange={(e) =>
-                              setServiceForm({ ...serviceForm, cadence: e.target.value })
-                            }
-                            placeholder="weekly or biweekly"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="field-label">Колір іконки (Hex)</label>
-                          <input
-                            type="text"
-                            className="field-input"
-                            value={serviceForm.iconBg}
-                            onChange={(e) =>
-                              setServiceForm({ ...serviceForm, iconBg: e.target.value })
-                            }
-                            placeholder="#E3EFFB"
-                          />
-                        </div>
-                      </div>
-
-                      <label className="field-label">Опис послуги</label>
-                      <textarea
-                        className="field-textarea"
-                        style={{ minHeight: '80px', marginBottom: '16px' }}
-                        value={serviceForm.description}
-                        onChange={(e) =>
-                          setServiceForm({ ...serviceForm, description: e.target.value })
-                        }
-                        placeholder="Короткий опис того, для кого підходить ця послуга..."
-                        required
-                      />
-
-                      <label className="field-label">Що входить у вартість (по 1 пункту на рядок)</label>
-                      <textarea
-                        className="field-textarea"
-                        style={{ minHeight: '110px' }}
-                        value={serviceForm.includedText}
-                        onChange={(e) =>
-                          setServiceForm({ ...serviceForm, includedText: e.target.value })
-                        }
-                        placeholder="Миття вікон&#10;Прибирання пилу&#10;Миття підлоги"
-                        required
-                      />
-
-                      <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
-                        <button
-                          type="submit"
-                          className="btn-primary"
-                          style={{ flex: 1, justifyContent: 'center' }}
-                        >
-                          {isAddingService ? 'Додати послугу' : 'Зберегти зміни'}
-                        </button>
-                        <button
-                          type="button"
-                          className="btn-secondary"
-                          onClick={() => {
-                            setIsAddingService(false);
-                            setEditingServiceId(null);
-                          }}
-                        >
-                          Скасувати
-                        </button>
-                      </div>
-                    </form>
-                  )}
                 </div>
-              )}
+              </div>
 
-              {/* TAB 3: Backup & Export */}
-              {activeTab === 'backup' && (
-                <div>
-                  <h4 style={{ marginBottom: '8px' }}>Резервна копія налаштувань</h4>
-                  <p style={{ fontSize: '0.88rem', color: 'var(--ink-soft)', marginBottom: '16px' }}>
-                    Ви можете скопіювати налаштування у форматі JSON, зберегти собі або вставити на іншому пристрої.
-                  </p>
+              <div style={{ marginTop: '24px' }}>
+                <button
+                  type="submit"
+                  className="btn-primary admin-btn-touch"
+                >
+                  💾 {t.saveSettingsBtn}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
 
-                  <div style={{ marginBottom: '24px' }}>
+        {/* ================= TAB 2: SERVICES ================= */}
+        {activeTab === 'services' && (
+          <div>
+            {!isAddingService && !editingServiceId ? (
+              <div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '16px',
+                    flexWrap: 'wrap',
+                    gap: '10px',
+                  }}
+                >
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '1.15rem' }}>🧹 {t.servicesHeader}</h3>
+                    <p style={{ margin: '2px 0 0 0', fontSize: '0.82rem', color: 'var(--ink-soft)' }}>
+                      {t.servicesSub}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    className="btn-primary"
+                    style={{ padding: '8px 16px', fontSize: '0.86rem', borderRadius: '100px' }}
+                    onClick={handleOpenAddService}
+                  >
+                    {t.addServiceBtn}
+                  </button>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  {services.map((service, index) => (
+                    <div key={service.id || index} className="admin-service-card">
+                      <div className="admin-service-top">
+                        <div className="admin-service-info">
+                          <h4>{service.name}</h4>
+                          <div className="admin-service-meta">
+                            <span className="admin-badge-rate">
+                              €{service.rate} {t.ratePerM2}
+                            </span>
+                            <span className="admin-badge-cadence">
+                              {service.cadence}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {service.description && (
+                        <p className="admin-service-desc">{service.description}</p>
+                      )}
+
+                      {service.included && service.included.length > 0 && (
+                        <div className="admin-service-included">
+                          <strong style={{ display: 'block', marginBottom: '6px', fontSize: '0.78rem', color: 'var(--ink)' }}>
+                            {t.includedTitle}
+                          </strong>
+                          <ul style={{ paddingLeft: '16px', margin: 0, lineHeight: '1.4' }}>
+                            {service.included.map((item, i) => (
+                              <li key={i} style={{ marginBottom: '3px' }}>
+                                {item}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      <div className="admin-service-actions">
+                        <button
+                          type="button"
+                          className="btn-secondary admin-action-btn"
+                          onClick={() => handleOpenEditService(service)}
+                        >
+                          {t.editBtn}
+                        </button>
+                        <button
+                          type="button"
+                          className="admin-action-btn"
+                          style={{
+                            background: '#FFF1F2',
+                            color: '#E11D48',
+                            border: '1px solid #FFE4E6',
+                          }}
+                          onClick={() => handleDeleteService(service.id, service.name)}
+                        >
+                          {t.deleteBtn}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              /* Add or Edit Service Form */
+              <div className="admin-card">
+                <div className="admin-card-header">
+                  <h3>{isAddingService ? t.formAddTitle : t.formEditTitle}</h3>
+                </div>
+
+                <form onSubmit={handleSaveService}>
+                  <div className="admin-field-group">
+                    <label className="field-label">{t.serviceNameLabel}</label>
+                    <input
+                      type="text"
+                      className="admin-input-touch"
+                      value={serviceForm.name}
+                      onChange={(e) =>
+                        setServiceForm({ ...serviceForm, name: e.target.value })
+                      }
+                      placeholder="Regular cleaning"
+                      required
+                    />
+                  </div>
+
+                  <div className="admin-field-group">
+                    <label className="field-label">{t.serviceRateLabel}</label>
+                    <input
+                      type="number"
+                      step="0.05"
+                      min="0.1"
+                      className="admin-input-touch"
+                      value={serviceForm.rate}
+                      onChange={(e) =>
+                        setServiceForm({ ...serviceForm, rate: e.target.value })
+                      }
+                      placeholder="1.2"
+                      required
+                    />
+                  </div>
+
+                  <div className="admin-field-group">
+                    <label className="field-label">{t.serviceCadenceLabel}</label>
+                    <select
+                      className="admin-input-touch"
+                      value={serviceForm.cadence}
+                      onChange={(e) =>
+                        setServiceForm({ ...serviceForm, cadence: e.target.value })
+                      }
+                    >
+                      <option value="weekly or biweekly">{t.cadenceWeekly}</option>
+                      <option value="one-time or seasonal">{t.cadenceSeasonal}</option>
+                      <option value="one-time">{t.cadenceOneTime}</option>
+                    </select>
+                  </div>
+
+                  <div className="admin-field-group">
+                    <label className="field-label">{t.serviceDescLabel}</label>
+                    <textarea
+                      className="admin-input-touch"
+                      rows={3}
+                      value={serviceForm.description}
+                      onChange={(e) =>
+                        setServiceForm({ ...serviceForm, description: e.target.value })
+                      }
+                      placeholder="A thorough clean for spaces that need extra care."
+                    />
+                  </div>
+
+                  <div className="admin-field-group">
+                    <label className="field-label">{t.serviceIncludedLabel}</label>
+                    <textarea
+                      className="admin-input-touch"
+                      rows={5}
+                      value={serviceForm.includedText}
+                      onChange={(e) =>
+                        setServiceForm({ ...serviceForm, includedText: e.target.value })
+                      }
+                      placeholder={"Kitchen surfaces and sink\nBathroom disinfection\nFloors vacuumed and mopped"}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+                    <button
+                      type="submit"
+                      className="btn-primary admin-btn-touch"
+                      style={{ flex: 2 }}
+                    >
+                      💾 {t.saveServiceBtn}
+                    </button>
                     <button
                       type="button"
-                      className="btn-primary"
-                      onClick={handleCopyJson}
+                      className="btn-secondary admin-btn-touch"
+                      style={{ flex: 1 }}
+                      onClick={() => {
+                        setIsAddingService(false);
+                        setEditingServiceId(null);
+                      }}
                     >
-                      📋 Скопіювати повний JSON конфігурації
+                      {t.cancelBtn}
                     </button>
-                    {backupMsg && (
-                      <div
-                        style={{
-                          marginTop: '8px',
-                          color: '#1E7B41',
-                          fontWeight: 600,
-                          fontSize: '0.88rem',
-                        }}
-                      >
-                        {backupMsg}
-                      </div>
-                    )}
                   </div>
+                </form>
+              </div>
+            )}
+          </div>
+        )}
 
-                  <div className="divider" />
+        {/* ================= TAB 3: BACKUP & DATA ================= */}
+        {activeTab === 'backup' && (
+          <div className="admin-card">
+            <div className="admin-card-header">
+              <h3>💾 {t.backupHeader}</h3>
+              <p>{t.backupSub}</p>
+            </div>
 
-                  <h4 style={{ marginBottom: '8px' }}>Імпорт конфігурації</h4>
-                  <textarea
-                    className="field-textarea"
-                    placeholder="Вставте сюди скопійований JSON..."
-                    value={importJsonText}
-                    onChange={(e) => setImportJsonText(e.target.value)}
-                    style={{ minHeight: '120px', fontFamily: 'monospace', fontSize: '0.82rem' }}
-                  />
-                  <button
-                    type="button"
-                    className="btn-secondary"
-                    onClick={handleImportJson}
-                    disabled={!importJsonText.trim()}
-                    style={{ marginTop: '8px' }}
-                  >
-                    📥 Застосувати імпортований JSON
-                  </button>
-
-                  <div className="divider" />
-
-                  <h4>Скидання</h4>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--ink-soft)', marginBottom: '12px' }}>
-                    Повертає контакти та послуги до початкового стану.
-                  </p>
-                  <button
-                    type="button"
-                    style={{
-                      background: '#FFF0F0',
-                      color: 'var(--danger)',
-                      border: '1px solid #FFD4D4',
-                      padding: '10px 18px',
-                      borderRadius: '100px',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                    }}
-                    onClick={handleResetAll}
-                  >
-                    ⚠️ Скинути все до початкового стану
-                  </button>
+            <div style={{ marginBottom: '24px' }}>
+              <button
+                type="button"
+                className="btn-primary admin-btn-touch"
+                onClick={handleCopyJson}
+              >
+                {t.copyJsonBtn}
+              </button>
+              {backupMsg && (
+                <div
+                  style={{
+                    marginTop: '10px',
+                    color: '#15803D',
+                    fontWeight: 600,
+                    fontSize: '0.88rem',
+                    background: '#DCFCE7',
+                    padding: '8px 12px',
+                    borderRadius: '8px',
+                  }}
+                >
+                  {backupMsg}
                 </div>
               )}
             </div>
-      </div>
+
+            <div className="divider" />
+
+            <div style={{ marginBottom: '24px' }}>
+              <h4 style={{ fontSize: '1rem', marginBottom: '8px' }}>{t.importHeader}</h4>
+              <textarea
+                className="admin-input-touch"
+                placeholder={t.importPlaceholder}
+                value={importJsonText}
+                onChange={(e) => setImportJsonText(e.target.value)}
+                style={{ minHeight: '120px', fontFamily: 'monospace', fontSize: '0.82rem' }}
+              />
+              <button
+                type="button"
+                className="btn-secondary admin-btn-touch"
+                onClick={handleImportJson}
+                disabled={!importJsonText.trim()}
+                style={{ marginTop: '10px' }}
+              >
+                {t.importBtn}
+              </button>
+            </div>
+
+            <div className="divider" />
+
+            <div>
+              <h4 style={{ fontSize: '1rem', color: '#E11D48', marginBottom: '6px' }}>
+                {t.resetHeader}
+              </h4>
+              <p style={{ fontSize: '0.84rem', color: 'var(--ink-soft)', marginBottom: '12px' }}>
+                {t.resetSub}
+              </p>
+              <button
+                type="button"
+                className="admin-btn-touch"
+                style={{
+                  background: '#FFF1F2',
+                  color: '#E11D48',
+                  border: '1px solid #FFE4E6',
+                }}
+                onClick={handleResetAll}
+              >
+                {t.resetBtn}
+              </button>
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* Mobile App Bottom Navigation Bar */}
+      <nav className="admin-bottom-nav">
+        <button
+          type="button"
+          className={`admin-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
+          onClick={() => {
+            setActiveTab('settings');
+            setIsAddingService(false);
+            setEditingServiceId(null);
+          }}
+        >
+          <div className="admin-nav-icon-wrap">
+            <span>📞</span>
+          </div>
+          <span className="admin-nav-label">{t.tabContacts}</span>
+        </button>
+
+        <button
+          type="button"
+          className={`admin-nav-item ${activeTab === 'services' ? 'active' : ''}`}
+          onClick={() => setActiveTab('services')}
+        >
+          <div className="admin-nav-icon-wrap">
+            <span>🧹</span>
+            {services.length > 0 && (
+              <span className="admin-nav-badge">{services.length}</span>
+            )}
+          </div>
+          <span className="admin-nav-label">{t.tabServices}</span>
+        </button>
+
+        <button
+          type="button"
+          className={`admin-nav-item ${activeTab === 'backup' ? 'active' : ''}`}
+          onClick={() => {
+            setActiveTab('backup');
+            setIsAddingService(false);
+            setEditingServiceId(null);
+          }}
+        >
+          <div className="admin-nav-icon-wrap">
+            <span>💾</span>
+          </div>
+          <span className="admin-nav-label">{t.tabBackup}</span>
+        </button>
+      </nav>
     </div>
   );
 }
