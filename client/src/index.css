@@ -127,21 +127,21 @@ header.site-header .nav {
 .blob{position:absolute; border-radius:50%; filter:blur(75px); opacity:0.58; z-index:0; pointer-events:none;}
 .hero .blob-1{
   width:340px; height:340px;
-  background: radial-gradient(circle at 40% 40%, #60A5FA 0%, #3B82F6 75%, #1D4ED8 100%);
+  background: radial-gradient(circle at 40% 40%, #60A5FA 0%, #2563EB 70%, #1D4ED8 100%);
   top:-40px; left:4%;
   animation: dvdBounce1 22s linear infinite;
   will-change: transform, opacity;
 }
 .hero .blob-2{
   width:310px; height:310px;
-  background: radial-gradient(circle at 40% 40%, #F472B6 0%, #EC4899 75%, #BE185D 100%);
+  background: radial-gradient(circle at 40% 40%, #FDE047 0%, #F59E0B 70%, #D97706 100%);
   top:20px; right:4%;
   animation: dvdBounce2 22s linear infinite;
   will-change: transform, opacity;
 }
 .hero .blob-3{
   width:280px; height:280px;
-  background: radial-gradient(circle at 40% 40%, #34D399 0%, #10B981 75%, #047857 100%);
+  background: radial-gradient(circle at 40% 40%, #38BDF8 0%, #0284C7 70%, #0369A1 100%);
   bottom:-60px; left:36%;
   animation: dvdBounce3 22s linear infinite;
   will-change: transform, opacity;
