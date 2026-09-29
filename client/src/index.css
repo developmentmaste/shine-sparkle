@@ -13,7 +13,7 @@
   --radius-xl: 32px;
   --radius-lg: 24px;
   --radius-md: 16px;
-  --section-fade-height: 160px;
+  --section-fade-height: 110px;
 }
 *,
 *::before,
@@ -123,7 +123,7 @@ header.site-header .nav {
 }
 
 /* HERO */
-.hero{position:relative; padding:88px 24px 70px; text-align:center; overflow:hidden;}
+.hero{position:relative; padding:60px 24px 48px; text-align:center; overflow:hidden;}
 .blob{position:absolute; border-radius:50%; filter:blur(75px); opacity:0.55; z-index:0; pointer-events:none;}
 .hero .blob-1{
   width:340px; height:340px; background:var(--lav); top:-60px; left:8%;
@@ -215,7 +215,7 @@ header.site-header .nav {
 }
 
 /* SECTION */
-.section{padding:90px 0;}
+.section{padding:60px 0;}
 .section-head{max-width:600px; margin:0 auto 46px; text-align:center;}
 .section-head .eyebrow{margin-bottom:16px;}
 .section-head h2{font-size:clamp(1.8rem, 3.2vw, 2.4rem); font-weight:800; letter-spacing:-0.02em; margin-bottom:14px;}
@@ -505,7 +505,7 @@ header.site-header .nav {
 
 @media (max-width: 768px) {
   :root {
-    --section-fade-height: 100px;
+    --section-fade-height: 70px;
   }
   .site-footer {
     padding: 44px 0 28px;
