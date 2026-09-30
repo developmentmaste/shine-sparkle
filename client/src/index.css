@@ -1186,66 +1186,278 @@ header.site-header .nav {
   animation: none !important;
 }
 
-/* Pen writing animation along the points of the main path */
-.draw-loop-svg .draw-main-path {
-  stroke: var(--ink, #14395F);
-  stroke-dasharray: 1 1;
-  stroke-dashoffset: 1;
-  animation: drawLoopPath 3.67s linear forwards;
+/* The clean lettering revealed dynamically as mop wipes across */
+.draw-loop-svg .mop-revealed-text {
+  clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+  animation: mopCleanReveal 3.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
-.draw-loop-svg.is-looping .draw-main-path {
-  animation: drawLoopPathLoop 4.67s linear infinite;
+.draw-loop-svg.is-looping .mop-revealed-text {
+  animation: mopCleanRevealLoop 4.2s cubic-bezier(0.25, 1, 0.5, 1) infinite;
 }
 
-.draw-loop-svg ellipse {
-  fill: var(--ink, #14395F);
-  opacity: 0;
-  animation: drawLoopDot 3.67s linear forwards;
-}
-
-.draw-loop-svg.is-looping ellipse {
-  animation: drawLoopDotLoop 4.67s linear infinite;
-}
-
-@keyframes drawLoopPath {
+@keyframes mopCleanReveal {
   0% {
-    stroke-dashoffset: 1;
-  }
-  60%, 100% {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes drawLoopPathLoop {
-  0% {
-    stroke-dashoffset: 1;
-  }
-  60%, 82% {
-    stroke-dashoffset: 0;
-  }
-  90%, 100% {
-    stroke-dashoffset: 1;
-  }
-}
-
-@keyframes drawLoopDot {
-  0%, 55% {
+    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
     opacity: 0;
   }
-  63%, 100% {
+  2% {
+    opacity: 1;
+  }
+  12% {
+    clip-path: polygon(0 0, 20% 0, 14% 100%, 0 100%);
+  }
+  24% {
+    clip-path: polygon(0 0, 34% 0, 26% 100%, 0 100%);
+  }
+  38% {
+    clip-path: polygon(0 0, 50% 0, 44% 100%, 0 100%);
+  }
+  50% {
+    clip-path: polygon(0 0, 64% 0, 58% 100%, 0 100%);
+  }
+  62% {
+    clip-path: polygon(0 0, 78% 0, 72% 100%, 0 100%);
+  }
+  74% {
+    clip-path: polygon(0 0, 90% 0, 85% 100%, 0 100%);
+  }
+  84%, 100% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
     opacity: 1;
   }
 }
 
-@keyframes drawLoopDotLoop {
-  0%, 55% {
+@keyframes mopCleanRevealLoop {
+  0% {
+    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
     opacity: 0;
   }
-  63%, 82% {
+  2% {
     opacity: 1;
   }
+  12% {
+    clip-path: polygon(0 0, 20% 0, 14% 100%, 0 100%);
+  }
+  24% {
+    clip-path: polygon(0 0, 34% 0, 26% 100%, 0 100%);
+  }
+  38% {
+    clip-path: polygon(0 0, 50% 0, 44% 100%, 0 100%);
+  }
+  50% {
+    clip-path: polygon(0 0, 64% 0, 58% 100%, 0 100%);
+  }
+  62% {
+    clip-path: polygon(0 0, 78% 0, 72% 100%, 0 100%);
+  }
+  74% {
+    clip-path: polygon(0 0, 90% 0, 85% 100%, 0 100%);
+  }
+  84%, 89% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    opacity: 1;
+  }
+  95% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    opacity: 0;
+  }
+  100% {
+    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+    opacity: 0;
+  }
+}
+
+/* Mop Actor Group: scrubs and rubs across the canvas */
+.draw-loop-svg .mop-actor-group {
+  animation: mopTrackPath 3.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  pointer-events: none;
+}
+
+.draw-loop-svg.is-looping .mop-actor-group {
+  animation: mopTrackPathLoop 4.2s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+  pointer-events: none;
+}
+
+@keyframes mopTrackPath {
+  0% {
+    transform: translate(-80px, 120px) rotate(-10deg);
+    opacity: 0;
+  }
+  3% {
+    transform: translate(60px, 150px) rotate(-14deg);
+    opacity: 1;
+  }
+  12% {
+    transform: translate(220px, 460px) rotate(18deg);
+  }
+  24% {
+    transform: translate(380px, 160px) rotate(-16deg);
+  }
+  38% {
+    transform: translate(580px, 480px) rotate(16deg);
+  }
+  50% {
+    transform: translate(780px, 150px) rotate(-14deg);
+  }
+  62% {
+    transform: translate(990px, 490px) rotate(18deg);
+  }
+  74% {
+    transform: translate(1200px, 180px) rotate(-12deg);
+  }
+  84% {
+    transform: translate(1390px, 420px) rotate(10deg);
+    opacity: 1;
+  }
+  92% {
+    transform: translate(1520px, 300px) rotate(5deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(1550px, 300px);
+    opacity: 0;
+  }
+}
+
+@keyframes mopTrackPathLoop {
+  0% {
+    transform: translate(-80px, 120px) rotate(-10deg);
+    opacity: 0;
+  }
+  3% {
+    transform: translate(60px, 150px) rotate(-14deg);
+    opacity: 1;
+  }
+  12% {
+    transform: translate(220px, 460px) rotate(18deg);
+  }
+  24% {
+    transform: translate(380px, 160px) rotate(-16deg);
+  }
+  38% {
+    transform: translate(580px, 480px) rotate(16deg);
+  }
+  50% {
+    transform: translate(780px, 150px) rotate(-14deg);
+  }
+  62% {
+    transform: translate(990px, 490px) rotate(18deg);
+  }
+  74% {
+    transform: translate(1200px, 180px) rotate(-12deg);
+  }
+  84% {
+    transform: translate(1390px, 420px) rotate(10deg);
+    opacity: 1;
+  }
+  90% {
+    transform: translate(1520px, 300px) rotate(5deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(1550px, 300px);
+    opacity: 0;
+  }
+}
+
+/* Bubbles & foam pulsing around mop base */
+.draw-loop-svg .mop-foam {
+  animation: mopFoamPulse 0.35s ease-in-out infinite alternate;
+}
+@keyframes mopFoamPulse {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.75;
+  }
+  100% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+/* Sparkles that appear after clean wipe */
+.draw-loop-svg .mop-sparkles {
+  animation: mopSparkleFlash 3.4s ease-in-out forwards;
+}
+
+.draw-loop-svg.is-looping .mop-sparkles {
+  animation: mopSparkleFlashLoop 4.2s ease-in-out infinite;
+}
+
+@keyframes mopSparkleFlash {
+  0%, 72% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  82% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
   90%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes mopSparkleFlashLoop {
+  0%, 72% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  82% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+  89% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  95%, 100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
+
+/* Shiny light sheen across finished logo */
+.draw-loop-svg .mop-clean-sheen {
+  animation: mopSheenSweep 3.4s ease-in-out forwards;
+}
+
+.draw-loop-svg.is-looping .mop-clean-sheen {
+  animation: mopSheenSweepLoop 4.2s ease-in-out infinite;
+}
+
+@keyframes mopSheenSweep {
+  0%, 80% {
+    opacity: 0;
+    transform: translateX(-400px) skewX(-20deg);
+  }
+  84% {
+    opacity: 0.7;
+  }
+  94% {
+    opacity: 0;
+    transform: translateX(1500px) skewX(-20deg);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes mopSheenSweepLoop {
+  0%, 80% {
+    opacity: 0;
+    transform: translateX(-400px) skewX(-20deg);
+  }
+  84% {
+    opacity: 0.7;
+  }
+  92% {
+    opacity: 0;
+    transform: translateX(1500px) skewX(-20deg);
+  }
+  93%, 100% {
     opacity: 0;
   }
 }
