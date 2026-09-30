@@ -1164,7 +1164,7 @@ header.site-header .nav {
 .splash-stage {
   position: relative;
   width: min(92vw, 980px);
-  aspect-ratio: 1125 / 627;
+  aspect-ratio: 1422 / 650;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1177,35 +1177,110 @@ header.site-header .nav {
   height: 100%;
 }
 
-.draw-loop-svg path {
+/* Ensure the SVG mask is strictly static and acts as an alpha stencil */
+.draw-loop-svg mask,
+.draw-loop-svg mask * {
+  stroke: none !important;
+  stroke-dasharray: none !important;
+  stroke-dashoffset: 0 !important;
+  animation: none !important;
+}
+
+/* Progressive reveal animation on the main SVG graphic */
+.draw-loop-svg .draw-main-group,
+.draw-loop-svg .draw-main-path,
+.draw-loop-svg > g:not(mask) {
+  clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+  animation: drawMainSvgReveal 2.8s cubic-bezier(0.35, 0.1, 0.25, 1) forwards;
+}
+
+.draw-loop-svg.is-looping .draw-main-group,
+.draw-loop-svg.is-looping .draw-main-path,
+.draw-loop-svg.is-looping > g:not(mask) {
+  animation: drawMainSvgRevealLoop 3.6s cubic-bezier(0.35, 0.1, 0.25, 1) infinite;
+}
+
+/* Fallback/support if stroke drawing is used with pathLength="1" */
+.draw-loop-svg .draw-main-path[pathLength="1"],
+.draw-loop-svg > g:not(mask) path[pathLength="1"] {
   stroke: var(--ink, #14395F);
   stroke-dasharray: 1 1;
   stroke-dashoffset: 1;
-  animation: drawLoopPath 3.67s linear forwards;
+  animation: drawMainStroke 2.8s linear forwards;
+}
+
+.draw-loop-svg.is-looping .draw-main-path[pathLength="1"],
+.draw-loop-svg.is-looping > g:not(mask) path[pathLength="1"] {
+  animation: drawMainStrokeLoop 3.6s linear infinite;
 }
 
 .draw-loop-svg ellipse {
   fill: var(--ink, #14395F);
   opacity: 0;
-  animation: drawLoopDot 3.67s linear forwards;
-}
-
-.draw-loop-svg.is-looping path {
-  animation: drawLoopPath 4.67s linear infinite;
+  animation: drawLoopDot 2.8s linear forwards;
 }
 
 .draw-loop-svg.is-looping ellipse {
-  animation: drawLoopDot 4.67s linear infinite;
+  animation: drawLoopDotLoop 3.6s linear infinite;
 }
 
-@keyframes drawLoopPath {
+@keyframes drawMainSvgReveal {
+  0% {
+    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+    opacity: 0;
+  }
+  3% {
+    opacity: 1;
+  }
+  70%, 100% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    opacity: 1;
+  }
+}
+
+@keyframes drawMainSvgRevealLoop {
+  0% {
+    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+    opacity: 0;
+  }
+  4% {
+    opacity: 1;
+  }
+  65%, 85% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    opacity: 1;
+  }
+  92% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    opacity: 0;
+  }
+  100% {
+    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+    opacity: 0;
+  }
+}
+
+@keyframes drawMainStroke {
   0% { stroke-dashoffset: 1; }
-  57%, 100% { stroke-dashoffset: 0; }
+  70%, 100% { stroke-dashoffset: 0; }
+}
+
+@keyframes drawMainStrokeLoop {
+  0% { stroke-dashoffset: 1; }
+  65%, 85% { stroke-dashoffset: 0; }
+  92% { stroke-dashoffset: 0; opacity: 0; }
+  100% { stroke-dashoffset: 1; opacity: 0; }
 }
 
 @keyframes drawLoopDot {
   0%, 55% { opacity: 0; }
   63%, 100% { opacity: 1; }
+}
+
+@keyframes drawLoopDotLoop {
+  0%, 55% { opacity: 0; }
+  63%, 85% { opacity: 1; }
+  92%, 100% { opacity: 0; }
 }
 
 /* =========================================================
