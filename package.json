@@ -3,12 +3,15 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "dev": "npm --prefix client run dev",
+    "start": "npm --prefix client run dev",
     "build": "npm --prefix client run build",
     "client:dev": "npm --prefix client run dev",
     "client:build": "npm --prefix client run build",
     "client:deploy": "npm --prefix client run deploy",
     "server:dev": "npm --prefix server run dev",
     "server:start": "npm --prefix server start",
-    "server:migrate": "npm --prefix server run db:migrate"
+    "server:migrate": "npm --prefix server run db:migrate",
+    "bot": "npm --prefix server run bot"
   }
 }
