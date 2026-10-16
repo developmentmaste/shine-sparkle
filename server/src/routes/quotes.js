@@ -62,9 +62,15 @@ quotesRouter.post('/', async (req, res) => {
   }
 });
 
-// GET /api/quotes — lightweight listing for an internal dashboard later on.
-// Not linked from the public site; add auth before exposing this beyond localhost.
+// GET /api/quotes — protected listing for administrative dashboard.
 quotesRouter.get('/', async (req, res) => {
+  const adminKey = req.headers['x-admin-key'];
+  const expectedKey = process.env.ADMIN_API_KEY;
+
+  if (!expectedKey || !adminKey || adminKey !== expectedKey) {
+    return res.status(401).json({ error: 'Unauthorized: Valid x-admin-key header required.' });
+  }
+
   try {
     const result = await query(
       `SELECT id, service_name, rate_per_sqm, area_sqm, estimated_price,

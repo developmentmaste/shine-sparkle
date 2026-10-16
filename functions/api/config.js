@@ -5,7 +5,6 @@ const DEFAULT_SETTINGS = {
   brandName: 'Shine & Sparkle Cleaning',
   minCharge: 40,
   cities: 'Dublin & surrounding areas',
-  adminPin: 'admin123',
 };
 
 const DEFAULT_SERVICES = [
@@ -77,6 +76,74 @@ let memoryConfig = {
   services: [...DEFAULT_SERVICES],
 };
 
+// Cryptographic verification of Telegram WebApp initData
+async function verifyTelegramWebAppData(initData, botToken) {
+  if (!initData || !botToken) return null;
+  try {
+    const params = new URLSearchParams(initData);
+    const hash = params.get('hash');
+    if (!hash) return null;
+
+    params.delete('hash');
+    const items = [];
+    for (const [key, value] of params.entries()) {
+      items.push(`${key}=${value}`);
+    }
+    items.sort();
+    const dataCheckString = items.join('\n');
+
+    const encoder = new TextEncoder();
+    const keyMaterial = await crypto.subtle.importKey(
+      'raw',
+      encoder.encode('WebAppData'),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign']
+    );
+    const secretKey = await crypto.subtle.sign('HMAC', keyMaterial, encoder.encode(botToken));
+
+    const hmacKey = await crypto.subtle.importKey(
+      'raw',
+      secretKey,
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign']
+    );
+    const signature = await crypto.subtle.sign('HMAC', hmacKey, encoder.encode(dataCheckString));
+    const hexHash = Array.from(new Uint8Array(signature))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+
+    if (hexHash.toLowerCase() === hash.toLowerCase()) {
+      const userStr = params.get('user');
+      if (userStr) {
+        return JSON.parse(userStr);
+      }
+    }
+  } catch (err) {
+    console.error('Error verifying Telegram WebApp data in config:', err);
+  }
+  return null;
+}
+
+async function isUserAuthorized(env, userId) {
+  const strId = String(userId);
+  const envAdminIds = (env.TELEGRAM_ADMIN_IDS || '')
+    .split(',')
+    .map((x) => x.trim())
+    .filter(Boolean);
+
+  if (envAdminIds.includes(strId)) return true;
+
+  if (env.CONFIG_KV) {
+    try {
+      const data = await env.CONFIG_KV.get('authorized_admins', 'json');
+      if (Array.isArray(data) && data.includes(strId)) return true;
+    } catch (e) {}
+  }
+  return false;
+}
+
 export async function onRequestGet(context) {
   const { env } = context;
   let config = memoryConfig;
@@ -92,7 +159,14 @@ export async function onRequestGet(context) {
     }
   }
 
-  return new Response(JSON.stringify(config), {
+  // Ensure sensitive fields are never returned in public config
+  const safeConfig = {
+    settings: { ...config.settings },
+    services: config.services,
+  };
+  delete safeConfig.settings.adminPin;
+
+  return new Response(JSON.stringify(safeConfig), {
     headers: {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': '*',
@@ -106,7 +180,41 @@ export async function onRequestPost(context) {
 
   try {
     const body = await request.json();
+
+    // Verify admin authorization
+    const adminKey = request.headers.get('x-admin-key');
+    const initData = request.headers.get('x-telegram-init-data') || body.initData;
+
+    let authorized = false;
+
+    if (env.ADMIN_API_KEY && adminKey && adminKey === env.ADMIN_API_KEY) {
+      authorized = true;
+    } else if (env.TELEGRAM_BOT_TOKEN && initData) {
+      const verifiedUser = await verifyTelegramWebAppData(initData, env.TELEGRAM_BOT_TOKEN);
+      if (verifiedUser && verifiedUser.id) {
+        authorized = await isUserAuthorized(env, verifiedUser.id);
+      }
+    } else if (!env.TELEGRAM_BOT_TOKEN && !env.ADMIN_API_KEY && !env.CONFIG_KV) {
+      // Local dev fallback only
+      authorized = true;
+    }
+
+    if (!authorized) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized: Valid admin authentication required to update configuration.' }),
+        {
+          status: 401,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
+        }
+      );
+    }
+
     const newSettings = body.settings ? { ...DEFAULT_SETTINGS, ...body.settings } : memoryConfig.settings;
+    delete newSettings.adminPin;
+
     const newServices = Array.isArray(body.services) && body.services.length > 0 ? body.services : memoryConfig.services;
 
     const newConfig = {
@@ -142,7 +250,7 @@ export async function onRequestOptions() {
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Allow-Headers': 'Content-Type, X-Telegram-Init-Data, X-Admin-Key',
     },
   });
 }

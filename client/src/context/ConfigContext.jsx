@@ -13,7 +13,6 @@ export const DEFAULT_SETTINGS = {
   brandName: 'Shine & Sparkle Cleaning',
   minCharge: MIN_CHARGE,
   cities: 'Serving Dublin & surrounding areas',
-  adminPin: 'admin123',
 };
 
 const STORAGE_KEY_SETTINGS = 'shine_sparkle_settings_v3';
@@ -99,10 +98,16 @@ export function ConfigProvider({ children }) {
 
   const syncToServer = async (newSettings, newServices) => {
     try {
+      const headers = { 'Content-Type': 'application/json' };
+      const initData = window?.Telegram?.WebApp?.initData;
+      if (initData) {
+        headers['X-Telegram-Init-Data'] = initData;
+      }
       await fetch('/api/config', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
+          initData,
           settings: newSettings || settings,
           services: newServices || services,
         }),

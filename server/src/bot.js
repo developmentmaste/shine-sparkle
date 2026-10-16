@@ -40,7 +40,6 @@ const DEFAULT_SETTINGS = {
   brandName: 'Shine & Sparkle Cleaning',
   minCharge: 40,
   cities: 'Dublin & surrounding areas',
-  adminPin: 'admin123',
 };
 
 const DEFAULT_SERVICES = [
@@ -842,13 +841,8 @@ async function handleMessage(msg) {
     ? rawText.replace('/login', '').trim()
     : rawText;
 
-  const adminPin = (appConfig && appConfig.settings && appConfig.settings.adminPin) || 'admin123';
-  const isMasterCode =
-    codeCandidate === 'SPARKLE-MASTER-2026' ||
-    codeCandidate === 'SPARKLE-2026' ||
-    codeCandidate === adminPin ||
-    codeCandidate === 'admin123' ||
-    codeCandidate === 'admin';
+  const masterPassword = process.env.TELEGRAM_ADMIN_PASSWORD || process.env.ADMIN_SECRET_KEY;
+  const isMasterCode = Boolean(masterPassword && codeCandidate === masterPassword);
 
   if (isMasterCode && (rawText.startsWith('/login') || rawText === codeCandidate)) {
     addAuthorizedUser(userId);

@@ -5,7 +5,6 @@ const DEFAULT_SETTINGS = {
   brandName: 'Shine & Sparkle Cleaning',
   minCharge: 40,
   cities: 'Dublin & surrounding areas',
-  adminPin: 'admin123',
 };
 
 const DEFAULT_SERVICES = [
@@ -334,10 +333,9 @@ export async function onRequestPost(context) {
           verifiedUser = await verifyTelegramWebAppData(body.initData, token);
         }
 
-        const targetUserId = (verifiedUser && verifiedUser.id) ? verifiedUser.id : body.userId;
-        if (!targetUserId) {
-          return new Response(JSON.stringify({ authorized: false, error: 'No user ID provided' }), {
-            status: 400,
+        if (!verifiedUser || !verifiedUser.id) {
+          return new Response(JSON.stringify({ authorized: false, error: 'Unauthorized: Invalid or missing Telegram verification data' }), {
+            status: 401,
             headers: {
               'Content-Type': 'application/json',
               'Access-Control-Allow-Origin': '*',
@@ -345,6 +343,7 @@ export async function onRequestPost(context) {
           });
         }
 
+        const targetUserId = verifiedUser.id;
         const config = await getConfig(env);
         const authorized = await isUserAuthorized(env, targetUserId, config);
 
@@ -352,11 +351,11 @@ export async function onRequestPost(context) {
           authorized,
           user: {
             id: targetUserId,
-            firstName: verifiedUser?.first_name || body.firstName || '',
-            username: verifiedUser?.username || body.username || '',
+            firstName: verifiedUser.first_name || '',
+            username: verifiedUser.username || '',
           },
         }), {
-          status: 200,
+          status: authorized ? 200 : 403,
           headers: {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*',
@@ -980,13 +979,8 @@ export async function onRequestPost(context) {
         ? rawText.replace('/login', '').trim()
         : rawText;
 
-      const adminPin = config.settings.adminPin || 'admin123';
-      const isMasterCode =
-        codeCandidate === 'SPARKLE-MASTER-2026' ||
-        codeCandidate === 'SPARKLE-2026' ||
-        codeCandidate === adminPin ||
-        codeCandidate === 'admin123' ||
-        codeCandidate === 'admin';
+      const masterPassword = env.TELEGRAM_ADMIN_PASSWORD || env.ADMIN_SECRET_KEY;
+      const isMasterCode = Boolean(masterPassword && codeCandidate === masterPassword);
 
       if (isMasterCode && (rawText.startsWith('/login') || rawText === codeCandidate)) {
         await addAuthorizedUser(env, userId);
@@ -1349,7 +1343,6 @@ export async function onRequestGet(context) {
   // 1. Handle Admin Verification via GET (e.g. /api/telegram?action=verify_admin&userId=...)
   const action = urlObj.searchParams.get('action');
   if (action === 'verify_admin' || action === 'check_admin') {
-    const userId = urlObj.searchParams.get('userId');
     const initData = urlObj.searchParams.get('initData');
 
     let verifiedUser = null;
@@ -1357,10 +1350,9 @@ export async function onRequestGet(context) {
       verifiedUser = await verifyTelegramWebAppData(initData, token);
     }
 
-    const targetUserId = (verifiedUser && verifiedUser.id) ? verifiedUser.id : userId;
-    if (!targetUserId) {
-      return new Response(JSON.stringify({ authorized: false, error: 'No user ID provided' }), {
-        status: 400,
+    if (!verifiedUser || !verifiedUser.id) {
+      return new Response(JSON.stringify({ authorized: false, error: 'Unauthorized: Invalid or missing Telegram verification data' }), {
+        status: 401,
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*',
@@ -1368,6 +1360,7 @@ export async function onRequestGet(context) {
       });
     }
 
+    const targetUserId = verifiedUser.id;
     const config = await getConfig(env);
     const authorized = await isUserAuthorized(env, targetUserId, config);
 
@@ -1375,11 +1368,11 @@ export async function onRequestGet(context) {
       authorized,
       user: {
         id: targetUserId,
-        firstName: verifiedUser?.first_name || urlObj.searchParams.get('firstName') || '',
-        username: verifiedUser?.username || urlObj.searchParams.get('username') || '',
+        firstName: verifiedUser.first_name || '',
+        username: verifiedUser.username || '',
       },
     }), {
-      status: 200,
+      status: authorized ? 200 : 403,
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
@@ -1394,8 +1387,16 @@ export async function onRequestGet(context) {
     });
   }
 
-  // If user visits /api/telegram?setup=1, automatically configure Telegram Webhook!
+  // If user visits /api/telegram?setup=1&secret=..., only allow if secret matches bot token
   if (urlObj.searchParams.get('setup')) {
+    const secret = urlObj.searchParams.get('secret');
+    if (secret !== token) {
+      return new Response(JSON.stringify({ error: 'Unauthorized: Valid bot token required as secret parameter.' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      });
+    }
+
     const webhookUrl = `${urlObj.protocol}//${urlObj.host}/api/telegram`;
     const res = await tgCall(token, 'setWebhook', { url: webhookUrl });
 

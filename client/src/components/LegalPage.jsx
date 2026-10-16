@@ -485,3 +485,4 @@ function PrivacyContent({ settings, getWhatsAppUrl }) {
     </article>
   );
 }
+
