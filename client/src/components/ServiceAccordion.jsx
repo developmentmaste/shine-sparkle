@@ -88,7 +88,7 @@ export default function ServiceAccordion({ onOpenQuote }) {
                   <div className="info">
                     <h3>{service.name}</h3>
                     <div className="price-tag">
-                      from €{service.rate}/m² · {service.cadence}
+                      {service.priceDisplay || `from €${service.rate}/m² · ${service.cadence}`}
                     </div>
                   </div>
                   <div className="chevron">+</div>
@@ -96,7 +96,7 @@ export default function ServiceAccordion({ onOpenQuote }) {
 
                 <div
                   className="service-detail"
-                  style={{ maxHeight: isOpen ? '460px' : '0px' }}
+                  style={{ maxHeight: isOpen ? '750px' : '0px' }}
                 >
                   <div className="service-detail-inner">
                     <p>{service.description}</p>
@@ -105,6 +105,18 @@ export default function ServiceAccordion({ onOpenQuote }) {
                         <li key={item}>{item}</li>
                       ))}
                     </ul>
+                    {service.terms && service.terms.length > 0 && (
+                      <div style={{ margin: '14px 0', padding: '10px 14px', background: 'rgba(20, 57, 95, 0.04)', borderRadius: '10px' }}>
+                        <strong style={{ display: 'block', fontSize: '0.78rem', color: 'var(--ink)', marginBottom: '5px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                          Key Terms & Conditions:
+                        </strong>
+                        <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '0.82rem', color: 'var(--ink-soft)' }}>
+                          {service.terms.map((t, idx) => (
+                            <li key={idx} style={{ marginBottom: '3px' }}>{t}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                     <button
                       type="button"
                       className="btn-quote"
@@ -214,7 +226,7 @@ export default function ServiceAccordion({ onOpenQuote }) {
                             className="card-price"
                             style={{ fontSize: '0.88rem', color: 'var(--ink-soft)', marginTop: '2px' }}
                           >
-                            from <b>€{service.rate}/m²</b>
+                            <b>{service.priceDisplay || `from €${service.rate}/m²`}</b>
                           </div>
                         </div>
                       </div>

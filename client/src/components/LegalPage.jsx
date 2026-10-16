@@ -186,14 +186,15 @@ function TermsContent({ settings, getWhatsAppUrl, onOpenQuote }) {
       <section id="t-1" className="legal-section">
         <h2>1. Scope of Services</h2>
         <p>
-          {settings.brandName} delivers professional residential and commercial cleaning services across {settings.cities || 'Dublin & surrounding areas'}. Our offerings include:
+          {settings.brandName} delivers professional residential and commercial cleaning services across {settings.cities || 'Dublin, Co. Meath, Co. Louth & surrounding areas'}. Our offerings include:
         </p>
         <ul>
-          <li><strong>Standard Residential Cleaning:</strong> Regular maintenance, dusting, vacuuming, mopping, bathroom sanitization, and surface wipe-down.</li>
-          <li><strong>Deep Cleaning:</strong> Comprehensive intensive cleaning of all accessible areas, degreasing, lime scale removal, and detailed detailing.</li>
-          <li><strong>Move-In / Move-Out (End of Tenancy):</strong> High-spec handover cleaning designed for deposit returns, landlord inspections, and estate agents.</li>
-          <li><strong>Post-Construction & Renovation:</strong> Removal of drywall dust, builder residue, paint splatters, and deep post-trade sanitization.</li>
-          <li><strong>Specialized Add-ons:</strong> Interior oven cleaning, interior refrigerator cleaning, interior window cleaning, and balcony / patio wash.</li>
+          <li><strong>House & Apartment Cleaning:</strong> Standard upkeep and maintenance cleaning tailored to client priorities (€30/hr, min. 3 hours / €90).</li>
+          <li><strong>Comprehensive Deep Cleaning:</strong> Intensive restorative cleaning across the entire property (from €295 based on bedroom count).</li>
+          <li><strong>End of Tenancy Cleaning:</strong> Turnover cleaning for landlord inspections and deposit return checklists (€30/hr, min. 3 hours / €90).</li>
+          <li><strong>Post-Construction Cleaning:</strong> Fine-dust removal and intensive sanitisation following renovation work (€350 base 5-room package).</li>
+          <li><strong>Internal Window Cleaning Package:</strong> Fixed-price glazing and frame cleaning package (€99 for up to 20 windows).</li>
+          <li><strong>Office & Commercial Cleaning:</strong> Contract-free professional commercial cleaning (€35/hr, min. 3 hours / €105, 23% VAT included).</li>
         </ul>
         <p>
           Specific tasks included in your service will align with the checklist confirmed during your WhatsApp booking consultation.
@@ -204,14 +205,14 @@ function TermsContent({ settings, getWhatsAppUrl, onOpenQuote }) {
       <section id="t-2" className="legal-section">
         <h2>2. Quotations, Pricing & Minimum Booking</h2>
         <p>
-          All initial price estimates calculated via our online quote calculator or WhatsApp chat are based on the square meters (m²), property type, and selected package provided by the client.
+          All initial price quotes provided via our website or WhatsApp chat are based on the service selected, property specification, and required hours.
         </p>
         <div className="legal-highlight-box">
-          <strong>Minimum Callout Charge:</strong> All scheduled appointments are subject to a minimum charge of <strong>€{settings.minCharge || 70}</strong> to cover travel, equipment setup, and cleaner dispatch.
+          <strong>Pricing, VAT & Minimum Booking:</strong> All prices are inclusive of applicable Irish VAT. Standard residential services operate on a minimum booking of 3 hours (€90). Commercial cleaning operates on a minimum booking of 3 hours (€105). Fixed packages apply to Window Cleaning (€99), Post-Construction (€350), and Deep Cleaning (from €295).
         </div>
         <ul>
-          <li><strong>Price Adjustments:</strong> If on-site inspection reveals that the actual property size, layout, or level of soiling differs significantly from the description provided (e.g. heavy biological contamination, hoarding, excessive pet hair, or undisclosed renovations), {settings.brandName} reserves the right to revise the quotation or time estimate before commencing work.</li>
-          <li><strong>No Hidden Surcharges:</strong> Eco-friendly cleaning detergents, microfiber cloths, professional vacuums, and standard equipment are included in your quote unless specialized heavy machinery is explicitly requested in advance.</li>
+          <li><strong>Price Adjustments:</strong> If on-site inspection reveals that actual property condition, layout, or level of soiling differs significantly from the description provided (e.g. biohazards, hoarding, excessive pet hair, or ongoing construction), {settings.brandName} reserves the right to revise the quotation or time estimate before commencing work.</li>
+          <li><strong>Included Equipment & Products:</strong> Standard cleaning detergents, microfiber cloths, professional vacuums, and equipment are included in the service unless specialized machinery is requested in advance.</li>
         </ul>
       </section>
 
@@ -228,10 +229,11 @@ function TermsContent({ settings, getWhatsAppUrl, onOpenQuote }) {
 
       {/* Section 4 */}
       <section id="t-4" className="legal-section">
-        <h2>4. Client Responsibilities & Site Access</h2>
+        <h2>4. Client Responsibilities, Site Access & Parking</h2>
         <p>To ensure thorough, safe, and uninterrupted execution of your cleaning service, the client agrees to:</p>
         <ul>
           <li><strong>Provide Access:</strong> Grant timely entry to the property at the agreed appointment time (via personal presence, concierge, key-lockbox, or key handover).</li>
+          <li><strong>Vehicle Parking & Charges:</strong> Safe vehicle parking must be available near or adjacent to the property for the transport of cleaning equipment and detergents. Any applicable parking fees, disc charges, or meter costs are the customer's responsibility.</li>
           <li><strong>Provide Working Utilities:</strong> Ensure uninterrupted access to running hot and cold water and active electricity. If utilities are disconnected, cleaning cannot proceed safely, and lockout policy applies.</li>
           <li><strong>Secure Valuables:</strong> Safely secure all currency, high-value jewelry, confidential documents, and fragile sentimental heirlooms prior to cleaner arrival.</li>
           <li><strong>Pet Safety:</strong> Restrain or place household pets in secure, separate rooms during the cleaning process to prevent accidental escapes or distress.</li>

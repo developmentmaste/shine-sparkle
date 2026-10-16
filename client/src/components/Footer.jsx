@@ -24,7 +24,7 @@ export default function Footer({ onNavigate }) {
               className="footer-logo"
             />
             <p className="footer-brand-desc">
-              Professional cleaning service tailored to your home and office. Book in minutes via WhatsApp, with transparent per-m² pricing and zero hidden fees.
+              Professional residential and commercial cleaning across Dublin, Co. Meath, and Co. Louth. Book in minutes via WhatsApp with transparent pricing and zero hidden fees.
             </p>
           </div>
 

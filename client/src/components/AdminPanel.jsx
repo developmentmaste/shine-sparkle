@@ -527,7 +527,7 @@ export default function AdminPanel({ isOpen, onClose, telegramUser }) {
                           <h4>{service.name}</h4>
                           <div className="admin-service-meta">
                             <span className="admin-badge-rate">
-                              €{service.rate} {t.ratePerM2}
+                              {service.priceDisplay || `€${service.rate} ${t.ratePerM2}`}
                             </span>
                             <span className="admin-badge-cadence">
                               {service.cadence}

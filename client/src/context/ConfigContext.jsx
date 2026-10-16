@@ -12,11 +12,11 @@ export const DEFAULT_SETTINGS = {
   email: 'shineandsparkle.mm@gmail.com',
   brandName: 'Shine & Sparkle Cleaning',
   minCharge: MIN_CHARGE,
-  cities: 'Serving Dublin & surrounding areas',
+  cities: 'Serving Dublin, Co. Meath, Co. Louth & surrounding areas',
 };
 
 const STORAGE_KEY_SETTINGS = 'shine_sparkle_settings_v3';
-const STORAGE_KEY_SERVICES = 'shine_sparkle_services_v1';
+const STORAGE_KEY_SERVICES = 'shine_sparkle_services_v2';
 
 const ConfigContext = createContext(null);
 
@@ -46,7 +46,8 @@ export function ConfigProvider({ children }) {
       const saved = localStorage.getItem(STORAGE_KEY_SERVICES);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        const hasLegacy = Array.isArray(parsed) && parsed.some((s) => s.id === 'renovation' || s.id === 'moveout');
+        if (Array.isArray(parsed) && parsed.length > 0 && !hasLegacy) return parsed;
       }
     } catch {
       // fallback
@@ -83,7 +84,10 @@ export function ConfigProvider({ children }) {
             setSettings((prev) => ({ ...prev, ...data.settings }));
           }
           if (data && Array.isArray(data.services) && data.services.length > 0) {
-            setServices(data.services);
+            const hasLegacy = data.services.some((s) => s.id === 'renovation' || s.id === 'moveout');
+            if (!hasLegacy) {
+              setServices(data.services);
+            }
           }
         }
       } catch (err) {
