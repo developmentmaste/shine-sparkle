@@ -78,12 +78,7 @@ export default function LegalPage({ initialTab = 'terms', onNavigate, onOpenQuot
         </div>
 
         <div className="wrap legal-hero-inner">
-          <div className="legal-hero-badge" key={`badge-${activeTab}`}>
-            <span className="legal-badge-dot"></span>
-            <span>{activeTab === 'privacy' ? 'Data Protection & GDPR' : 'Client Service Agreement'}</span>
-          </div>
-
-          <div key={`header-${activeTab}`} className="legal-hero-text-anim">
+          <div className="legal-hero-text">
             <h1 className="legal-hero-title">
               {activeTab === 'privacy' ? 'Privacy Policy' : 'Terms & Conditions'}
             </h1>
@@ -140,14 +135,12 @@ export default function LegalPage({ initialTab = 'terms', onNavigate, onOpenQuot
       {/* Main Document Body */}
       <main className="legal-content-wrap">
         <div className="wrap">
-          <div className="legal-card" key={`content-${activeTab}`}>
-            <div className="legal-pane-animated">
-              {activeTab === 'terms' ? (
-                <TermsContent settings={settings} getWhatsAppUrl={getWhatsAppUrl} onOpenQuote={onOpenQuote} />
-              ) : (
-                <PrivacyContent settings={settings} getWhatsAppUrl={getWhatsAppUrl} />
-              )}
-            </div>
+          <div className="legal-card">
+            {activeTab === 'terms' ? (
+              <TermsContent settings={settings} getWhatsAppUrl={getWhatsAppUrl} onOpenQuote={onOpenQuote} />
+            ) : (
+              <PrivacyContent settings={settings} getWhatsAppUrl={getWhatsAppUrl} />
+            )}
           </div>
 
           {/* Contact / Help Banner */}

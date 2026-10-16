@@ -1759,57 +1759,9 @@ header.site-header .nav {
   opacity: 0.55;
 }
 
-/* --- Themed Badge with Entrance Pop --- */
-.legal-hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 6px 16px;
-  border-radius: 999px;
-  margin-bottom: 16px;
-  backdrop-filter: blur(12px);
-  transition: all 0.5s ease;
-  animation: legalBadgePop 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.legal-theme-terms .legal-hero-badge {
-  background: rgba(254, 243, 199, 0.85);
-  color: #92400E;
-  border: 1px solid rgba(245, 158, 11, 0.35);
-  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.12);
-}
-
-.legal-theme-terms .legal-badge-dot {
-  background: #D97706;
-  box-shadow: 0 0 8px #F59E0B;
-}
-
-.legal-theme-privacy .legal-hero-badge {
-  background: rgba(209, 250, 229, 0.85);
-  color: #065F46;
-  border: 1px solid rgba(16, 185, 129, 0.35);
-  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.12);
-}
-
-.legal-theme-privacy .legal-badge-dot {
-  background: #10B981;
-  box-shadow: 0 0 8px #34D399;
-}
-
-.legal-badge-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  transition: background 0.4s ease, box-shadow 0.4s ease;
-}
-
-/* --- Title & Subtitle Switching Animation --- */
-.legal-hero-text-anim {
-  animation: legalTitleFade 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+.legal-hero-text {
+  max-width: 760px;
+  margin: 0 auto;
 }
 
 .legal-hero-title {
@@ -1924,44 +1876,6 @@ header.site-header .nav {
 
 .legal-tab-btn.is-active svg {
   transform: scale(1.1);
-}
-
-/* --- Animations --- */
-@keyframes legalBadgePop {
-  0% {
-    opacity: 0;
-    transform: scale(0.88);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes legalTitleFade {
-  0% {
-    opacity: 0;
-    transform: translateY(12px) scale(0.985);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes legalPaneEnter {
-  0% {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.legal-pane-animated {
-  animation: legalPaneEnter 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* Legal Content Body */
