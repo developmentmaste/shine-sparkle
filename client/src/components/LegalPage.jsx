@@ -194,7 +194,7 @@ function TermsContent({ settings, getWhatsAppUrl, onOpenQuote }) {
           <li><strong>End of Tenancy Cleaning:</strong> Turnover cleaning for landlord inspections and deposit return checklists (€30/hr, min. 3 hours / €90).</li>
           <li><strong>Post-Construction Cleaning:</strong> Fine-dust removal and intensive sanitisation following renovation work (€350 base 5-room package).</li>
           <li><strong>Internal Window Cleaning Package:</strong> Fixed-price glazing and frame cleaning package (€99 for up to 20 windows).</li>
-          <li><strong>Office & Commercial Cleaning:</strong> Contract-free professional commercial cleaning (€35/hr, min. 3 hours / €105, 23% VAT included).</li>
+          <li><strong>Office & Commercial Cleaning:</strong> Contract-free professional commercial cleaning (€35/hr, min. 3 hours / €105, Irish VAT included).</li>
         </ul>
         <p>
           Specific tasks included in your service will align with the checklist confirmed during your WhatsApp booking consultation.

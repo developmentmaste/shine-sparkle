@@ -150,7 +150,7 @@ export const SERVICES = [
     iconBg: '#EAF3FB',
     icon: serviceIcon,
     description:
-      'Commercial cleaning for offices, schools, medical spaces, and childcare facilities. Available for regular visits, one-off deep cleans, or temporary staff cover. No long-term lock-in contract. €35/hr includes 23% Irish VAT (min. 3 hours / €105).',
+      'Commercial cleaning for offices, schools, medical spaces, and childcare facilities. Available for regular visits, one-off deep cleans, or temporary staff cover. No long-term lock-in contract. €35/hr includes Irish VAT (min. 3 hours / €105).',
     included: [
       'Sanitisation of desks, accessible work surfaces, and keyboards',
       'Staff kitchen: surfaces wiped, sink and microwave cleaned',
@@ -160,7 +160,7 @@ export const SERVICES = [
       'Waste bins and recycling emptied with liners replaced',
     ],
     terms: [
-      'Rate: €35.00/hr (23% VAT included) · Minimum booking: 3 hours (€105)',
+      'Rate: €35.00/hr (VAT included) · Minimum booking: 3 hours (€105)',
       'No contract required; one-off and scheduled services available',
       'Commercial equipment and detergents provided',
       'Service scheduled according to office operating hours',
