@@ -11,6 +11,7 @@ import Footer from './components/Footer.jsx';
 import QuoteModal from './components/QuoteModal.jsx';
 import AdminPanel from './components/AdminPanel.jsx';
 import LegalPage from './components/LegalPage.jsx';
+import CookieBanner from './components/CookieBanner.jsx';
 
 const getInitialRoute = () => {
   if (typeof window === 'undefined') return '/';
@@ -204,6 +205,8 @@ function MainApp() {
         onClose={handleCloseAdmin}
         telegramUser={telegramUser}
       />
+
+      <CookieBanner onNavigate={navigate} />
 
       {adminAuthError && (
         <div className="modal-overlay open" style={{ zIndex: 10001 }}>

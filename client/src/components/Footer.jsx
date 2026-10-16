@@ -77,6 +77,14 @@ export default function Footer({ onNavigate }) {
             <a href="/terms" onClick={(e) => handleLegalClick(e, '/terms')}>Terms & Conditions</a>
             <span className="dot">•</span>
             <a href="/privacy" onClick={(e) => handleLegalClick(e, '/privacy')}>Privacy Policy</a>
+            <span className="dot">•</span>
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new CustomEvent('open_cookie_settings'))}
+              className="footer-cookie-btn"
+            >
+              Cookie Preferences
+            </button>
           </div>
         </div>
       </div>

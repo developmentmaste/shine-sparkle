@@ -469,12 +469,15 @@ function PrivacyContent({ settings, getWhatsAppUrl }) {
       <section id="p-8" className="legal-section">
         <h2>8. Cookies & Local Storage</h2>
         <p>
-          Our website uses minimal, privacy-first technical mechanisms:
+          Our website uses minimal, privacy-compliant technical storage and cookies:
         </p>
         <ul>
-          <li><strong>Essential Local Storage:</strong> Used to temporarily remember your selected cleaning parameters in the quote calculator, custom price adjustments, and administrative session preferences.</li>
-          <li><strong>No Tracking Cookies:</strong> We do not deploy invasive third-party tracking cookies or behavioral advertising pixels across our public website.</li>
+          <li><strong>Essential Storage & Cookies:</strong> Strictly necessary for core website operations, including remembering your selected cleaning parameters in the quote calculator, saving your cookie consent preferences, and maintaining secure administrative sessions.</li>
+          <li><strong>Analytics Cookies:</strong> With your consent, we use anonymous aggregated analytics cookies to understand how visitors interact with our pages, diagnose performance bottlenecks, and improve service usability. These cookies do not identify you personally.</li>
         </ul>
+        <p>
+          You can update or withdraw your cookie preferences at any time by clicking "Cookie Preferences" in the footer of our website.
+        </p>
       </section>
 
       {/* Section 9 */}
