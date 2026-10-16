@@ -61,19 +61,38 @@ export default function LegalPage({ initialTab = 'terms', onNavigate, onOpenQuot
         </div>
       </header>
 
-      {/* Hero Header */}
-      <section className="legal-hero">
-        <div className="wrap">
-          <div className="legal-hero-badge">
+      {/* Hero Header with Dynamic Floating Blobs */}
+      <section className={`legal-hero legal-theme-${activeTab}`}>
+        {/* Golden Blobs for Terms & Conditions */}
+        <div className={`legal-blobs-layer terms-blobs ${activeTab === 'terms' ? 'is-active' : ''}`} aria-hidden="true">
+          <div className="blob blob-1 blob-gold-1" />
+          <div className="blob blob-2 blob-gold-2" />
+          <div className="blob blob-3 blob-gold-3" />
+        </div>
+
+        {/* Emerald Green Blobs for Privacy Policy */}
+        <div className={`legal-blobs-layer privacy-blobs ${activeTab === 'privacy' ? 'is-active' : ''}`} aria-hidden="true">
+          <div className="blob blob-1 blob-green-1" />
+          <div className="blob blob-2 blob-green-2" />
+          <div className="blob blob-3 blob-green-3" />
+        </div>
+
+        <div className="wrap legal-hero-inner">
+          <div className="legal-hero-badge" key={`badge-${activeTab}`}>
             <span className="legal-badge-dot"></span>
-            Legal & Compliance
+            <span>{activeTab === 'privacy' ? 'Data Protection & GDPR' : 'Client Service Agreement'}</span>
           </div>
-          <h1 className="legal-hero-title">
-            {activeTab === 'privacy' ? 'Privacy Policy' : 'Terms & Conditions'}
-          </h1>
-          <p className="legal-hero-subtitle">
-            Transparent, fair, and reliable policies for our valued clients across {settings.cities || 'Dublin & surrounding areas'}.
-          </p>
+
+          <div key={`header-${activeTab}`} className="legal-hero-text-anim">
+            <h1 className="legal-hero-title">
+              {activeTab === 'privacy' ? 'Privacy Policy' : 'Terms & Conditions'}
+            </h1>
+            <p className="legal-hero-subtitle">
+              {activeTab === 'privacy'
+                ? `Clear, GDPR-compliant privacy standards for our valued clients across ${settings.cities || 'Dublin & surrounding areas'}.`
+                : `Transparent, fair, and reliable service conditions for our valued clients across ${settings.cities || 'Dublin & surrounding areas'}.`}
+            </p>
+          </div>
 
           <div className="legal-hero-meta">
             <span>Last updated: <strong>{lastUpdated}</strong></span>
@@ -87,10 +106,10 @@ export default function LegalPage({ initialTab = 'terms', onNavigate, onOpenQuot
               type="button"
               role="tab"
               aria-selected={activeTab === 'terms'}
-              className={`legal-tab-btn ${activeTab === 'terms' ? 'is-active' : ''}`}
+              className={`legal-tab-btn legal-tab-terms ${activeTab === 'terms' ? 'is-active' : ''}`}
               onClick={() => handleTabSwitch('terms')}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                 <polyline points="14 2 14 8 20 8"></polyline>
                 <line x1="16" y1="13" x2="8" y2="13"></line>
@@ -104,10 +123,10 @@ export default function LegalPage({ initialTab = 'terms', onNavigate, onOpenQuot
               type="button"
               role="tab"
               aria-selected={activeTab === 'privacy'}
-              className={`legal-tab-btn ${activeTab === 'privacy' ? 'is-active' : ''}`}
+              className={`legal-tab-btn legal-tab-privacy ${activeTab === 'privacy' ? 'is-active' : ''}`}
               onClick={() => handleTabSwitch('privacy')}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
               </svg>
@@ -120,12 +139,14 @@ export default function LegalPage({ initialTab = 'terms', onNavigate, onOpenQuot
       {/* Main Document Body */}
       <main className="legal-content-wrap">
         <div className="wrap">
-          <div className="legal-card">
-            {activeTab === 'terms' ? (
-              <TermsContent settings={settings} getWhatsAppUrl={getWhatsAppUrl} onOpenQuote={onOpenQuote} />
-            ) : (
-              <PrivacyContent settings={settings} getWhatsAppUrl={getWhatsAppUrl} />
-            )}
+          <div className="legal-card" key={`content-${activeTab}`}>
+            <div className="legal-pane-animated">
+              {activeTab === 'terms' ? (
+                <TermsContent settings={settings} getWhatsAppUrl={getWhatsAppUrl} onOpenQuote={onOpenQuote} />
+              ) : (
+                <PrivacyContent settings={settings} getWhatsAppUrl={getWhatsAppUrl} />
+              )}
+            </div>
           </div>
 
           {/* Contact / Help Banner */}

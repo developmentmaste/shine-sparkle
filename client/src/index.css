@@ -1654,51 +1654,179 @@ header.site-header .nav {
   box-shadow: 0 6px 18px rgba(20, 57, 95, 0.22);
 }
 
-/* Legal Hero Section */
+/* Legal Hero Section with Morphing Blobs */
 .legal-hero {
-  background: linear-gradient(180deg, #FFFFFF 0%, #F5F8FB 100%);
+  position: relative;
+  overflow: hidden;
   border-bottom: 1px solid var(--border);
-  padding: 48px 0 32px;
+  padding: 56px 20px 40px;
   text-align: center;
+  transition: background 0.85s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.85s ease;
 }
 
+.legal-hero.legal-theme-terms {
+  background: radial-gradient(circle at 50% 0%, #FFFDF5 0%, #FFFBEB 50%, #FEF3C7 100%);
+  border-bottom-color: rgba(245, 158, 11, 0.25);
+}
+
+.legal-hero.legal-theme-privacy {
+  background: radial-gradient(circle at 50% 0%, #F9FDFB 0%, #ECFDF5 50%, #D1FAE5 100%);
+  border-bottom-color: rgba(16, 185, 129, 0.25);
+}
+
+.legal-hero-inner {
+  position: relative;
+  z-index: 2;
+}
+
+/* Layered Blobs Container with Smooth Cross-Fade */
+.legal-blobs-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.85s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity;
+}
+
+.legal-blobs-layer.is-active {
+  opacity: 1;
+}
+
+/* Shared Blob Dimensions & Blur in Legal Hero */
+.legal-hero .blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.legal-hero .blob-1 {
+  width: 360px;
+  height: 360px;
+  top: -50px;
+  left: 5%;
+  animation: dvdBounce1 22s linear infinite;
+}
+
+.legal-hero .blob-2 {
+  width: 330px;
+  height: 330px;
+  top: 15px;
+  right: 5%;
+  animation: dvdBounce2 22s linear infinite;
+}
+
+.legal-hero .blob-3 {
+  width: 300px;
+  height: 300px;
+  bottom: -70px;
+  left: 36%;
+  animation: dvdBounce3 22s linear infinite;
+}
+
+/* --- Terms & Conditions Golden Blobs --- */
+.blob-gold-1 {
+  background: radial-gradient(circle at 40% 40%, #FDE68A 0%, #F59E0B 55%, #B45309 100%);
+  opacity: 0.65;
+}
+
+.blob-gold-2 {
+  background: radial-gradient(circle at 40% 40%, #FEF08A 0%, #D97706 58%, #92400E 100%);
+  opacity: 0.62;
+}
+
+.blob-gold-3 {
+  background: radial-gradient(circle at 40% 40%, #FCD34D 0%, #B45309 65%, #78350F 100%);
+  opacity: 0.58;
+}
+
+/* --- Privacy Policy Emerald Green Blobs --- */
+.blob-green-1 {
+  background: radial-gradient(circle at 40% 40%, #6EE7B7 0%, #10B981 55%, #047857 100%);
+  opacity: 0.62;
+}
+
+.blob-green-2 {
+  background: radial-gradient(circle at 40% 40%, #A7F3D0 0%, #059669 60%, #064E3B 100%);
+  opacity: 0.58;
+}
+
+.blob-green-3 {
+  background: radial-gradient(circle at 40% 40%, #34D399 0%, #047857 65%, #022C22 100%);
+  opacity: 0.55;
+}
+
+/* --- Themed Badge with Entrance Pop --- */
 .legal-hero-badge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: #EBF3FA;
-  color: var(--ink);
   font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  padding: 6px 14px;
+  padding: 6px 16px;
   border-radius: 999px;
   margin-bottom: 16px;
+  backdrop-filter: blur(12px);
+  transition: all 0.5s ease;
+  animation: legalBadgePop 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.legal-theme-terms .legal-hero-badge {
+  background: rgba(254, 243, 199, 0.85);
+  color: #92400E;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.12);
+}
+
+.legal-theme-terms .legal-badge-dot {
+  background: #D97706;
+  box-shadow: 0 0 8px #F59E0B;
+}
+
+.legal-theme-privacy .legal-hero-badge {
+  background: rgba(209, 250, 229, 0.85);
+  color: #065F46;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.12);
+}
+
+.legal-theme-privacy .legal-badge-dot {
+  background: #10B981;
+  box-shadow: 0 0 8px #34D399;
 }
 
 .legal-badge-dot {
   width: 7px;
   height: 7px;
-  background: #00C2CB;
   border-radius: 50%;
+  transition: background 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* --- Title & Subtitle Switching Animation --- */
+.legal-hero-text-anim {
+  animation: legalTitleFade 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .legal-hero-title {
-  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-size: clamp(2.1rem, 4.5vw, 3rem);
   font-weight: 800;
   color: var(--ink);
-  letter-spacing: -0.025em;
-  line-height: 1.18;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
   margin-bottom: 12px;
 }
 
 .legal-hero-subtitle {
   font-size: 1.05rem;
   color: var(--ink-soft);
-  max-width: 620px;
+  max-width: 640px;
   margin: 0 auto 16px;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 .legal-hero-meta {
@@ -1708,23 +1836,24 @@ header.site-header .nav {
   gap: 10px;
   font-size: 0.85rem;
   color: var(--ink-soft);
-  margin-bottom: 28px;
+  margin-bottom: 26px;
 }
 
 .legal-hero-meta .dot-sep {
   opacity: 0.4;
 }
 
-/* Segmented Tabs Bar */
+/* --- Document Switcher Tabs --- */
 .legal-tabs-bar {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: #FFFFFF;
-  padding: 5px;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(14px);
+  padding: 6px;
   border-radius: 999px;
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
   max-width: 100%;
 }
 
@@ -1735,24 +1864,83 @@ header.site-header .nav {
   background: transparent;
   color: var(--ink-soft);
   border: none;
-  padding: 10px 22px;
+  padding: 10px 24px;
   border-radius: 999px;
-  font-size: 0.92rem;
+  font-size: 0.94rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   white-space: nowrap;
+  position: relative;
 }
 
 .legal-tab-btn:hover {
   color: var(--ink);
-  background: rgba(245, 248, 251, 0.7);
+  background: rgba(0, 0, 0, 0.04);
 }
 
-.legal-tab-btn.is-active {
-  background: var(--ink);
+.legal-tab-btn:active {
+  transform: scale(0.96);
+}
+
+.legal-tab-btn svg {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.legal-tab-btn.is-active svg {
+  transform: scale(1.12);
+}
+
+/* Terms active tab (Golden/Amber glow) */
+.legal-tab-btn.legal-tab-terms.is-active {
+  background: linear-gradient(135deg, #B45309 0%, #D97706 60%, #F59E0B 100%);
   color: #FFFFFF;
-  box-shadow: 0 3px 12px rgba(20, 57, 95, 0.2);
+  box-shadow: 0 4px 18px rgba(217, 119, 6, 0.38);
+}
+
+/* Privacy active tab (Emerald Green glow) */
+.legal-tab-btn.legal-tab-privacy.is-active {
+  background: linear-gradient(135deg, #047857 0%, #059669 60%, #10B981 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4px 18px rgba(16, 185, 129, 0.38);
+}
+
+/* --- Animations --- */
+@keyframes legalBadgePop {
+  0% {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes legalTitleFade {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.985);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes legalPaneEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.legal-pane-animated {
+  animation: legalPaneEnter 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* Legal Content Body */
@@ -1994,6 +2182,21 @@ header.site-header .nav {
     border-radius: 16px;
   }
   .legal-hero {
-    padding: 32px 0 24px;
+    padding: 40px 14px 28px;
+  }
+  .legal-hero .blob-1 {
+    width: 260px;
+    height: 260px;
+    left: -30px;
+  }
+  .legal-hero .blob-2 {
+    width: 230px;
+    height: 230px;
+    right: -30px;
+  }
+  .legal-hero .blob-3 {
+    width: 210px;
+    height: 210px;
+    left: 15%;
   }
 }
