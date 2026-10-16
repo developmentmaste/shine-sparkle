@@ -10,11 +10,61 @@ import CTA from './components/CTA.jsx';
 import Footer from './components/Footer.jsx';
 import QuoteModal from './components/QuoteModal.jsx';
 import AdminPanel from './components/AdminPanel.jsx';
+import LegalPage from './components/LegalPage.jsx';
 
+const getInitialRoute = () => {
+  if (typeof window === 'undefined') return '/';
+  const path = window.location.pathname.toLowerCase();
+  const hash = window.location.hash.toLowerCase();
+  if (path.startsWith('/terms') || hash === '#terms' || hash === '#/terms') return '/terms';
+  if (path.startsWith('/privacy') || hash === '#privacy' || hash === '#/privacy') return '/privacy';
+  return '/';
+};
 
 function MainApp() {
+  const [currentRoute, setCurrentRoute] = useState(getInitialRoute);
   const [isQuoteOpen, setIsQuoteOpen] = useState(false);
   const [quoteServiceId, setQuoteServiceId] = useState(null);
+
+  // Synchronize route with browser history (back/forward and hashchange)
+  useEffect(() => {
+    const handleLocationChange = () => {
+      setCurrentRoute(getInitialRoute());
+    };
+    window.addEventListener('popstate', handleLocationChange);
+    window.addEventListener('hashchange', handleLocationChange);
+    return () => {
+      window.removeEventListener('popstate', handleLocationChange);
+      window.removeEventListener('hashchange', handleLocationChange);
+    };
+  }, []);
+
+  const navigate = (targetPath) => {
+    let cleanPath = targetPath;
+    let targetHash = '';
+    if (targetPath.includes('#')) {
+      const parts = targetPath.split('#');
+      cleanPath = parts[0] || '/';
+      targetHash = parts[1];
+    }
+
+    if (cleanPath === '' || cleanPath === '/') {
+      window.history.pushState(null, '', targetHash ? `#${targetHash}` : '/');
+      setCurrentRoute('/');
+      if (targetHash) {
+        setTimeout(() => {
+          const el = document.getElementById(targetHash);
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }, 80);
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    } else {
+      window.history.pushState(null, '', cleanPath);
+      setCurrentRoute(cleanPath);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   // Telegram Admin State
   const [isAdminOpen, setIsAdminOpen] = useState(false);
@@ -117,16 +167,31 @@ function MainApp() {
     }
   };
 
+  const isLegalRoute = currentRoute === '/terms' || currentRoute === '/privacy';
+
   return (
     <>
-      <Nav onOpenQuote={() => handleOpenQuote()} />
-      <Hero onOpenQuote={() => handleOpenQuote()} />
-      <ServiceAccordion onOpenQuote={handleOpenQuote} />
-      <Process />
-      <Testimonials />
-      <Contact />
-      <CTA onOpenQuote={() => handleOpenQuote()} />
-      <Footer />
+      {isLegalRoute ? (
+        <>
+          <LegalPage
+            initialTab={currentRoute === '/privacy' ? 'privacy' : 'terms'}
+            onNavigate={navigate}
+            onOpenQuote={handleOpenQuote}
+          />
+          <Footer onNavigate={navigate} />
+        </>
+      ) : (
+        <>
+          <Nav onOpenQuote={() => handleOpenQuote()} />
+          <Hero onOpenQuote={() => handleOpenQuote()} />
+          <ServiceAccordion onOpenQuote={handleOpenQuote} />
+          <Process />
+          <Testimonials />
+          <Contact />
+          <CTA onOpenQuote={() => handleOpenQuote()} />
+          <Footer onNavigate={navigate} />
+        </>
+      )}
 
       <QuoteModal
         isOpen={isQuoteOpen}
