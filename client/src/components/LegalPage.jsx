@@ -89,8 +89,8 @@ export default function LegalPage({ initialTab = 'terms', onNavigate, onOpenQuot
             </h1>
             <p className="legal-hero-subtitle">
               {activeTab === 'privacy'
-                ? `Clear, GDPR-compliant privacy standards for our valued clients across ${settings.cities || 'Dublin & surrounding areas'}.`
-                : `Transparent, fair, and reliable service conditions for our valued clients across ${settings.cities || 'Dublin & surrounding areas'}.`}
+                ? 'Information on how personal data is collected, processed, and protected under GDPR.'
+                : 'Terms and conditions governing the booking, payment, and provision of cleaning services.'}
             </p>
           </div>
 
@@ -100,8 +100,9 @@ export default function LegalPage({ initialTab = 'terms', onNavigate, onOpenQuot
             <span>Entity: <strong>{settings.brandName}</strong></span>
           </div>
 
-          {/* Interactive Document Switcher Tabs */}
+          {/* Interactive Document Switcher Tabs (Swiper/Slider) */}
           <div className="legal-tabs-bar" role="tablist">
+            <span className={`legal-tabs-glider ${activeTab}`} aria-hidden="true" />
             <button
               type="button"
               role="tab"

@@ -1843,25 +1843,58 @@ header.site-header .nav {
   opacity: 0.4;
 }
 
-/* --- Document Switcher Tabs --- */
+/* --- Document Switcher Tabs (Sliding Swiper Pill) --- */
 .legal-tabs-bar {
-  display: inline-flex;
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
   align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(14px);
-  padding: 6px;
+  padding: 5px;
   border-radius: 999px;
   border: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
   max-width: 100%;
+  user-select: none;
+}
+
+/* Sliding active pill indicator */
+.legal-tabs-glider {
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  left: 5px;
+  width: calc(50% - 5px);
+  border-radius: 999px;
+  pointer-events: none;
+  z-index: 1;
+  transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.45s ease,
+              box-shadow 0.45s ease;
+  will-change: transform, background, box-shadow;
+}
+
+.legal-tabs-glider.terms {
+  transform: translateX(0%);
+  background: linear-gradient(135deg, #B45309 0%, #D97706 60%, #F59E0B 100%);
+  box-shadow: 0 4px 18px rgba(217, 119, 6, 0.38);
+}
+
+.legal-tabs-glider.privacy {
+  transform: translateX(100%);
+  background: linear-gradient(135deg, #047857 0%, #059669 60%, #10B981 100%);
+  box-shadow: 0 4px 18px rgba(16, 185, 129, 0.38);
 }
 
 .legal-tab-btn {
+  position: relative;
+  z-index: 2;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  background: transparent;
+  background: transparent !important;
   color: var(--ink-soft);
   border: none;
   padding: 10px 24px;
@@ -1869,18 +1902,20 @@ header.site-header .nav {
   font-size: 0.94rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: color 0.25s ease, transform 0.15s ease;
   white-space: nowrap;
-  position: relative;
 }
 
 .legal-tab-btn:hover {
   color: var(--ink);
-  background: rgba(0, 0, 0, 0.04);
+}
+
+.legal-tab-btn.is-active {
+  color: #FFFFFF !important;
 }
 
 .legal-tab-btn:active {
-  transform: scale(0.96);
+  transform: scale(0.97);
 }
 
 .legal-tab-btn svg {
@@ -1888,21 +1923,7 @@ header.site-header .nav {
 }
 
 .legal-tab-btn.is-active svg {
-  transform: scale(1.12);
-}
-
-/* Terms active tab (Golden/Amber glow) */
-.legal-tab-btn.legal-tab-terms.is-active {
-  background: linear-gradient(135deg, #B45309 0%, #D97706 60%, #F59E0B 100%);
-  color: #FFFFFF;
-  box-shadow: 0 4px 18px rgba(217, 119, 6, 0.38);
-}
-
-/* Privacy active tab (Emerald Green glow) */
-.legal-tab-btn.legal-tab-privacy.is-active {
-  background: linear-gradient(135deg, #047857 0%, #059669 60%, #10B981 100%);
-  color: #FFFFFF;
-  box-shadow: 0 4px 18px rgba(16, 185, 129, 0.38);
+  transform: scale(1.1);
 }
 
 /* --- Animations --- */
