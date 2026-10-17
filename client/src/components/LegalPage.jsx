@@ -184,16 +184,16 @@ function TermsContent({ settings, getWhatsAppUrl, onOpenQuote }) {
       <nav className="legal-toc">
         <h4 className="legal-toc-title">Table of Contents</h4>
         <ol>
-          <li><a href="#t-1">1. Scope of Services</a></li>
-          <li><a href="#t-2">2. Quotations, Pricing & Minimum Booking</a></li>
-          <li><a href="#t-3">3. Booking Confirmations & Scheduling</a></li>
-          <li><a href="#t-4">4. Client Responsibilities & Site Access</a></li>
-          <li><a href="#t-5">5. Payment Terms & Methods</a></li>
-          <li><a href="#t-6">6. Cancellation, Rescheduling & Lockout Policy</a></li>
-          <li><a href="#t-7">7. 24-Hour Quality & Satisfaction Guarantee</a></li>
-          <li><a href="#t-8">8. Damage, Breakage & Liability Insurance</a></li>
-          <li><a href="#t-9">9. Health, Safety & Hazardous Substances</a></li>
-          <li><a href="#t-10">10. Amendments, Governing Law & Jurisdiction</a></li>
+          <li><a href="#t-1">Scope of Services</a></li>
+          <li><a href="#t-2">Quotations, Pricing & Minimum Booking</a></li>
+          <li><a href="#t-3">Booking Confirmations & Scheduling</a></li>
+          <li><a href="#t-4">Client Responsibilities & Site Access</a></li>
+          <li><a href="#t-5">Payment Terms & Methods</a></li>
+          <li><a href="#t-6">Cancellation, Rescheduling & Lockout Policy</a></li>
+          <li><a href="#t-7">24-Hour Quality & Satisfaction Guarantee</a></li>
+          <li><a href="#t-8">Damage, Breakage & Liability Insurance</a></li>
+          <li><a href="#t-9">Health, Safety & Hazardous Substances</a></li>
+          <li><a href="#t-10">Amendments, Governing Law & Jurisdiction</a></li>
         </ol>
       </nav>
 
@@ -357,16 +357,16 @@ function PrivacyContent({ settings, getWhatsAppUrl }) {
       <nav className="legal-toc">
         <h4 className="legal-toc-title">Table of Contents</h4>
         <ol>
-          <li><a href="#p-1">1. Data Controller Information</a></li>
-          <li><a href="#p-2">2. Personal Data We Collect</a></li>
-          <li><a href="#p-3">3. How & Why We Use Your Personal Data</a></li>
-          <li><a href="#p-4">4. Legal Grounds for Processing</a></li>
-          <li><a href="#p-5">5. Communication via WhatsApp & Third Parties</a></li>
-          <li><a href="#p-6">6. Data Retention Period</a></li>
-          <li><a href="#p-7">7. Your Data Protection Rights under GDPR</a></li>
-          <li><a href="#p-8">8. Cookies & Local Storage</a></li>
-          <li><a href="#p-9">9. Data Security Safeguards</a></li>
-          <li><a href="#p-10">10. Contacting Our Data Privacy Officer</a></li>
+          <li><a href="#p-1">Data Controller Information</a></li>
+          <li><a href="#p-2">Personal Data We Collect</a></li>
+          <li><a href="#p-3">How & Why We Use Your Personal Data</a></li>
+          <li><a href="#p-4">Legal Grounds for Processing</a></li>
+          <li><a href="#p-5">Communication via WhatsApp & Third Parties</a></li>
+          <li><a href="#p-6">Data Retention Period</a></li>
+          <li><a href="#p-7">Your Data Protection Rights under GDPR</a></li>
+          <li><a href="#p-8">Cookies & Local Storage</a></li>
+          <li><a href="#p-9">Data Security Safeguards</a></li>
+          <li><a href="#p-10">Contacting Our Data Privacy Officer</a></li>
         </ol>
       </nav>
 
