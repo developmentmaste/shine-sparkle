@@ -925,7 +925,7 @@ header.site-header .nav {
 
 /* Responsive display toggle for services */
 .service-view-accordion {
-  display: block;
+  display: flex;
 }
 .service-view-slider {
   display: none;
