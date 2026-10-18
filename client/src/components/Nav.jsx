@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useConfig } from '../context/ConfigContext.jsx';
 import { DEFAULT_MESSAGE } from '../whatsapp.js';
+import ThemeToggle from './ThemeToggle.jsx';
 
 export default function Nav({ onOpenQuote }) {
   const { settings, getWhatsAppUrl } = useConfig();
@@ -58,7 +59,8 @@ export default function Nav({ onOpenQuote }) {
           <a href="#contact">Contact</a>
         </nav>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <ThemeToggle />
           <button
             type="button"
             className="nav-cta"
@@ -96,7 +98,7 @@ export default function Nav({ onOpenQuote }) {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <img src="/logo.png" alt={settings.brandName} style={{ height: '38px', width: 'auto' }} />
+              <img src="/logo.png" alt={settings.brandName} className="logo-img" style={{ height: '38px', width: 'auto' }} />
               <div>
                 <div style={{ fontWeight: 700, fontSize: '1.15rem', color: 'var(--ink)' }}>
                   {settings.brandName}
@@ -106,14 +108,17 @@ export default function Nav({ onOpenQuote }) {
                 </div>
               </div>
             </div>
-            <button
-              type="button"
-              className="menu-close-btn"
-              onClick={() => setMobileMenuOpen(false)}
-              aria-label="Close navigation menu"
-            >
-              ✕
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <ThemeToggle />
+              <button
+                type="button"
+                className="menu-close-btn"
+                onClick={() => setMobileMenuOpen(false)}
+                aria-label="Close navigation menu"
+              >
+                ✕
+              </button>
+            </div>
           </div>
 
           <ul style={{ listStyle: 'none', padding: 0, margin: '10px 0 20px' }}>

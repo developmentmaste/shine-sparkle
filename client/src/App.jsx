@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ConfigProvider } from './context/ConfigContext.jsx';
+import { ThemeProvider } from './context/ThemeContext.jsx';
 import Nav from './components/Nav.jsx';
 import Hero from './components/Hero.jsx';
 import ServiceAccordion from './components/ServiceAccordion.jsx';
@@ -258,8 +259,10 @@ function MainApp() {
 
 export default function App() {
   return (
-    <ConfigProvider>
-      <MainApp />
-    </ConfigProvider>
+    <ThemeProvider>
+      <ConfigProvider>
+        <MainApp />
+      </ConfigProvider>
+    </ThemeProvider>
   );
 }

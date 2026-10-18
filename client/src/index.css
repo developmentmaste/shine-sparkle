@@ -2290,3 +2290,434 @@ header.site-header .nav {
   }
 }
 
+/* ==========================================================================
+   THEME TOGGLE BUTTON
+   ========================================================================== */
+.theme-toggle-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--white);
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  padding: 0;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--bg-soft);
+  border-color: var(--ink-soft);
+  transform: scale(1.06);
+}
+
+.theme-toggle-btn:active {
+  transform: scale(0.94);
+}
+
+.theme-toggle-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.theme-toggle-btn:hover .theme-toggle-icon-wrap {
+  transform: rotate(18deg);
+}
+
+.theme-icon-moon {
+  color: #38BDF8;
+}
+
+.theme-icon-sun {
+  color: #F59E0B;
+}
+
+/* ==========================================================================
+   DARK THEME (SLATE / GRAPHITE GRAY PALETTE & SYSTEM PREFERENCE SUPPORT)
+   ========================================================================== */
+:root {
+  --bg-page: #FFFFFF;
+}
+
+html[data-theme="dark"] {
+  --ink: #F1F5F9;
+  --ink-soft: #94A3B8;
+  --border: #2C3545;
+  --bg-soft: #161C26;
+  --bg-page: #11151E;
+  --white: #1E2633;
+  --accent: #38BDF8;
+  color-scheme: dark;
+}
+
+/* Base Body in Dark Theme */
+html[data-theme="dark"] body {
+  background: #11151E;
+  color: #F1F5F9;
+}
+
+/* Logo inversion to crisp white on dark background */
+html[data-theme="dark"] .logo-img {
+  filter: brightness(0) invert(1);
+}
+
+/* Header & Navbar */
+html[data-theme="dark"] header.site-header .nav {
+  background: rgba(26, 33, 46, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-color: #2D3748;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Eyebrow badge */
+html[data-theme="dark"] .eyebrow {
+  background: rgba(56, 189, 248, 0.12);
+  color: #38BDF8;
+  border: 1px solid rgba(56, 189, 248, 0.28);
+}
+
+/* Primary & Action Buttons */
+html[data-theme="dark"] .btn-primary,
+html[data-theme="dark"] .nav-cta,
+html[data-theme="dark"] .btn-quote,
+html[data-theme="dark"] .btn-send-uiverse {
+  background: #38BDF8;
+  color: #0B1320;
+  box-shadow: 0 4px 16px rgba(56, 189, 248, 0.32);
+}
+
+html[data-theme="dark"] .btn-primary:hover,
+html[data-theme="dark"] .nav-cta:hover,
+html[data-theme="dark"] .btn-quote:hover,
+html[data-theme="dark"] .btn-send-uiverse:hover {
+  background: #7DD3FC;
+  box-shadow: 0 6px 22px rgba(56, 189, 248, 0.45);
+}
+
+/* Secondary Button */
+html[data-theme="dark"] .btn-secondary {
+  background: #1E2634;
+  color: #F1F5F9;
+  border-color: #2D3748;
+}
+
+html[data-theme="dark"] .btn-secondary:hover {
+  background: #263142;
+  border-color: #38BDF8;
+}
+
+/* Service Accordion Cards */
+html[data-theme="dark"] .service-card {
+  background: #1E2634;
+  border-color: #2C3546;
+}
+
+html[data-theme="dark"] .service-card.open {
+  border-color: #38BDF8;
+}
+
+html[data-theme="dark"] .service-icon {
+  background: #273243 !important;
+  color: #38BDF8;
+}
+
+html[data-theme="dark"] .chevron {
+  border-color: #2C3546;
+  color: #94A3B8;
+}
+
+/* Process Section */
+html[data-theme="dark"] .process {
+  background: linear-gradient(180deg, #11151E 0%, #161C26 var(--section-fade-height), #161C26 100%);
+}
+
+html[data-theme="dark"] .step {
+  background: #1E2634;
+  border-color: #2C3546;
+}
+
+html[data-theme="dark"] .step-num {
+  background: #38BDF8;
+  color: #0B1320;
+}
+
+/* Plans (Pricing) */
+html[data-theme="dark"] .plan {
+  background: #1E2634;
+  border-color: #2C3546;
+}
+
+html[data-theme="dark"] .plan-btn {
+  background: #161C26;
+  color: #F1F5F9;
+}
+
+html[data-theme="dark"] .plan-btn:hover {
+  background: #263142;
+}
+
+/* Reviews / Testimonials */
+html[data-theme="dark"] .reviews,
+html[data-theme="dark"] #reviews {
+  background: linear-gradient(180deg, #161C26 0%, #161C26 calc(100% - var(--section-fade-height)), #11151E 100%);
+}
+
+html[data-theme="dark"] .test-card {
+  background: #1E2634;
+  border-color: #2C3546;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* Contact Form */
+html[data-theme="dark"] .contact-card {
+  background: #1E2634;
+  border-color: #2C3546;
+}
+
+html[data-theme="dark"] .field-input,
+html[data-theme="dark"] .field-textarea {
+  background: #161C26;
+  border-color: #2C3546;
+  color: #F1F5F9;
+}
+
+html[data-theme="dark"] .field-input:focus,
+html[data-theme="dark"] .field-textarea:focus {
+  border-color: #38BDF8;
+  outline-color: #38BDF8;
+}
+
+/* Bottom CTA Banner */
+html[data-theme="dark"] .cta {
+  background: linear-gradient(135deg, #1E2634 0%, #283344 100%);
+  border: 1px solid #2C3546;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme="dark"] .cta .btn-primary {
+  background: #F1F5F9;
+  color: #0B1320;
+}
+
+html[data-theme="dark"] .cta .btn-primary:hover {
+  background: #FFFFFF;
+}
+
+/* Site Footer in Dark Mode */
+html[data-theme="dark"] .site-footer {
+  background: #0E1219;
+  border-top: 1px solid #202735;
+}
+
+/* Quote Modal */
+html[data-theme="dark"] .modal-card {
+  background: #1E2634;
+  border: 1px solid #2C3546;
+  color: #F1F5F9;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+}
+
+html[data-theme="dark"] .modal-close {
+  background: #161C26;
+  border-color: #2C3546;
+  color: #F1F5F9;
+}
+
+html[data-theme="dark"] .divider {
+  background: #2C3546;
+}
+
+/* Fullscreen Mobile Menu Drawer */
+html[data-theme="dark"] #menu {
+  background: #11151E;
+  color: #F1F5F9;
+}
+
+html[data-theme="dark"] .menu-text-link {
+  color: #F1F5F9;
+  border-bottom-color: #202735;
+}
+
+html[data-theme="dark"] .menu-close-btn {
+  background: #1E2634;
+  border-color: #2C3546;
+  color: #F1F5F9;
+}
+
+html[data-theme="dark"] .menu-hamburger-btn svg {
+  stroke: #F1F5F9;
+}
+
+/* 3D Mobile Deck Card Slider */
+html[data-theme="dark"] .service-deck-card {
+  background: #1E2634;
+  border-color: #2C3546;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+html[data-theme="dark"] .service-nav-btn {
+  background: #1E2634;
+  border-color: #2C3546;
+  color: #F1F5F9;
+}
+
+html[data-theme="dark"] .service-slider-dot {
+  background: #475569;
+}
+
+html[data-theme="dark"] .service-slider-dot.active {
+  background: #38BDF8;
+}
+
+/* Cookie Notice Banner */
+html[data-theme="dark"] .cookie-banner-card {
+  background: rgba(30, 38, 52, 0.98);
+  border-color: #2C3546;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+}
+
+html[data-theme="dark"] .cookie-banner-title {
+  color: #F1F5F9;
+}
+
+html[data-theme="dark"] .cookie-banner-text {
+  color: #94A3B8;
+}
+
+html[data-theme="dark"] .cookie-privacy-link {
+  color: #38BDF8;
+}
+
+html[data-theme="dark"] .cookie-btn-primary {
+  background: #38BDF8;
+  color: #0B1320;
+}
+
+html[data-theme="dark"] .cookie-btn-ghost {
+  background: #273142;
+  color: #F1F5F9;
+}
+
+html[data-theme="dark"] .cookie-btn-ghost:hover {
+  background: #334155;
+}
+
+/* Legal Documents Page (Terms & Conditions / Privacy Policy) */
+html[data-theme="dark"] .legal-page-root {
+  background: #11151E;
+  color: #F1F5F9;
+}
+
+html[data-theme="dark"] .legal-header {
+  background: rgba(26, 33, 46, 0.88);
+  border-bottom-color: #2C3546;
+}
+
+html[data-theme="dark"] .legal-btn-ghost {
+  background: #1E2634;
+  border-color: #2C3546;
+  color: #F1F5F9;
+}
+
+html[data-theme="dark"] .legal-hero {
+  background: #11151E;
+  border-bottom-color: #2C3546;
+}
+
+html[data-theme="dark"] .legal-tabs-bar {
+  background: rgba(30, 38, 52, 0.95);
+  border-color: #2C3546;
+}
+
+html[data-theme="dark"] .legal-tab-btn {
+  color: #94A3B8;
+}
+
+html[data-theme="dark"] .legal-card {
+  background: #1E2634;
+  border-color: #2C3546;
+}
+
+html[data-theme="dark"] .legal-intro-callout {
+  background: #161C26;
+  border-left-color: #38BDF8;
+  color: #F1F5F9;
+}
+
+html[data-theme="dark"] .legal-toc {
+  background: #161C26;
+  border-color: #2C3546;
+}
+
+html[data-theme="dark"] .legal-toc a {
+  color: #E2E8F0;
+}
+
+html[data-theme="dark"] .legal-toc a:hover {
+  color: #38BDF8;
+}
+
+html[data-theme="dark"] .legal-section {
+  border-top-color: #2C3546;
+}
+
+html[data-theme="dark"] .legal-section h2 {
+  color: #F1F5F9;
+}
+
+html[data-theme="dark"] .legal-section p,
+html[data-theme="dark"] .legal-section li {
+  color: #94A3B8;
+}
+
+html[data-theme="dark"] .legal-section li strong {
+  color: #F1F5F9;
+}
+
+html[data-theme="dark"] .legal-highlight-box {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #34D399;
+}
+
+html[data-theme="dark"] .legal-contact-card {
+  background: #161C26;
+  border-color: #2C3546;
+}
+
+html[data-theme="dark"] .legal-contact-card a {
+  color: #38BDF8;
+}
+
+html[data-theme="dark"] .legal-help-box {
+  background: #1E2634;
+  border-color: #2C3546;
+}
+
+html[data-theme="dark"] .legal-help-info p {
+  color: #94A3B8;
+}
+
+/* Fallback for Pure CSS System Preference */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #F1F5F9;
+    --ink-soft: #94A3B8;
+    --border: #2C3545;
+    --bg-soft: #161C26;
+    --bg-page: #11151E;
+    --white: #1E2633;
+    --accent: #38BDF8;
+    color-scheme: dark;
+  }
+}
+
+

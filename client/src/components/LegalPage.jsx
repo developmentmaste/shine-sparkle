@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useConfig } from '../context/ConfigContext.jsx';
+import ThemeToggle from './ThemeToggle.jsx';
 
 export default function LegalPage({ initialTab = 'terms', onNavigate, onOpenQuote }) {
   const { settings, getWhatsAppUrl } = useConfig();
@@ -41,6 +42,7 @@ export default function LegalPage({ initialTab = 'terms', onNavigate, onOpenQuot
           </a>
 
           <div className="legal-header-actions">
+            <ThemeToggle />
             <button type="button" onClick={handleBackHome} className="legal-btn-ghost">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="19" y1="12" x2="5" y2="12"></line>
