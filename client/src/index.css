@@ -2627,9 +2627,35 @@ html[data-theme="dark"] .legal-btn-ghost {
   color: #F1F5F9;
 }
 
+html[data-theme="dark"] .legal-btn-ghost:hover {
+  background: #273142;
+  border-color: #38BDF8;
+}
+
+html[data-theme="dark"] .legal-btn-primary {
+  background: #38BDF8;
+  color: #0B1320 !important;
+  box-shadow: 0 4px 16px rgba(56, 189, 248, 0.32);
+}
+
+html[data-theme="dark"] .legal-btn-primary:hover {
+  background: #7DD3FC;
+  box-shadow: 0 6px 22px rgba(56, 189, 248, 0.45);
+}
+
 html[data-theme="dark"] .legal-hero {
   background: #11151E;
   border-bottom-color: #2C3546;
+}
+
+html[data-theme="dark"] .legal-hero.legal-theme-terms {
+  background: radial-gradient(circle at 50% 0%, #1A1813 0%, #171510 50%, #11151E 100%);
+  border-bottom-color: rgba(245, 158, 11, 0.2);
+}
+
+html[data-theme="dark"] .legal-hero.legal-theme-privacy {
+  background: radial-gradient(circle at 50% 0%, #111C18 0%, #111815 50%, #11151E 100%);
+  border-bottom-color: rgba(16, 185, 129, 0.2);
 }
 
 html[data-theme="dark"] .legal-tabs-bar {
