@@ -19,6 +19,34 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <!-- Google tag (gtag.js) with GDPR Consent Mode -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+
+    // Check existing stored consent from Cookie Banner
+    var hasAnalyticsConsent = false;
+    try {
+      var saved = localStorage.getItem('shine_sparkle_cookie_consent');
+      if (saved && JSON.parse(saved).analytics) {
+        hasAnalyticsConsent = true;
+      }
+    } catch(e) {}
+
+    gtag('consent', 'default', {
+      'analytics_storage': hasAnalyticsConsent ? 'granted' : 'denied',
+      'ad_storage': 'denied',
+      'ad_user_data': 'denied',
+      'ad_personalization': 'denied'
+    });
+
+    gtag('js', new Date());
+    gtag('config', 'G-XFY2CL6WYF', {
+      'anonymize_ip': true
+    });
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XFY2CL6WYF"></script>
 </head>
 <body>
   <div id="root"></div>

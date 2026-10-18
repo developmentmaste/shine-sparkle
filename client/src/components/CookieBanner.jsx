@@ -29,6 +29,14 @@ export default function CookieBanner({ onNavigate }) {
     return () => window.removeEventListener('open_cookie_settings', handleReopen);
   }, []);
 
+  const updateGtagConsent = (granted) => {
+    if (typeof window.gtag === 'function') {
+      window.gtag('consent', 'update', {
+        'analytics_storage': granted ? 'granted' : 'denied'
+      });
+    }
+  };
+
   const handleAcceptAll = () => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
@@ -37,6 +45,7 @@ export default function CookieBanner({ onNavigate }) {
         timestamp: new Date().toISOString()
       }));
     } catch (e) {}
+    updateGtagConsent(true);
     setIsVisible(false);
   };
 
@@ -48,6 +57,7 @@ export default function CookieBanner({ onNavigate }) {
         timestamp: new Date().toISOString()
       }));
     } catch (e) {}
+    updateGtagConsent(false);
     setIsVisible(false);
   };
 
@@ -115,3 +125,4 @@ export default function CookieBanner({ onNavigate }) {
     </aside>
   );
 }
+
