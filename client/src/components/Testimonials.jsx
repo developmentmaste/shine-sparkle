@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useConfig } from '../context/ConfigContext.jsx';
 
 const REVIEWS = [
@@ -102,7 +102,72 @@ function StarRow({ count = 5, size = 16 }) {
 
 export default function Testimonials() {
   const { settings, getWhatsAppUrl } = useConfig();
-  const [showAllMobile, setShowAllMobile] = useState(false);
+  const [current, setCurrent] = useState(0);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const touchStartRef = useRef({ x: 0, y: 0, time: 0 });
+  const directionLockRef = useRef(null);
+  const len = REVIEWS.length;
+
+  const next = () => setCurrent((prev) => (prev + 1) % len);
+  const prev = () => setCurrent((prev) => (prev - 1 + len) % len);
+
+  const handlePointerDown = (e) => {
+    if (e.button !== undefined && e.button !== 0) return;
+    try {
+      e.currentTarget.setPointerCapture?.(e.pointerId);
+    } catch {
+      // ignore
+    }
+    touchStartRef.current = { x: e.clientX, y: e.clientY, time: Date.now() };
+    directionLockRef.current = null;
+    setIsDragging(false);
+    setDragOffset(0);
+  };
+
+  const handlePointerMove = (e) => {
+    if (!touchStartRef.current.time) return;
+    const dx = e.clientX - touchStartRef.current.x;
+    const dy = e.clientY - touchStartRef.current.y;
+
+    if (directionLockRef.current === null) {
+      if (Math.abs(dy) > 7 && Math.abs(dy) > Math.abs(dx)) {
+        directionLockRef.current = 'vertical';
+        return;
+      } else if (Math.abs(dx) > 7 && Math.abs(dx) > Math.abs(dy)) {
+        directionLockRef.current = 'horizontal';
+        setIsDragging(true);
+      }
+    }
+
+    if (directionLockRef.current === 'horizontal') {
+      setDragOffset(dx);
+    }
+  };
+
+  const handlePointerUp = (e) => {
+    try {
+      if (e?.currentTarget?.hasPointerCapture?.(e.pointerId)) {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      }
+    } catch {
+      // ignore
+    }
+    if (touchStartRef.current.time && isDragging) {
+      const dt = Date.now() - touchStartRef.current.time;
+      const velocity = Math.abs(dragOffset) / Math.max(dt, 1);
+      if (dragOffset < -50 || (dragOffset < -20 && velocity > 0.35)) {
+        next();
+      } else if (dragOffset > 50 || (dragOffset > 20 && velocity > 0.35)) {
+        prev();
+      }
+    }
+    setIsDragging(false);
+    setDragOffset(0);
+    touchStartRef.current = { x: 0, y: 0, time: 0 };
+    directionLockRef.current = null;
+  };
 
   const reviewActionUrl =
     settings?.googleReviewUrl ||
@@ -156,13 +221,10 @@ export default function Testimonials() {
           </a>
         </div>
 
-        {/* Reviews Grid */}
-        <div className={`test-grid g-reviews-grid${showAllMobile ? ' show-all-mobile' : ''}`}>
-          {REVIEWS.map((r, idx) => (
-            <article
-              className={`test-card g-review-card${idx >= 3 ? ' g-extra-mobile' : ''}`}
-              key={r.id}
-            >
+        {/* DESKTOP VIEW: 3x2 Grid */}
+        <div className="test-grid g-reviews-desktop">
+          {REVIEWS.map((r) => (
+            <article className="test-card g-review-card" key={r.id}>
               <div className="g-card-header">
                 <div className="g-reviewer-info">
                   <div
@@ -192,14 +254,146 @@ export default function Testimonials() {
           ))}
         </div>
 
-        <div className="g-more-mobile-wrap">
-          <button
-            type="button"
-            className="g-more-mobile-btn"
-            onClick={() => setShowAllMobile((prev) => !prev)}
+        {/* MOBILE VIEW: 3D Stacked Card Deck Slider */}
+        <div className="service-slider-wrap review-view-slider">
+          <div
+            className="service-slider-stage review-slider-stage"
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
           >
-            {showAllMobile ? 'Show fewer reviews' : `Show all ${REVIEWS.length} reviews`}
-          </button>
+            <div className="service-slider-track">
+              {REVIEWS.map((r, i) => {
+                let offset = i - current;
+                if (offset > len / 2) offset -= len;
+                if (offset < -len / 2) offset += len;
+
+                const abs = Math.abs(offset);
+                if (abs > 1) {
+                  return (
+                    <div
+                      key={r.id}
+                      className="service-deck-card review-deck-card is-hidden"
+                      style={{ display: 'none' }}
+                      aria-hidden="true"
+                    />
+                  );
+                }
+
+                const dragProgress = dragOffset / 300;
+                let x = offset * 44;
+                let scale = abs === 0 ? 1 : 0.93;
+                let rotate = 0;
+                let opacity = abs === 0 ? 1 : 0.82;
+                let zIndex = abs === 0 ? 10 : 8;
+
+                if (offset === 0) {
+                  x = dragOffset;
+                  rotate = dragOffset * 0.035;
+                  const pull = Math.min(Math.abs(dragProgress), 0.9);
+                  scale = 1 - pull * 0.06;
+                  opacity = 1 - pull * 0.12;
+                  zIndex = 10;
+                } else if (offset === 1) {
+                  if (dragOffset < 0) {
+                    const factor = Math.min(Math.abs(dragProgress), 1);
+                    x = 44 * (1 - factor);
+                    scale = 0.93 + 0.07 * factor;
+                    opacity = 0.82 + 0.18 * factor;
+                    zIndex = factor > 0.6 ? 10 : 9;
+                  } else {
+                    x = 44 + dragOffset * 0.15;
+                    opacity = Math.max(0, 0.82 - dragProgress * 0.6);
+                  }
+                } else if (offset === -1) {
+                  if (dragOffset > 0) {
+                    const factor = Math.min(dragProgress, 1);
+                    x = -44 * (1 - factor);
+                    scale = 0.93 + 0.07 * factor;
+                    opacity = 0.82 + 0.18 * factor;
+                    zIndex = factor > 0.6 ? 10 : 9;
+                  } else {
+                    x = -44 + dragOffset * 0.15;
+                    opacity = Math.max(0, 0.82 - Math.abs(dragProgress) * 0.6);
+                  }
+                }
+
+                const isActive = abs === 0;
+
+                return (
+                  <article
+                    key={r.id}
+                    className={`service-deck-card review-deck-card ${isActive ? 'card-active' : 'card-side'}`}
+                    style={{
+                      transform: `translate(-50%, -50%) translateX(${x}px) rotate(${rotate}deg) scale(${scale})`,
+                      zIndex,
+                      opacity,
+                      transition: isDragging
+                        ? 'none'
+                        : 'transform 0.38s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease, background 0.3s ease, border-color 0.3s ease',
+                      cursor: isDragging ? 'grabbing' : isActive ? 'grab' : 'pointer',
+                    }}
+                    onClick={() => {
+                      if (isDragging || Math.abs(dragOffset) > 8) return;
+                      if (offset === 1) next();
+                      else if (offset === -1) prev();
+                    }}
+                  >
+                    <div
+                      style={{
+                        opacity: isActive ? 1 : 0.45,
+                        transition: 'opacity 0.3s ease',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        height: '100%',
+                      }}
+                    >
+                      <div className="g-card-header">
+                        <div className="g-reviewer-info">
+                          <div
+                            className="g-avatar"
+                            style={{ background: r.avatarBg }}
+                            aria-hidden="true"
+                          >
+                            {r.name.charAt(0)}
+                          </div>
+                          <div>
+                            <div className="test-name">{r.name}</div>
+                            <div className="test-role">{r.location}</div>
+                          </div>
+                        </div>
+                        <GoogleLogo size={20} />
+                      </div>
+
+                      <div className="g-card-meta">
+                        <StarRow count={5} size={16} />
+                        <span className="g-review-date">{r.date}</span>
+                      </div>
+
+                      <p className="g-review-text">{r.text}</p>
+
+                      <div className="g-service-tag" style={{ marginTop: 'auto' }}>
+                        {r.service}
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="service-slider-dots" aria-label="Reviews pagination">
+            {REVIEWS.map((r, idx) => (
+              <button
+                key={r.id}
+                type="button"
+                className={`service-slider-dot ${idx === current ? 'active' : ''}`}
+                onClick={() => setCurrent(idx)}
+                aria-label={`Go to review by ${r.name}`}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>

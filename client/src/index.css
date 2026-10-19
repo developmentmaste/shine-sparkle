@@ -628,27 +628,17 @@ header.site-header .nav {
   border-radius: 100px;
 }
 
-.g-more-mobile-wrap {
+.service-slider-wrap.review-view-slider {
   display: none;
-  margin-top: 16px;
 }
 
-.g-more-mobile-btn {
-  width: 100%;
-  padding: 13px 20px;
-  border-radius: 100px;
-  background: var(--white);
-  border: 1px solid var(--border);
-  color: var(--ink);
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease;
+.service-slider-stage.review-slider-stage {
+  height: 345px;
 }
 
-.g-more-mobile-btn:hover {
-  background: var(--bg-soft);
-  border-color: var(--accent);
+.service-deck-card.review-deck-card {
+  height: 310px;
+  padding: 24px 22px;
 }
 
 @media (max-width: 768px) {
@@ -661,21 +651,11 @@ header.site-header .nav {
     width: 100%;
     justify-content: center;
   }
-  .test-grid.g-reviews-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 14px;
+  .g-reviews-desktop {
+    display: none !important;
   }
-  .g-review-card {
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-  }
-  .g-reviews-grid:not(.show-all-mobile) .g-extra-mobile {
-    display: none;
-  }
-  .g-more-mobile-wrap {
-    display: block;
+  .service-slider-wrap.review-view-slider {
+    display: flex;
   }
 }
 
