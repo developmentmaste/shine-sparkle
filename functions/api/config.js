@@ -17,7 +17,7 @@ const DEFAULT_SERVICES = [
     cadence: 'Regular or one-off',
     iconBg: '#E3EFFB',
     description:
-      'Standard residential upkeep and maintenance cleaning tailored to client priorities. Operatives follow an agreed task list for booked hours. Cleaning products and equipment included. All prices include Irish VAT.',
+      'Standard residential upkeep and maintenance cleaning tailored to client priorities. Operatives follow an agreed task list for booked hours. Cleaning products and equipment included. Transparent final pricing with no hidden charges.',
     included: [
       'Kitchen worktops, surfaces, and sink sanitisation',
       'Bathrooms and toilets: toilet, sink, mirrors, and accessible surfaces',
@@ -43,7 +43,7 @@ const DEFAULT_SERVICES = [
     cadence: 'One-off or seasonal',
     iconBg: '#EAF3FB',
     description:
-      'Intensive restorative clean targeting built-up grime, limescale, and neglected areas across the entire home. Fixed tiered rates: 1 Bed: €295 | 2 Bed: €325 | 3 Bed: €355 | 4+ Bed: €385. Covering Dublin, Co. Meath, and Co. Louth. VAT included.',
+      'Intensive restorative clean targeting built-up grime, limescale, and neglected areas across the entire home. Fixed tiered rates: 1 Bed: €295 | 2 Bed: €325 | 3 Bed: €355 | 4+ Bed: €385. Covering Dublin, Co. Meath, and Co. Louth. Final price with no hidden fees.',
     included: [
       'Complete bathroom descaling, tile scrubbing, and fixture disinfection',
       'Kitchen degreasing of exterior surfaces, splashbacks, and hobs',
@@ -69,7 +69,7 @@ const DEFAULT_SERVICES = [
     cadence: 'Move-in / move-out',
     iconBg: '#D6E8F8',
     description:
-      'Turnover cleaning for houses and apartments after tenant vacating. Tailored to landlord inspection and deposit return checklists according to property condition. All prices include Irish VAT.',
+      'Turnover cleaning for houses and apartments after tenant vacating. Tailored to landlord inspection and deposit return checklists according to property condition. Transparent final rates with no hidden charges.',
     included: [
       'Sanitisation of kitchen worktops, sinks, and exterior cupboards',
       'Bathroom descaling, toilet disinfection, and fixture polishing',
@@ -96,7 +96,7 @@ const DEFAULT_SERVICES = [
     cadence: 'Post-renovation',
     iconBg: '#DCEEFA',
     description:
-      'Specialised fine-dust removal and intensive clean following renovation work. Base €350 package covers: 1 Bedroom, 1 Living Room, 1 Kitchen, 1 Bathroom, 1 Hallway, plus up to 4 interior window panes. Additional rooms and glazing quoted on request. VAT included.',
+      'Specialised fine-dust removal and intensive clean following renovation work. Base €350 package covers: 1 Bedroom, 1 Living Room, 1 Kitchen, 1 Bathroom, 1 Hallway, plus up to 4 interior window panes. Additional rooms and glazing quoted on request. Final package price with no hidden charges.',
     included: [
       'Complete construction dust extraction from all accessible surfaces',
       'Cleaning of 1 Bedroom, 1 Living Room, 1 Kitchen, 1 Bathroom & 1 Hallway',
@@ -123,7 +123,7 @@ const DEFAULT_SERVICES = [
     cadence: 'One-off or regular',
     iconBg: '#E3EFFB',
     description:
-      'Professional internal glazing and frame cleaning for up to 20 standard window units. Smear-free finish using commercial tools. Removal of dust, finger marks, and water spots. VAT included.',
+      'Professional internal glazing and frame cleaning for up to 20 standard window units. Smear-free finish using commercial tools. Removal of dust, finger marks, and water spots. Fixed final price with no hidden fees.',
     included: [
       'Internal glass cleaning of up to 20 standard windows',
       'Wiping and dusting of accessible internal window frames',
@@ -148,7 +148,7 @@ const DEFAULT_SERVICES = [
     cadence: 'Flexible / Contract-free',
     iconBg: '#EAF3FB',
     description:
-      'Commercial cleaning for offices, schools, medical spaces, and childcare facilities. Available for regular visits, one-off deep cleans, or temporary staff cover. No long-term lock-in contract. €35/hr includes Irish VAT (min. 3 hours / €105).',
+      'Commercial cleaning for offices, schools, medical spaces, and childcare facilities. Available for regular visits, one-off deep cleans, or temporary staff cover. No long-term lock-in contract. €35/hr final rate with official invoicing (min. 3 hours / €105).',
     included: [
       'Sanitisation of desks, accessible work surfaces, and keyboards',
       'Staff kitchen: surfaces wiped, sink and microwave cleaned',
@@ -158,7 +158,7 @@ const DEFAULT_SERVICES = [
       'Waste bins and recycling emptied with liners replaced',
     ],
     terms: [
-      'Rate: €35.00/hr (VAT included) · Minimum booking: 3 hours (€105)',
+      'Rate: €35.00/hr (final rate, no hidden fees) · Minimum booking: 3 hours (€105)',
       'No contract required; one-off and scheduled services available',
       'Commercial equipment and detergents provided',
       'Service scheduled according to office operating hours',
@@ -167,11 +167,33 @@ const DEFAULT_SERVICES = [
   },
 ];
 
-// Fallback in-memory cache for Cloudflare Worker instance
+// Fallback in-memory cache for Cloudflare Worker instance (protects KV read quotas during traffic spikes)
 let memoryConfig = {
   settings: { ...DEFAULT_SETTINGS },
   services: [...DEFAULT_SERVICES],
 };
+let lastKvFetchAt = 0;
+const KV_CACHE_TTL_MS = 45 * 1000; // 45s in-memory worker cache
+
+// Lightweight per-IP rate limiter for write requests
+const postRateMap = new Map();
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+const MAX_POSTS_PER_MINUTE = 15;
+
+function isRateLimited(ip) {
+  const now = Date.now();
+  const entry = postRateMap.get(ip);
+  if (!entry || now - entry.start > RATE_LIMIT_WINDOW_MS) {
+    postRateMap.set(ip, { start: now, count: 1 });
+    if (postRateMap.size > 1000) {
+      const firstKey = postRateMap.keys().next().value;
+      postRateMap.delete(firstKey);
+    }
+    return false;
+  }
+  entry.count += 1;
+  return entry.count > MAX_POSTS_PER_MINUTE;
+}
 
 // Cryptographic verification of Telegram WebApp initData
 async function verifyTelegramWebAppData(initData, botToken) {
@@ -244,10 +266,12 @@ async function isUserAuthorized(env, userId) {
 export async function onRequestGet(context) {
   const { env } = context;
   let config = memoryConfig;
+  const now = Date.now();
 
-  if (env.CONFIG_KV) {
+  if (env.CONFIG_KV && now - lastKvFetchAt > KV_CACHE_TTL_MS) {
     try {
       const kvData = await env.CONFIG_KV.get('app_config', 'json');
+      lastKvFetchAt = now;
       if (kvData) {
         if (Array.isArray(kvData.services) && kvData.services.some((s) => s.id === 'renovation' || s.id === 'moveout')) {
           config = {
@@ -258,6 +282,7 @@ export async function onRequestGet(context) {
         } else {
           config = kvData;
         }
+        memoryConfig = config;
       }
     } catch (e) {
       console.error('KV read error:', e);
@@ -275,13 +300,32 @@ export async function onRequestGet(context) {
     headers: {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': '*',
-      'Cache-Control': 'no-cache',
+      'Cache-Control': 'public, max-age=15, s-maxage=45, stale-while-revalidate=300',
     },
   });
 }
 
 export async function onRequestPost(context) {
   const { request, env } = context;
+
+  const clientIp = request.headers.get('cf-connecting-ip') || 'unknown';
+  if (isRateLimited(clientIp)) {
+    return new Response(JSON.stringify({ error: 'Too many requests. Please slow down.' }), {
+      status: 429,
+      headers: {
+        'Content-Type': 'application/json',
+        'Retry-After': '60',
+      },
+    });
+  }
+
+  const contentLength = Number(request.headers.get('content-length') || 0);
+  if (contentLength > 65536) {
+    return new Response(JSON.stringify({ error: 'Payload too large.' }), {
+      status: 413,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 
   try {
     const body = await request.json();
@@ -328,6 +372,7 @@ export async function onRequestPost(context) {
     };
 
     memoryConfig = newConfig;
+    lastKvFetchAt = Date.now();
 
     if (env.CONFIG_KV) {
       await env.CONFIG_KV.put('app_config', JSON.stringify(newConfig));
