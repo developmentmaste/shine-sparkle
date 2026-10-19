@@ -161,7 +161,7 @@ header.site-header .nav {
 }
 
 /* HERO */
-.hero{position:relative; padding:120px 24px 60px; text-align:center; overflow:hidden;}
+.hero{position:relative; padding:120px 24px 60px; text-align:center; overflow:visible;}
 .blob{position:absolute; border-radius:50%; filter:blur(75px); opacity:0.58; z-index:0; pointer-events:none;}
 .hero .blob-1{
   width:340px; height:340px;
@@ -346,7 +346,7 @@ header.site-header .nav {
 }
 
 /* SECTION */
-.section{padding:60px 0;}
+.section{padding:60px 0; position:relative; z-index:1;}
 .section-head{max-width:600px; margin:0 auto 46px; text-align:center;}
 .section-head .eyebrow{margin-bottom:16px;}
 .section-head h2{font-size:clamp(1.8rem, 3.2vw, 2.4rem); font-weight:700; letter-spacing:-0.02em; margin-bottom:14px;}
