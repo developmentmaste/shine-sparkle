@@ -428,21 +428,240 @@ header.site-header .nav {
   box-shadow: 0 6px 18px rgba(20, 57, 95, 0.25);
 }
 
-/* TESTIMONIALS */
+/* TESTIMONIALS / GOOGLE REVIEWS */
 .reviews, #reviews {
   background: linear-gradient(180deg, var(--bg-soft) 0%, var(--bg-soft) calc(100% - var(--section-fade-height)), var(--white) 100%);
 }
-.test-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
-.test-card{
-  background:var(--white); 
-  border-radius:var(--radius-md); 
-  padding:26px; 
-  border:1px solid var(--border);
-  box-shadow: 0 4px 16px rgba(20, 57, 95, 0.04);
+
+.g-summary-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 26px;
+  margin-bottom: 24px;
+  box-shadow: 0 6px 22px rgba(20, 57, 95, 0.06);
+  flex-wrap: wrap;
 }
-.test-card p{font-size:0.95rem; margin-bottom:18px;}
-.test-name{font-weight:700; font-size:0.9rem;}
-.test-role{color:var(--ink-soft); font-size:0.84rem;}
+
+.g-summary-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.g-logo-badge {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: #F8FAFC;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.g-summary-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.g-summary-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+
+.g-verified-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #0F9D58;
+  background: rgba(15, 157, 88, 0.1);
+  padding: 3px 9px;
+  border-radius: 100px;
+}
+
+.g-summary-rating-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.g-rating-number {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1;
+}
+
+.g-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.g-rating-count {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+.g-write-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 20px;
+  border-radius: 100px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 8px rgba(20, 57, 95, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.g-write-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+  box-shadow: 0 6px 16px rgba(20, 57, 95, 0.12);
+}
+
+.test-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.test-card {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 16px rgba(20, 57, 95, 0.04);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.test-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 26px rgba(20, 57, 95, 0.08);
+}
+
+.g-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.g-reviewer-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.g-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.test-name {
+  font-weight: 700;
+  font-size: 0.94rem;
+  color: var(--ink);
+  line-height: 1.25;
+}
+
+.test-role {
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+}
+
+.g-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.g-review-date {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
+.g-review-text {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--ink);
+  margin: 0 0 16px 0;
+  flex-grow: 1;
+}
+
+.g-service-tag {
+  align-self: flex-start;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: rgba(2, 132, 199, 0.08);
+  padding: 4px 10px;
+  border-radius: 100px;
+}
+
+@media (max-width: 768px) {
+  .g-summary-bar {
+    padding: 18px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .g-write-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .g-reviews-grid {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 14px;
+    padding-bottom: 10px;
+    margin: 0 -4px;
+    padding-left: 4px;
+    padding-right: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .g-reviews-grid::-webkit-scrollbar {
+    height: 5px;
+  }
+  .g-reviews-grid::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
+  }
+  .g-review-card {
+    min-width: min(84vw, 330px);
+    scroll-snap-align: center;
+    flex-shrink: 0;
+  }
+}
 
 /* SECTION TRANSITION UTILITIES */
 .fade-from-white {
@@ -693,7 +912,7 @@ header.site-header .nav {
   .nav-links{display:none;}
   .steps{grid-template-columns:repeat(2,1fr);}
   .plans{grid-template-columns:1fr;}
-  .test-grid{grid-template-columns:1fr;}
+  .test-grid{grid-template-columns:repeat(2,1fr);}
   .service-detail-inner{padding-left:24px;}
   .service-detail-inner ul{grid-template-columns:1fr;}
   .form-row{grid-template-columns:1fr;}
@@ -2491,10 +2710,43 @@ html[data-theme="dark"] #reviews {
   background: linear-gradient(180deg, #161C26 0%, #161C26 calc(100% - var(--section-fade-height)), #11151E 100%);
 }
 
+html[data-theme="dark"] .g-summary-bar {
+  background: #1E2634;
+  border-color: #2C3546;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+html[data-theme="dark"] .g-logo-badge {
+  background: #161C26;
+  border-color: #2C3546;
+}
+
+html[data-theme="dark"] .g-verified-pill {
+  color: #34D399;
+  background: rgba(16, 185, 129, 0.14);
+}
+
+html[data-theme="dark"] .g-write-btn {
+  background: #161C26;
+  border-color: #2C3546;
+  color: #F1F5F9;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+html[data-theme="dark"] .g-write-btn:hover {
+  background: #242E3F;
+  border-color: #38BDF8;
+}
+
 html[data-theme="dark"] .test-card {
   background: #1E2634;
   border-color: #2C3546;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+html[data-theme="dark"] .g-service-tag {
+  color: #38BDF8;
+  background: rgba(56, 189, 248, 0.12);
 }
 
 /* Contact Form */
