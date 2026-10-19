@@ -51,7 +51,7 @@ export const SERVICES = [
     iconBg: '#E3EFFB',
     icon: houseIcon,
     description:
-      'Standard residential upkeep and maintenance cleaning tailored to client priorities. Operatives follow an agreed task list for booked hours. Cleaning products and equipment included. All prices include Irish VAT.',
+      'Standard residential upkeep and maintenance cleaning tailored to client priorities. Operatives follow an agreed task list for booked hours. Cleaning products and equipment included. Transparent final pricing with no hidden charges.',
     included: [
       'Kitchen worktops, surfaces, and sink sanitisation',
       'Bathrooms and toilets: toilet, sink, mirrors, and accessible surfaces',
@@ -78,7 +78,7 @@ export const SERVICES = [
     iconBg: '#EAF3FB',
     icon: deepIcon,
     description:
-      'Intensive restorative clean targeting built-up grime, limescale, and neglected areas across the entire home. Fixed tiered rates: 1 Bed: €295 | 2 Bed: €325 | 3 Bed: €355 | 4+ Bed: €385. Covering Dublin, Co. Meath, and Co. Louth. VAT included.',
+      'Intensive restorative clean targeting built-up grime, limescale, and neglected areas across the entire home. Fixed tiered rates: 1 Bed: €295 | 2 Bed: €325 | 3 Bed: €355 | 4+ Bed: €385. Covering Dublin, Co. Meath, and Co. Louth. Final price with no hidden fees.',
     included: [
       'Complete bathroom descaling, tile scrubbing, and fixture disinfection',
       'Kitchen degreasing of exterior surfaces, splashbacks, and hobs',
@@ -105,7 +105,7 @@ export const SERVICES = [
     iconBg: '#D6E8F8',
     icon: tenancyIcon,
     description:
-      'Turnover cleaning for houses and apartments after tenant vacating. Tailored to landlord inspection and deposit return checklists according to property condition. All prices include Irish VAT.',
+      'Turnover cleaning for houses and apartments after tenant vacating. Tailored to landlord inspection and deposit return checklists according to property condition. Transparent final rates with no hidden charges.',
     included: [
       'Sanitisation of kitchen worktops, sinks, and exterior cupboards',
       'Bathroom descaling, toilet disinfection, and fixture polishing',
@@ -133,7 +133,7 @@ export const SERVICES = [
     iconBg: '#DCEEFA',
     icon: constructionIcon,
     description:
-      'Specialised fine-dust removal and intensive clean following renovation work. Base €350 package covers: 1 Bedroom, 1 Living Room, 1 Kitchen, 1 Bathroom, 1 Hallway, plus up to 4 interior window panes. Additional rooms and glazing quoted on request. VAT included.',
+      'Specialised fine-dust removal and intensive clean following renovation work. Base €350 package covers: 1 Bedroom, 1 Living Room, 1 Kitchen, 1 Bathroom, 1 Hallway, plus up to 4 interior window panes. Additional rooms and glazing quoted on request. Final package price with no hidden charges.',
     included: [
       'Complete construction dust extraction from all accessible surfaces',
       'Cleaning of 1 Bedroom, 1 Living Room, 1 Kitchen, 1 Bathroom & 1 Hallway',
@@ -161,7 +161,7 @@ export const SERVICES = [
     iconBg: '#E3EFFB',
     icon: windowIcon,
     description:
-      'Professional internal glazing and frame cleaning for up to 20 standard window units. Smear-free finish using commercial tools. Removal of dust, finger marks, and water spots. VAT included.',
+      'Professional internal glazing and frame cleaning for up to 20 standard window units. Smear-free finish using commercial tools. Removal of dust, finger marks, and water spots. Fixed final price with no hidden fees.',
     included: [
       'Internal glass cleaning of up to 20 standard windows',
       'Wiping and dusting of accessible internal window frames',
@@ -187,7 +187,7 @@ export const SERVICES = [
     iconBg: '#EAF3FB',
     icon: officeIcon,
     description:
-      'Commercial cleaning for offices, schools, medical spaces, and childcare facilities. Available for regular visits, one-off deep cleans, or temporary staff cover. No long-term lock-in contract. €35/hr includes Irish VAT (min. 3 hours / €105).',
+      'Commercial cleaning for offices, schools, medical spaces, and childcare facilities. Available for regular visits, one-off deep cleans, or temporary staff cover. No long-term lock-in contract. €35/hr final rate with official invoicing (min. 3 hours / €105).',
     included: [
       'Sanitisation of desks, accessible work surfaces, and keyboards',
       'Staff kitchen: surfaces wiped, sink and microwave cleaned',
@@ -197,7 +197,7 @@ export const SERVICES = [
       'Waste bins and recycling emptied with liners replaced',
     ],
     terms: [
-      'Rate: €35.00/hr (VAT included) · Minimum booking: 3 hours (€105)',
+      'Rate: €35.00/hr (final rate, no hidden fees) · Minimum booking: 3 hours (€105)',
       'No contract required; one-off and scheduled services available',
       'Commercial equipment and detergents provided',
       'Service scheduled according to office operating hours',

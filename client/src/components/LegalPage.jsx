@@ -30,7 +30,7 @@ export default function LegalPage({ initialTab = 'terms', onNavigate, onOpenQuot
     }
   };
 
-  const lastUpdated = 'October 16, 2026';
+  const lastUpdated = 'April 2025';
 
   return (
     <div className="legal-page-root">
@@ -203,7 +203,7 @@ function TermsContent({ settings, getWhatsAppUrl, onOpenQuote }) {
       <section id="t-1" className="legal-section">
         <h2>1. Scope of Services</h2>
         <p>
-          {settings.brandName} delivers professional residential and commercial cleaning services across {settings.cities || 'Dublin, Co. Meath, Co. Louth & surrounding areas'}. Our offerings include:
+          {settings.brandName} operates as an Irish business delivering professional residential and commercial cleaning services across {settings.cities || 'Dublin, Co. Meath, Co. Louth & surrounding areas'}. Our offerings include:
         </p>
         <ul>
           <li><strong>House & Apartment Cleaning:</strong> Standard upkeep and maintenance cleaning tailored to client priorities (€30/hr, min. 3 hours / €90).</li>
@@ -211,7 +211,7 @@ function TermsContent({ settings, getWhatsAppUrl, onOpenQuote }) {
           <li><strong>End of Tenancy Cleaning:</strong> Turnover cleaning for landlord inspections and deposit return checklists (€30/hr, min. 3 hours / €90).</li>
           <li><strong>Post-Construction Cleaning:</strong> Fine-dust removal and intensive sanitisation following renovation work (€350 base 5-room package).</li>
           <li><strong>Internal Window Cleaning Package:</strong> Fixed-price glazing and frame cleaning package (€99 for up to 20 windows).</li>
-          <li><strong>Office & Commercial Cleaning:</strong> Contract-free professional commercial cleaning (€35/hr, min. 3 hours / €105, Irish VAT included).</li>
+          <li><strong>Office & Commercial Cleaning:</strong> Contract-free professional commercial cleaning (€35/hr, min. 3 hours / €105).</li>
         </ul>
         <p>
           Specific tasks included in your service will align with the checklist confirmed during your WhatsApp booking consultation.
@@ -225,10 +225,10 @@ function TermsContent({ settings, getWhatsAppUrl, onOpenQuote }) {
           All initial price quotes provided via our website or WhatsApp chat are based on the service selected, property specification, and required hours.
         </p>
         <div className="legal-highlight-box">
-          <strong>Pricing, VAT & Minimum Booking:</strong> All prices are inclusive of applicable Irish VAT. Standard residential services operate on a minimum booking of 3 hours (€90). Commercial cleaning operates on a minimum booking of 3 hours (€105). Fixed packages apply to Window Cleaning (€99), Post-Construction (€350), and Deep Cleaning (from €295).
+          <strong>Transparent Final Pricing & Minimum Booking:</strong> In accordance with Irish consumer protection standards, all quoted prices are final and inclusive of any applicable taxes, with zero hidden charges. Standard residential services operate on a minimum booking of 3 hours (€90). Commercial cleaning operates on a minimum booking of 3 hours (€105). Fixed packages apply to Window Cleaning (€99), Post-Construction (€350), and Deep Cleaning (from €295).
         </div>
         <ul>
-          <li><strong>Price Adjustments:</strong> If on-site inspection reveals that actual property condition, layout, or level of soiling differs significantly from the description provided (e.g. biohazards, hoarding, excessive pet hair, or ongoing construction), {settings.brandName} reserves the right to revise the quotation or time estimate before commencing work.</li>
+          <li><strong>Price Adjustments:</strong> If on-site inspection reveals that actual property condition, layout, or level of soiling differs significantly from the description provided (e.g. biohazards, hoarding, excessive pet hair, or ongoing construction), {settings.brandName} reserves the right to revise the quotation or time estimate with the client's consent before commencing work.</li>
           <li><strong>Included Equipment & Products:</strong> Standard cleaning detergents, microfiber cloths, professional vacuums, and equipment are included in the service unless specialized machinery is requested in advance.</li>
         </ul>
       </section>
@@ -265,21 +265,22 @@ function TermsContent({ settings, getWhatsAppUrl, onOpenQuote }) {
         </p>
         <ul>
           <li><strong>Accepted Methods:</strong> Electronic bank transfer (SEPA), instant debit/credit card payment link, or cash where agreed.</li>
-          <li><strong>Invoicing:</strong> Digital receipts and VAT invoices are issued electronically to the client's email address upon receipt of payment.</li>
-          <li><strong>Late Payments:</strong> Accounts unpaid after 7 business days from invoice delivery may incur administrative late recovery fees.</li>
+          <li><strong>Receipts & Invoicing:</strong> Official digital receipts and itemised invoices are issued electronically to the client's email address or WhatsApp upon receipt of payment.</li>
+          <li><strong>Late Payments:</strong> Commercial or residential accounts unpaid after 7 business days from invoice delivery may incur administrative late recovery charges as permitted under applicable Irish legislation.</li>
         </ul>
       </section>
 
       {/* Section 6 */}
       <section id="t-6" className="legal-section">
-        <h2>6. Cancellation, Rescheduling & Lockout Policy</h2>
+        <h2>6. Cancellation, Rescheduling & Statutory Cooling-Off Rights</h2>
         <p>
-          We allocate specific team members and equipment for your appointment. Therefore, the following notice requirements apply:
+          We allocate specific team members and equipment for your appointment. Therefore, the following notice requirements and statutory provisions apply:
         </p>
         <ul>
           <li><strong>Free Cancellation / Rescheduling:</strong> You may cancel or postpone your booking with <strong>at least 24 hours prior notice</strong> before your scheduled arrival window at zero charge.</li>
-          <li><strong>Late Cancellation Notice:</strong> Cancellations or rescheduling requests submitted with less than 24 hours notice are subject to a cancellation fee of <strong>50% of the estimated quote</strong> (or the minimum charge of €{settings.minCharge || 70}) to compensate dispatched staff.</li>
+          <li><strong>Late Cancellation Notice:</strong> Cancellations or rescheduling requests submitted with less than 24 hours notice are subject to a cancellation fee of <strong>50% of the estimated quote</strong> (or the minimum charge of €{settings.minCharge || 90}) to compensate dispatched staff.</li>
           <li><strong>Client Lockout / No-Show:</strong> If cleaners arrive at the scheduled property and cannot gain access within 30 minutes, or if power/water is unavailable, the full minimum callout charge is payable.</li>
+          <li><strong>Statutory Cooling-Off Period (Consumer Rights Act 2022):</strong> Under Part 5 of the Irish Consumer Rights Act 2022, consumers booking distance contracts have a 14-day right to cancel from booking confirmation. By requesting a cleaning appointment scheduled within 14 days of booking, you expressly request us to perform the service during the cooling-off period and acknowledge that once the service has been fully performed, the statutory right to cancel ends.</li>
         </ul>
       </section>
 
@@ -293,7 +294,7 @@ function TermsContent({ settings, getWhatsAppUrl, onOpenQuote }) {
           <strong>24-Hour Reporting Window:</strong> If any area included in the agreed scope of work was missed or not cleaned to professional standards, please notify us via WhatsApp within <strong>24 hours of service completion</strong> accompanied by clear photographic evidence.
         </div>
         <p>
-          Upon verification, {settings.brandName} will dispatch a cleaning specialist to re-clean the specific disputed area <strong>free of charge</strong>. Free re-cleans must be scheduled within 48 hours of notification. A re-clean is our exclusive remedy for quality disputes.
+          Upon verification, {settings.brandName} will dispatch a cleaning specialist to re-clean the specific disputed area <strong>free of charge</strong> within 48 hours of notification. Nothing in these Terms and Conditions limits or affects your statutory rights and remedies as a consumer under the <strong>Consumer Rights Act 2022 (Ireland)</strong>.
         </p>
       </section>
 
@@ -301,12 +302,12 @@ function TermsContent({ settings, getWhatsAppUrl, onOpenQuote }) {
       <section id="t-8" className="legal-section">
         <h2>8. Damage, Breakage & Liability Insurance</h2>
         <p>
-          Our cleaning personnel are rigorously trained, vetted, and covered by comprehensive Public Liability Insurance. In the rare event of accidental damage:
+          Our cleaning personnel are rigorously trained, vetted, and covered by Public Liability Insurance. In the rare event of accidental damage:
         </p>
         <ul>
           <li><strong>Immediate Reporting:</strong> Any alleged breakage or property damage must be reported in writing with photographs within <strong>24 hours</strong> of the service.</li>
-          <li><strong>Repair or Replacement:</strong> Verified accidental damage directly caused by staff negligence will be repaired or replaced at fair depreciated market value.</li>
-          <li><strong>Exclusions:</strong> We are not liable for:
+          <li><strong>Repair or Replacement:</strong> Verified accidental damage directly caused by staff negligence will be repaired or replaced at fair market value.</li>
+          <li><strong>Exclusions:</strong> Subject to mandatory Irish consumer law, we are not liable for:
             <ul>
               <li>Pre-existing damage, wear-and-tear, unsealed natural stone, loose grout, or unstable wall fixtures.</li>
               <li>Improperly hung pictures, mirrors, or unsecured shelves that fall during routine surface dusting.</li>
@@ -315,17 +316,20 @@ function TermsContent({ settings, getWhatsAppUrl, onOpenQuote }) {
             </ul>
           </li>
         </ul>
+        <p>
+          Nothing in these Terms excludes or limits liability for death or personal injury caused by negligence, fraud, or any other liability that cannot be excluded under the laws of Ireland.
+        </p>
       </section>
 
       {/* Section 9 */}
       <section id="t-9" className="legal-section">
         <h2>9. Health, Safety & Hazardous Substances</h2>
         <p>
-          The safety of our cleaners is paramount. {settings.brandName} reserves the right to withdraw personnel immediately without refund if:
+          In accordance with the <strong>Safety, Health and Welfare at Work Act 2005 (Ireland)</strong>, the safety of our cleaners is paramount. {settings.brandName} reserves the right to withdraw personnel immediately if:
         </p>
         <ul>
           <li>Hazardous biological matter, human/animal bodily waste, mold infestations, or pest infestations (e.g. bedbugs, rodents) are present without prior disclosure and hazard gear.</li>
-          <li>Cleaners are asked to clean exterior windows at heights exceeding standard safe ladder access, or work in conditions violating statutory occupational health regulations.</li>
+          <li>Cleaners are asked to clean exterior windows at heights exceeding standard safe internal access, or work in conditions violating statutory Irish occupational health and safety regulations.</li>
           <li>Cleaners are subjected to verbal abuse, harassment, or unsafe physical environments.</li>
         </ul>
       </section>
@@ -337,7 +341,7 @@ function TermsContent({ settings, getWhatsAppUrl, onOpenQuote }) {
           {settings.brandName} reserves the right to amend these Terms and Conditions at any time. Continued use of our booking channels following updates constitutes acceptance of the modified terms.
         </p>
         <p>
-          These Terms and Conditions shall be governed by and construed in accordance with the laws of <strong>Ireland</strong>. Any dispute arising out of or in connection with these terms shall be subject to the exclusive jurisdiction of the competent Irish courts.
+          These Terms and Conditions shall be governed by and construed in accordance with the laws of the <strong>Republic of Ireland</strong>. Any dispute arising out of or in connection with these terms shall be subject to the jurisdiction of the courts of Ireland (without prejudice to a consumer's access to the Small Claims procedure of the District Court of Ireland where applicable).
         </p>
       </section>
     </article>
@@ -352,7 +356,7 @@ function PrivacyContent({ settings, getWhatsAppUrl }) {
     <article className="legal-article">
       <div className="legal-intro-callout">
         <p>
-          At <strong>{settings.brandName}</strong>, we respect your privacy and are committed to protecting your personal data in full compliance with the <strong>General Data Protection Regulation (EU) 2016/679 (GDPR)</strong> and national data protection legislation.
+          At <strong>{settings.brandName}</strong>, we respect your privacy and are committed to protecting your personal data in full compliance with the <strong>General Data Protection Regulation (EU) 2016/679 (GDPR)</strong>, the <strong>Data Protection Act 2018 (Ireland)</strong>, and the <strong>Irish ePrivacy Regulations (S.I. No. 336 of 2011)</strong>.
         </p>
       </div>
 
@@ -376,13 +380,13 @@ function PrivacyContent({ settings, getWhatsAppUrl }) {
       <section id="p-1" className="legal-section">
         <h2>1. Data Controller Information</h2>
         <p>
-          The data controller responsible for the collection and processing of your personal data is:
+          The data controller responsible for the collection and processing of your personal data in the Republic of Ireland is:
         </p>
         <div className="legal-contact-card">
-          <p><strong>Entity:</strong> {settings.brandName}</p>
+          <p><strong>Trading Name:</strong> {settings.brandName} (Sole Trader registered in Ireland)</p>
           <p><strong>Primary Contact Email:</strong> <a href={`mailto:${settings.email}`}>{settings.email}</a></p>
           <p><strong>WhatsApp Support:</strong> <a href={getWhatsAppUrl()} target="_blank" rel="noopener noreferrer">Official WhatsApp Channel</a></p>
-          <p><strong>Service Territory:</strong> {settings.cities || 'Dublin & surrounding areas, Ireland'}</p>
+          <p><strong>Operating Base & Service Territory:</strong> {settings.cities || 'Dublin, Co. Meath & Co. Louth, Republic of Ireland'}</p>
         </div>
       </section>
 

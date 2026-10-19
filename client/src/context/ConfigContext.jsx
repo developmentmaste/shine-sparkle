@@ -16,7 +16,7 @@ export const DEFAULT_SETTINGS = {
 };
 
 const STORAGE_KEY_SETTINGS = 'shine_sparkle_settings_v3';
-const STORAGE_KEY_SERVICES = 'shine_sparkle_services_v3';
+const STORAGE_KEY_SERVICES = 'shine_sparkle_services_v4';
 
 const hydrateServiceIcons = (list) =>
   list.map((s, idx) => ({

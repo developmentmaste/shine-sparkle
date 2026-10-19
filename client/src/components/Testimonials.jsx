@@ -54,7 +54,7 @@ const REVIEWS = [
     service: 'Office & Commercial Clean',
     date: '2 months ago',
     avatarBg: '#00897B',
-    text: 'We use them for our studio office twice a month. No pushy long-term contracts, VAT invoice always sent promptly, and the workspace is spotless every Monday morning. Highly recommended.',
+    text: 'We use them for our studio office twice a month. No pushy long-term contracts, official invoice always sent promptly, and the workspace is spotless every Monday morning. Highly recommended.',
   },
 ];
 
