@@ -628,6 +628,29 @@ header.site-header .nav {
   border-radius: 100px;
 }
 
+.g-more-mobile-wrap {
+  display: none;
+  margin-top: 16px;
+}
+
+.g-more-mobile-btn {
+  width: 100%;
+  padding: 13px 20px;
+  border-radius: 100px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.g-more-mobile-btn:hover {
+  background: var(--bg-soft);
+  border-color: var(--accent);
+}
+
 @media (max-width: 768px) {
   .g-summary-bar {
     padding: 18px;
@@ -638,28 +661,21 @@ header.site-header .nav {
     width: 100%;
     justify-content: center;
   }
-  .g-reviews-grid {
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
+  .test-grid.g-reviews-grid {
+    display: grid;
+    grid-template-columns: 1fr;
     gap: 14px;
-    padding-bottom: 10px;
-    margin: 0 -4px;
-    padding-left: 4px;
-    padding-right: 4px;
-    -webkit-overflow-scrolling: touch;
-  }
-  .g-reviews-grid::-webkit-scrollbar {
-    height: 5px;
-  }
-  .g-reviews-grid::-webkit-scrollbar-thumb {
-    background: var(--border);
-    border-radius: 10px;
   }
   .g-review-card {
-    min-width: min(84vw, 330px);
-    scroll-snap-align: center;
-    flex-shrink: 0;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+  .g-reviews-grid:not(.show-all-mobile) .g-extra-mobile {
+    display: none;
+  }
+  .g-more-mobile-wrap {
+    display: block;
   }
 }
 
@@ -2782,6 +2798,17 @@ html[data-theme="dark"] .test-card {
 html[data-theme="dark"] .g-service-tag {
   color: #38BDF8;
   background: rgba(56, 189, 248, 0.12);
+}
+
+html[data-theme="dark"] .g-more-mobile-btn {
+  background: #1E2634;
+  border-color: #2C3546;
+  color: #F1F5F9;
+}
+
+html[data-theme="dark"] .g-more-mobile-btn:hover {
+  background: #263142;
+  border-color: #38BDF8;
 }
 
 /* Contact Form */

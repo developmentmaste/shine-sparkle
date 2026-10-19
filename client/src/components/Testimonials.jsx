@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useConfig } from '../context/ConfigContext.jsx';
 
 const REVIEWS = [
@@ -101,6 +102,7 @@ function StarRow({ count = 5, size = 16 }) {
 
 export default function Testimonials() {
   const { settings, getWhatsAppUrl } = useConfig();
+  const [showAllMobile, setShowAllMobile] = useState(false);
 
   const reviewActionUrl =
     settings?.googleReviewUrl ||
@@ -154,10 +156,13 @@ export default function Testimonials() {
           </a>
         </div>
 
-        {/* Reviews Grid (3 columns on desktop, swipeable on mobile) */}
-        <div className="test-grid g-reviews-grid">
-          {REVIEWS.map((r) => (
-            <article className="test-card g-review-card" key={r.id}>
+        {/* Reviews Grid */}
+        <div className={`test-grid g-reviews-grid${showAllMobile ? ' show-all-mobile' : ''}`}>
+          {REVIEWS.map((r, idx) => (
+            <article
+              className={`test-card g-review-card${idx >= 3 ? ' g-extra-mobile' : ''}`}
+              key={r.id}
+            >
               <div className="g-card-header">
                 <div className="g-reviewer-info">
                   <div
@@ -185,6 +190,16 @@ export default function Testimonials() {
               <div className="g-service-tag">{r.service}</div>
             </article>
           ))}
+        </div>
+
+        <div className="g-more-mobile-wrap">
+          <button
+            type="button"
+            className="g-more-mobile-btn"
+            onClick={() => setShowAllMobile((prev) => !prev)}
+          >
+            {showAllMobile ? 'Show fewer reviews' : `Show all ${REVIEWS.length} reviews`}
+          </button>
         </div>
       </div>
     </section>
