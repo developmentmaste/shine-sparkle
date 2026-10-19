@@ -2303,8 +2303,10 @@ header.site-header .nav {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer !important;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   flex-shrink: 0;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   padding: 0;
@@ -2313,7 +2315,7 @@ header.site-header .nav {
 .theme-toggle-btn:hover {
   background: var(--bg-soft);
   border-color: var(--ink-soft);
-  transform: scale(1.06);
+  transform: scale(1.05);
 }
 
 .theme-toggle-btn:active {
@@ -2324,19 +2326,18 @@ header.site-header .nav {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.theme-toggle-btn:hover .theme-toggle-icon-wrap {
-  transform: rotate(18deg);
+  pointer-events: none;
+  user-select: none;
 }
 
 .theme-icon-moon {
   color: #38BDF8;
+  pointer-events: none;
 }
 
 .theme-icon-sun {
   color: #F59E0B;
+  pointer-events: none;
 }
 
 /* ==========================================================================

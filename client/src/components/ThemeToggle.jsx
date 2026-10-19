@@ -1,10 +1,9 @@
 import { useTheme } from '../context/ThemeContext.jsx';
 
 export default function ThemeToggle({ className = '' }) {
-  const { theme, resolvedTheme, toggleTheme } = useTheme();
+  const { resolvedTheme, toggleTheme } = useTheme();
 
   const label = resolvedTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
-  const title = `Current theme: ${theme === 'system' ? `System (${resolvedTheme})` : resolvedTheme}. Click to toggle.`;
 
   return (
     <button
@@ -12,7 +11,6 @@ export default function ThemeToggle({ className = '' }) {
       className={`theme-toggle-btn ${className}`}
       onClick={toggleTheme}
       aria-label={label}
-      title={title}
     >
       <span className="theme-toggle-icon-wrap" aria-hidden="true">
         {resolvedTheme === 'dark' ? (
@@ -22,12 +20,12 @@ export default function ThemeToggle({ className = '' }) {
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            strokeWidth="2.2"
+            strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
             className="theme-icon-moon"
           >
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor" fillOpacity="0.2"></path>
           </svg>
         ) : (
           <svg
@@ -36,20 +34,20 @@ export default function ThemeToggle({ className = '' }) {
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            strokeWidth="2.2"
+            strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
             className="theme-icon-sun"
           >
-            <circle cx="12" cy="12" r="5"></circle>
-            <line x1="12" y1="1" x2="12" y2="3"></line>
-            <line x1="12" y1="21" x2="12" y2="23"></line>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-            <line x1="1" y1="12" x2="3" y2="12"></line>
-            <line x1="21" y1="12" x2="23" y2="12"></line>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            <circle cx="12" cy="12" r="4.5" fill="currentColor" fillOpacity="0.25"></circle>
+            <path d="M12 2v2"></path>
+            <path d="M12 20v2"></path>
+            <path d="m4.93 4.93 1.41 1.41"></path>
+            <path d="m17.66 17.66 1.41 1.41"></path>
+            <path d="M2 12h2"></path>
+            <path d="M20 12h2"></path>
+            <path d="m6.34 17.66-1.41 1.41"></path>
+            <path d="m19.07 4.93-1.41 1.41"></path>
           </svg>
         )}
       </span>
