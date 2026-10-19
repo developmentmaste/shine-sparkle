@@ -72,19 +72,29 @@ export default function Footer({ onNavigate }) {
         </div>
 
         <div className="footer-bottom">
-          <span>© {new Date().getFullYear()} {settings.brandName}. All rights reserved.</span>
-          <div className="footer-legal-inline">
-            <a href="/terms" onClick={(e) => handleLegalClick(e, '/terms')}>Terms & Conditions</a>
-            <span className="dot">•</span>
-            <a href="/privacy" onClick={(e) => handleLegalClick(e, '/privacy')}>Privacy Policy</a>
-            <span className="dot">•</span>
-            <button
-              type="button"
-              onClick={() => window.dispatchEvent(new CustomEvent('open_cookie_settings'))}
-              className="footer-cookie-btn"
-            >
-              Cookie Preferences
-            </button>
+          <div className="footer-bottom-left">
+            <span>© {new Date().getFullYear()} {settings.brandName}. All rights reserved.</span>
+            <div className="footer-legal-inline">
+              <a href="/terms" onClick={(e) => handleLegalClick(e, '/terms')}>Terms & Conditions</a>
+              <span className="dot">•</span>
+              <a href="/privacy" onClick={(e) => handleLegalClick(e, '/privacy')}>Privacy Policy</a>
+              <span className="dot">•</span>
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new CustomEvent('open_cookie_settings'))}
+                className="footer-cookie-btn"
+              >
+                Cookie Preferences
+              </button>
+            </div>
+          </div>
+
+          <div className="footer-creator">
+            <img
+              src="/creator-logo.png"
+              alt="Creator Logo"
+              className="footer-creator-logo"
+            />
           </div>
         </div>
       </div>
