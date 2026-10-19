@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useConfig } from '../context/ConfigContext.jsx';
 import whatsappIcon from '../assets/whatsapp-svgrepo-com.svg';
 
@@ -6,8 +6,11 @@ export default function ServiceAccordion({ onOpenQuote }) {
   const { services, getWhatsAppUrl } = useConfig();
   const [openId, setOpenId] = useState(null);
   const [current, setCurrent] = useState(0);
-  const [startX, setStartX] = useState(0);
+  const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+
+  const touchStartRef = useRef({ x: 0, y: 0, time: 0 });
+  const directionLockRef = useRef(null); // 'horizontal' | 'vertical' | null
 
   const len = services.length;
 
@@ -36,22 +39,61 @@ export default function ServiceAccordion({ onOpenQuote }) {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [len]);
 
+  // Pointer / Touch gestures for real-time finger dragging
   const handlePointerDown = (e) => {
-    setIsDragging(true);
-    const clientX = e.clientX ?? (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
-    setStartX(clientX);
+    if (e.button !== undefined && e.button !== 0) return;
+    try {
+      e.currentTarget.setPointerCapture?.(e.pointerId);
+    } catch {
+      // ignore
+    }
+    touchStartRef.current = { x: e.clientX, y: e.clientY, time: Date.now() };
+    directionLockRef.current = null;
+    setIsDragging(false);
+    setDragOffset(0);
+  };
+
+  const handlePointerMove = (e) => {
+    if (!touchStartRef.current.time) return;
+    const dx = e.clientX - touchStartRef.current.x;
+    const dy = e.clientY - touchStartRef.current.y;
+
+    if (directionLockRef.current === null) {
+      if (Math.abs(dy) > 7 && Math.abs(dy) > Math.abs(dx)) {
+        directionLockRef.current = 'vertical';
+        return;
+      } else if (Math.abs(dx) > 7 && Math.abs(dx) > Math.abs(dy)) {
+        directionLockRef.current = 'horizontal';
+        setIsDragging(true);
+      }
+    }
+
+    if (directionLockRef.current === 'horizontal') {
+      setDragOffset(dx);
+    }
   };
 
   const handlePointerUp = (e) => {
-    if (!isDragging) return;
-    setIsDragging(false);
-    const clientX = e.clientX ?? (e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientX : 0);
-    const dx = clientX - startX;
-    if (dx > 40) {
-      prev();
-    } else if (dx < -40) {
-      next();
+    try {
+      if (e?.currentTarget?.hasPointerCapture?.(e.pointerId)) {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      }
+    } catch {
+      // ignore
     }
+    if (touchStartRef.current.time && isDragging) {
+      const dt = Date.now() - touchStartRef.current.time;
+      const velocity = Math.abs(dragOffset) / Math.max(dt, 1);
+      if (dragOffset < -50 || (dragOffset < -20 && velocity > 0.35)) {
+        next();
+      } else if (dragOffset > 50 || (dragOffset > 20 && velocity > 0.35)) {
+        prev();
+      }
+    }
+    setIsDragging(false);
+    setDragOffset(0);
+    touchStartRef.current = { x: 0, y: 0, time: 0 };
+    directionLockRef.current = null;
   };
 
   return (
@@ -150,9 +192,9 @@ export default function ServiceAccordion({ onOpenQuote }) {
           <div
             className="service-slider-stage"
             onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
-            onTouchStart={handlePointerDown}
-            onTouchEnd={handlePointerUp}
+            onPointerCancel={handlePointerUp}
           >
             <div className="service-slider-track">
               {services.map((service, i) => {
@@ -161,34 +203,78 @@ export default function ServiceAccordion({ onOpenQuote }) {
                 if (offset < -len / 2) offset += len;
 
                 const abs = Math.abs(offset);
-                const x = offset * 54;
-                const scale = abs === 0 ? 1 : 0.94;
-                const opacity = abs > 1 ? 0 : abs === 0 ? 1 : 0.92;
-                const z = 10 - abs;
-                const bg = abs === 0 ? 'var(--white)' : '#E6F0FA';
-                const border = abs === 0 ? '1px solid rgba(0, 0, 0, 0.08)' : '1px solid rgba(20, 57, 95, 0.16)';
-                const boxShadow = abs === 0 ? '0 16px 40px rgba(20, 57, 95, 0.16)' : '0 8px 24px rgba(20, 57, 95, 0.12)';
+                if (abs > 1) {
+                  return (
+                    <div
+                      key={service.id || i}
+                      className="service-deck-card is-hidden"
+                      style={{ display: 'none' }}
+                      aria-hidden="true"
+                    />
+                  );
+                }
+
+                // Smooth responsive physics calculations
+                const dragProgress = dragOffset / 300;
+                let x = offset * 46;
+                let scale = abs === 0 ? 1 : 0.93;
+                let rotate = 0;
+                let opacity = abs === 0 ? 1 : 0.82;
+                let zIndex = abs === 0 ? 10 : 8;
+
+                if (offset === 0) {
+                  x = dragOffset;
+                  rotate = dragOffset * 0.035;
+                  const pull = Math.min(Math.abs(dragProgress), 0.9);
+                  scale = 1 - pull * 0.06;
+                  opacity = 1 - pull * 0.12;
+                  zIndex = 10;
+                } else if (offset === 1) {
+                  if (dragOffset < 0) {
+                    const factor = Math.min(Math.abs(dragProgress), 1);
+                    x = 46 * (1 - factor);
+                    scale = 0.93 + 0.07 * factor;
+                    opacity = 0.82 + 0.18 * factor;
+                    zIndex = factor > 0.6 ? 10 : 9;
+                  } else {
+                    x = 46 + dragOffset * 0.15;
+                    opacity = Math.max(0, 0.82 - dragProgress * 0.6);
+                  }
+                } else if (offset === -1) {
+                  if (dragOffset > 0) {
+                    const factor = Math.min(dragProgress, 1);
+                    x = -46 * (1 - factor);
+                    scale = 0.93 + 0.07 * factor;
+                    opacity = 0.82 + 0.18 * factor;
+                    zIndex = factor > 0.6 ? 10 : 9;
+                  } else {
+                    x = -46 + dragOffset * 0.15;
+                    opacity = Math.max(0, 0.82 - Math.abs(dragProgress) * 0.6);
+                  }
+                }
+
+                const isActive = abs === 0;
 
                 return (
                   <div
                     key={service.id || i}
-                    className="service-deck-card"
+                    className={`service-deck-card ${isActive ? 'card-active' : 'card-side'}`}
                     style={{
-                      transform: `translate(-50%, -50%) translateX(${x}px) scale(${scale})`,
-                      zIndex: z,
-                      opacity: opacity,
-                      background: bg,
-                      border: border,
-                      boxShadow: boxShadow,
-                      pointerEvents: 'auto',
-                      cursor: abs === 0 ? 'grab' : 'pointer',
-                      display: abs > 1 ? 'none' : 'flex',
+                      transform: `translate(-50%, -50%) translateX(${x}px) rotate(${rotate}deg) scale(${scale})`,
+                      zIndex,
+                      opacity,
+                      transition: isDragging
+                        ? 'none'
+                        : 'transform 0.38s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease, background 0.3s ease, border-color 0.3s ease',
+                      cursor: isDragging ? 'grabbing' : isActive ? 'grab' : 'pointer',
                     }}
                     onClick={() => {
-                      if (i !== current) setCurrent(i);
+                      if (isDragging || Math.abs(dragOffset) > 8) return;
+                      if (offset === 1) next();
+                      else if (offset === -1) prev();
                     }}
                   >
-                    <div style={{ opacity: abs === 0 ? 1 : 0.55, transition: 'opacity 0.3s ease' }}>
+                    <div style={{ opacity: isActive ? 1 : 0.55, transition: 'opacity 0.3s ease' }}>
                       <div
                         style={{
                           display: 'flex',
@@ -256,12 +342,13 @@ export default function ServiceAccordion({ onOpenQuote }) {
                         borderRadius: '100px',
                         marginTop: 'auto',
                         flexShrink: 0,
-                        opacity: abs === 0 ? 1 : 0,
-                        pointerEvents: abs === 0 ? 'auto' : 'none',
+                        opacity: isActive ? 1 : 0,
+                        pointerEvents: isActive ? 'auto' : 'none',
                         transition: 'opacity 0.25s ease',
                       }}
                       onClick={(e) => {
                         e.stopPropagation();
+                        if (isDragging || Math.abs(dragOffset) > 6) return;
                         if (onOpenQuote) onOpenQuote(service.id);
                       }}
                     >
@@ -276,6 +363,19 @@ export default function ServiceAccordion({ onOpenQuote }) {
                 );
               })}
             </div>
+          </div>
+
+          {/* Indicator pagination dots */}
+          <div className="service-slider-dots" aria-label="Slider pagination">
+            {services.map((s, idx) => (
+              <button
+                key={s.id || idx}
+                type="button"
+                className={`service-slider-dot ${idx === current ? 'active' : ''}`}
+                onClick={() => setCurrent(idx)}
+                aria-label={`Go to ${s.name}`}
+              />
+            ))}
           </div>
         </div>
       </div>

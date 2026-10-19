@@ -171,17 +171,6 @@ export default function Nav({ onOpenQuote }) {
           >
             <span>Chat on WhatsApp</span>
           </a>
-
-          <div
-            style={{
-              fontSize: '0.84rem',
-              color: 'var(--ink-soft)',
-              textAlign: 'center',
-              marginTop: '4px',
-            }}
-          >
-            WhatsApp: <b>{settings.whatsappDisplay}</b>
-          </div>
         </div>
       </div>
     </header>

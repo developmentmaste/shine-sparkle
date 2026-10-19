@@ -43,7 +43,7 @@ export default function Footer({ onNavigate }) {
               <div className="footer-info-label">Contact:</div>
               <div className="footer-info-val">
                 <a href={getWhatsAppUrl()} target="_blank" rel="noopener noreferrer">
-                  {settings.whatsappDisplay}
+                  WhatsApp Chat
                 </a>
               </div>
             </div>

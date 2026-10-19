@@ -381,7 +381,7 @@ function PrivacyContent({ settings, getWhatsAppUrl }) {
         <div className="legal-contact-card">
           <p><strong>Entity:</strong> {settings.brandName}</p>
           <p><strong>Primary Contact Email:</strong> <a href={`mailto:${settings.email}`}>{settings.email}</a></p>
-          <p><strong>WhatsApp Support:</strong> <a href={getWhatsAppUrl()} target="_blank" rel="noopener noreferrer">{settings.whatsappDisplay}</a></p>
+          <p><strong>WhatsApp Support:</strong> <a href={getWhatsAppUrl()} target="_blank" rel="noopener noreferrer">Official WhatsApp Channel</a></p>
           <p><strong>Service Territory:</strong> {settings.cities || 'Dublin & surrounding areas, Ireland'}</p>
         </div>
       </section>
@@ -498,7 +498,7 @@ function PrivacyContent({ settings, getWhatsAppUrl }) {
         </p>
         <p>
           Email: <a href={`mailto:${settings.email}`}>{settings.email}</a><br />
-          WhatsApp: <a href={getWhatsAppUrl()} target="_blank" rel="noopener noreferrer">{settings.whatsappDisplay}</a>
+          WhatsApp: <a href={getWhatsAppUrl()} target="_blank" rel="noopener noreferrer">Official WhatsApp Channel</a>
         </p>
         <p>
           You also have the right to lodge a complaint with the <strong>Data Protection Commission (DPC)</strong> of Ireland (dataprotection.ie) if you believe your data has been handled unlawfully.
