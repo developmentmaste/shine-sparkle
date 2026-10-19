@@ -1927,21 +1927,19 @@ header.site-header .nav {
 /* Legal Hero Section with Morphing Blobs */
 .legal-hero {
   position: relative;
-  overflow: hidden;
-  border-bottom: 1px solid var(--border);
+  overflow: visible;
+  border-bottom: none;
   padding: 56px 20px 40px;
   text-align: center;
-  transition: background 0.85s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.85s ease;
+  transition: background 0.85s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .legal-hero.legal-theme-terms {
-  background: radial-gradient(circle at 50% 0%, #FFFDF5 0%, #FFFBEB 50%, #FEF3C7 100%);
-  border-bottom-color: rgba(245, 158, 11, 0.25);
+  background: linear-gradient(180deg, #FFFBEB 0%, #FEF7E0 60%, #F9FBFC 100%);
 }
 
 .legal-hero.legal-theme-privacy {
-  background: radial-gradient(circle at 50% 0%, #F9FDFB 0%, #ECFDF5 50%, #D1FAE5 100%);
-  border-bottom-color: rgba(16, 185, 129, 0.25);
+  background: linear-gradient(180deg, #ECFDF5 0%, #EBFBF3 60%, #F9FBFC 100%);
 }
 
 .legal-hero-inner {
@@ -1997,36 +1995,36 @@ header.site-header .nav {
   animation: dvdBounce3 22s linear infinite;
 }
 
-/* --- Terms & Conditions Golden Blobs --- */
+/* --- Terms & Conditions Golden Blobs (3 distinct warm shades: Bright Lemon-Gold, Copper-Orange Gold, Honey-Amber) --- */
 .blob-gold-1 {
-  background: radial-gradient(circle at 40% 40%, #FDE68A 0%, #F59E0B 55%, #B45309 100%);
+  background: radial-gradient(circle at 40% 40%, #FEF08A 0%, #EAB308 58%, #CA8A04 100%);
   opacity: 0.65;
 }
 
 .blob-gold-2 {
-  background: radial-gradient(circle at 40% 40%, #FEF08A 0%, #D97706 58%, #92400E 100%);
-  opacity: 0.62;
+  background: radial-gradient(circle at 40% 40%, #FDBA74 0%, #EA580C 60%, #9A3412 100%);
+  opacity: 0.60;
 }
 
 .blob-gold-3 {
-  background: radial-gradient(circle at 40% 40%, #FCD34D 0%, #B45309 65%, #78350F 100%);
-  opacity: 0.58;
+  background: radial-gradient(circle at 40% 40%, #FCD34D 0%, #D97706 62%, #92400E 100%);
+  opacity: 0.62;
 }
 
-/* --- Privacy Policy Emerald Green Blobs --- */
+/* --- Privacy Policy Emerald Green Blobs (3 distinct green shades: Spring Lime-Green, Sea-Teal Green, Deep Emerald) --- */
 .blob-green-1 {
-  background: radial-gradient(circle at 40% 40%, #6EE7B7 0%, #10B981 55%, #047857 100%);
+  background: radial-gradient(circle at 40% 40%, #BEF264 0%, #22C55E 58%, #15803D 100%);
   opacity: 0.62;
 }
 
 .blob-green-2 {
-  background: radial-gradient(circle at 40% 40%, #A7F3D0 0%, #059669 60%, #064E3B 100%);
-  opacity: 0.58;
+  background: radial-gradient(circle at 40% 40%, #5EEAD4 0%, #0D9488 60%, #115E59 100%);
+  opacity: 0.60;
 }
 
 .blob-green-3 {
-  background: radial-gradient(circle at 40% 40%, #34D399 0%, #047857 65%, #022C22 100%);
-  opacity: 0.55;
+  background: radial-gradient(circle at 40% 40%, #6EE7B7 0%, #10B981 62%, #065F46 100%);
+  opacity: 0.58;
 }
 
 .legal-hero-text {
@@ -2152,6 +2150,8 @@ header.site-header .nav {
 .legal-content-wrap {
   padding: 40px 0 60px;
   flex: 1;
+  position: relative;
+  z-index: 2;
 }
 
 .legal-card {
@@ -2964,19 +2964,11 @@ html[data-theme="dark"] .legal-btn-primary:hover {
   box-shadow: 0 6px 22px rgba(56, 189, 248, 0.45);
 }
 
-html[data-theme="dark"] .legal-hero {
-  background: #11151E;
-  border-bottom-color: #2C3546;
-}
-
-html[data-theme="dark"] .legal-hero.legal-theme-terms {
-  background: radial-gradient(circle at 50% 0%, #1A1813 0%, #171510 50%, #11151E 100%);
-  border-bottom-color: rgba(245, 158, 11, 0.2);
-}
-
+html[data-theme="dark"] .legal-hero,
+html[data-theme="dark"] .legal-hero.legal-theme-terms,
 html[data-theme="dark"] .legal-hero.legal-theme-privacy {
-  background: radial-gradient(circle at 50% 0%, #111C18 0%, #111815 50%, #11151E 100%);
-  border-bottom-color: rgba(16, 185, 129, 0.2);
+  background: transparent;
+  border-bottom: none;
 }
 
 html[data-theme="dark"] .legal-tabs-bar {
