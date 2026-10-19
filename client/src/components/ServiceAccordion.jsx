@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useConfig } from '../context/ConfigContext.jsx';
+import { resolveServiceIcon } from '../services.js';
 import whatsappIcon from '../assets/whatsapp-svgrepo-com.svg';
 
 export default function ServiceAccordion({ onOpenQuote }) {
@@ -107,8 +108,9 @@ export default function ServiceAccordion({ onOpenQuote }) {
 
         {/* DESKTOP VIEW: Classic Expandable Accordion */}
         <div className="service-list service-view-accordion">
-          {services.map((service) => {
+          {services.map((service, idx) => {
             const isOpen = openId === service.id;
+            const iconSrc = resolveServiceIcon(service, idx);
             return (
               <div className={`service-card${isOpen ? ' open' : ''}`} key={service.id}>
                 <button
@@ -117,15 +119,11 @@ export default function ServiceAccordion({ onOpenQuote }) {
                   onClick={() => setOpenId(isOpen ? null : service.id)}
                 >
                   <div className="service-icon" style={{ background: service.iconBg || '#E3EFFB' }}>
-                    {service.icon ? (
-                      <img
-                        src={service.icon}
-                        alt={service.name}
-                        style={{ width: '24px', height: '24px', objectFit: 'contain' }}
-                      />
-                    ) : (
-                      service.name.charAt(0)
-                    )}
+                    <img
+                      src={iconSrc}
+                      alt={service.name}
+                      style={{ width: '28px', height: '28px', objectFit: 'contain' }}
+                    />
                   </div>
                   <div className="info">
                     <h3>{service.name}</h3>
@@ -294,15 +292,11 @@ export default function ServiceAccordion({ onOpenQuote }) {
                             flexShrink: 0,
                           }}
                         >
-                          {service.icon ? (
-                            <img
-                              src={service.icon}
-                              alt={service.name}
-                              style={{ width: '24px', height: '24px', objectFit: 'contain' }}
-                            />
-                          ) : (
-                            service.name.charAt(0)
-                          )}
+                          <img
+                            src={resolveServiceIcon(service, i)}
+                            alt={service.name}
+                            style={{ width: '28px', height: '28px', objectFit: 'contain' }}
+                          />
                         </div>
                         <div>
                           <h3 style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0, color: 'var(--ink)' }}>

@@ -1,7 +1,44 @@
-import mopIcon from './assets/cleaning-mop-svgrepo-com.svg';
-import serviceIcon from './assets/cleaning-service-svgrepo-com.svg';
-import outIcon from './assets/out-svgrepo-com.svg';
-import renovationIcon from './assets/refresh-home-svgrepo-com.svg';
+import houseIcon from './assets/service-house.svg';
+import deepIcon from './assets/service-deep.svg';
+import tenancyIcon from './assets/service-tenancy.svg';
+import constructionIcon from './assets/service-construction.svg';
+import windowIcon from './assets/service-window.svg';
+import officeIcon from './assets/service-office.svg';
+
+export const SERVICE_ICONS = {
+  house_apartment: houseIcon,
+  deep_cleaning: deepIcon,
+  end_of_tenancy: tenancyIcon,
+  post_construction: constructionIcon,
+  window_cleaning: windowIcon,
+  office_commercial: officeIcon,
+};
+
+const ICON_FALLBACK_ORDER = [
+  houseIcon,
+  deepIcon,
+  tenancyIcon,
+  constructionIcon,
+  windowIcon,
+  officeIcon,
+];
+
+export function resolveServiceIcon(service, index = 0) {
+  if (service?.id && SERVICE_ICONS[service.id]) {
+    return SERVICE_ICONS[service.id];
+  }
+  const name = (service?.name || '').toLowerCase();
+  if (name.includes('house') || name.includes('apartment')) return houseIcon;
+  if (name.includes('deep')) return deepIcon;
+  if (name.includes('tenancy') || name.includes('move')) return tenancyIcon;
+  if (name.includes('construction') || name.includes('renovation') || name.includes('build')) return constructionIcon;
+  if (name.includes('window')) return windowIcon;
+  if (name.includes('office') || name.includes('commercial')) return officeIcon;
+  if (service?.icon && !String(service.icon).includes('svgrepo')) {
+    return service.icon;
+  }
+  return ICON_FALLBACK_ORDER[index % ICON_FALLBACK_ORDER.length];
+}
 
 export const SERVICES = [
   {
@@ -12,7 +49,7 @@ export const SERVICES = [
     priceDisplay: '€30 / hr (min. 3 hrs · €90)',
     cadence: 'Regular or one-off',
     iconBg: '#E3EFFB',
-    icon: mopIcon,
+    icon: houseIcon,
     description:
       'Standard residential upkeep and maintenance cleaning tailored to client priorities. Operatives follow an agreed task list for booked hours. Cleaning products and equipment included. All prices include Irish VAT.',
     included: [
@@ -39,7 +76,7 @@ export const SERVICES = [
     priceDisplay: 'From €295 (Fixed by property size)',
     cadence: 'One-off or seasonal',
     iconBg: '#EAF3FB',
-    icon: serviceIcon,
+    icon: deepIcon,
     description:
       'Intensive restorative clean targeting built-up grime, limescale, and neglected areas across the entire home. Fixed tiered rates: 1 Bed: €295 | 2 Bed: €325 | 3 Bed: €355 | 4+ Bed: €385. Covering Dublin, Co. Meath, and Co. Louth. VAT included.',
     included: [
@@ -66,7 +103,7 @@ export const SERVICES = [
     priceDisplay: '€30 / hr (min. 3 hrs · €90)',
     cadence: 'Move-in / move-out',
     iconBg: '#D6E8F8',
-    icon: outIcon,
+    icon: tenancyIcon,
     description:
       'Turnover cleaning for houses and apartments after tenant vacating. Tailored to landlord inspection and deposit return checklists according to property condition. All prices include Irish VAT.',
     included: [
@@ -94,7 +131,7 @@ export const SERVICES = [
     priceDisplay: '€350 Package (Base 5-room spec)',
     cadence: 'Post-renovation',
     iconBg: '#DCEEFA',
-    icon: renovationIcon,
+    icon: constructionIcon,
     description:
       'Specialised fine-dust removal and intensive clean following renovation work. Base €350 package covers: 1 Bedroom, 1 Living Room, 1 Kitchen, 1 Bathroom, 1 Hallway, plus up to 4 interior window panes. Additional rooms and glazing quoted on request. VAT included.',
     included: [
@@ -122,7 +159,7 @@ export const SERVICES = [
     priceDisplay: '€99 Package (up to 20 windows)',
     cadence: 'One-off or regular',
     iconBg: '#E3EFFB',
-    icon: mopIcon,
+    icon: windowIcon,
     description:
       'Professional internal glazing and frame cleaning for up to 20 standard window units. Smear-free finish using commercial tools. Removal of dust, finger marks, and water spots. VAT included.',
     included: [
@@ -148,7 +185,7 @@ export const SERVICES = [
     priceDisplay: '€35 / hr (min. 3 hrs · €105)',
     cadence: 'Flexible / Contract-free',
     iconBg: '#EAF3FB',
-    icon: serviceIcon,
+    icon: officeIcon,
     description:
       'Commercial cleaning for offices, schools, medical spaces, and childcare facilities. Available for regular visits, one-off deep cleans, or temporary staff cover. No long-term lock-in contract. €35/hr includes Irish VAT (min. 3 hours / €105).',
     included: [

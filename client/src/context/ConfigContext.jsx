@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { SERVICES as INITIAL_SERVICES, MIN_CHARGE } from '../services.js';
+import { SERVICES as INITIAL_SERVICES, MIN_CHARGE, resolveServiceIcon } from '../services.js';
 import {
   WHATSAPP_PHONE as INITIAL_PHONE,
   WHATSAPP_DISPLAY as INITIAL_DISPLAY,
@@ -16,7 +16,13 @@ export const DEFAULT_SETTINGS = {
 };
 
 const STORAGE_KEY_SETTINGS = 'shine_sparkle_settings_v3';
-const STORAGE_KEY_SERVICES = 'shine_sparkle_services_v2';
+const STORAGE_KEY_SERVICES = 'shine_sparkle_services_v3';
+
+const hydrateServiceIcons = (list) =>
+  list.map((s, idx) => ({
+    ...s,
+    icon: resolveServiceIcon(s, idx),
+  }));
 
 const ConfigContext = createContext(null);
 
@@ -47,7 +53,9 @@ export function ConfigProvider({ children }) {
       if (saved) {
         const parsed = JSON.parse(saved);
         const hasLegacy = Array.isArray(parsed) && parsed.some((s) => s.id === 'renovation' || s.id === 'moveout');
-        if (Array.isArray(parsed) && parsed.length > 0 && !hasLegacy) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0 && !hasLegacy) {
+          return hydrateServiceIcons(parsed);
+        }
       }
     } catch {
       // fallback
@@ -86,7 +94,7 @@ export function ConfigProvider({ children }) {
           if (data && Array.isArray(data.services) && data.services.length > 0) {
             const hasLegacy = data.services.some((s) => s.id === 'renovation' || s.id === 'moveout');
             if (!hasLegacy) {
-              setServices(data.services);
+              setServices(hydrateServiceIcons(data.services));
             }
           }
         }
