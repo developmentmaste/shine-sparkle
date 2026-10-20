@@ -840,9 +840,25 @@ header.site-header .nav {
 }
 
 .footer-creator {
+  position: relative;
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  padding-right: 16px;
+}
+
+.footer-creator-btn {
+  position: relative;
+  z-index: 3;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .footer-creator-logo {
@@ -851,13 +867,121 @@ header.site-header .nav {
   object-fit: contain;
   display: block;
   filter: brightness(0) invert(1);
-  opacity: 0.82;
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  opacity: 0.85;
+  transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
 }
 
-.footer-creator-logo:hover {
+.footer-creator-btn:hover .footer-creator-logo {
   opacity: 1;
   transform: scale(1.06);
+}
+
+.footer-creator-btn:active .footer-creator-logo {
+  transform: scale(0.93);
+}
+
+.footer-creator.is-blooming .footer-creator-logo {
+  opacity: 1;
+  filter: brightness(0) invert(1) drop-shadow(0 0 8px rgba(255, 255, 255, 0.28));
+}
+
+/* Interactive White 4-Leaf Clover Meadow */
+.clover-meadow {
+  position: absolute;
+  bottom: 2px;
+  right: 16px;
+  width: 190px;
+  height: 54px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.clover-meadow-ground {
+  position: absolute;
+  bottom: 0;
+  right: -18px;
+  width: 175px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.38) 65%, rgba(255, 255, 255, 0.5) 85%, rgba(255, 255, 255, 0) 100%);
+  transform: scaleX(0);
+  transform-origin: 85% 50%;
+  opacity: 0;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+}
+
+.footer-creator.is-blooming .clover-meadow-ground {
+  transform: scaleX(1);
+  opacity: 1;
+}
+
+.clover-sprout {
+  position: absolute;
+  display: inline-flex;
+  transform-origin: 50% 100%;
+  transform: translateY(8px) scale(0) rotate(0deg);
+  opacity: 0;
+  transition:
+    transform 0.48s cubic-bezier(0.34, 1.56, 0.64, 1) var(--clover-delay, 0ms),
+    opacity 0.28s ease var(--clover-delay, 0ms);
+}
+
+.footer-creator.is-blooming .clover-sprout {
+  transform: translateY(0) scale(1) rotate(var(--clover-tilt, 0deg));
+  opacity: var(--clover-opacity, 0.9);
+}
+
+.clover-sway-inner {
+  display: inline-flex;
+  transform-origin: 50% 100%;
+}
+
+.footer-creator.is-blooming .clover-sway-inner {
+  animation: cloverMeadowSway var(--clover-sway, 3s) ease-in-out infinite alternate;
+}
+
+@keyframes cloverMeadowSway {
+  0% {
+    transform: rotate(-5deg);
+  }
+  100% {
+    transform: rotate(6deg);
+  }
+}
+
+.clover-spore {
+  position: absolute;
+  border-radius: 50%;
+  background: #FFFFFF;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.85);
+  opacity: 0;
+  transform: translateY(6px) scale(0);
+  transition:
+    transform 0.5s ease var(--spore-delay, 0ms),
+    opacity 0.4s ease var(--spore-delay, 0ms);
+}
+
+.footer-creator.is-blooming .clover-spore {
+  opacity: 0.72;
+  animation: cloverSporeFloat 2.8s ease-in-out infinite alternate;
+  animation-delay: var(--spore-delay, 0ms);
+}
+
+@keyframes cloverSporeFloat {
+  0% {
+    transform: translateY(2px) scale(0.85);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-6px) scale(1.15);
+    opacity: 0.85;
+  }
+}
+
+@media (max-width: 640px) {
+  .clover-meadow {
+    transform: scale(0.78);
+    transform-origin: 100% 100%;
+  }
 }
 
 @media (max-width: 900px) {
