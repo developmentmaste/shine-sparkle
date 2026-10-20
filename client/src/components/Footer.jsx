@@ -251,8 +251,7 @@ export default function Footer({ onNavigate }) {
               type="button"
               className="footer-creator-btn"
               onClick={() => setMeadowOpen((prev) => !prev)}
-              aria-label="Toggle clover meadow"
-              title="Click to bloom clover meadow"
+              aria-label="Creator logo"
             >
               <img
                 src="/creator-logo.png"
